@@ -1,0 +1,13 @@
+{
+  "index_name": "wuchuheng",
+  "start_urls": ["https://wuchuheng.com"],
+  "selectors": {
+    "lvl0": "h1",
+    "lvl1": "h1",
+    "lvl2": "h3",
+    "lvl3": "h4",
+    "lvl4": "h5",
+    "lvl5": "h6",
+    "text": "body p, div, nav"
+  }
+}
