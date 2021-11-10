@@ -43,24 +43,24 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
-        title: 'My Site',
+        title: '楚衡.笔记',
         logo: {
-          alt: 'My Site Logo',
-          src: 'img/logo.svg',
+          alt: '楚衡.笔记',
+          src: 'img/favicon-96x96.png',
         },
         items: [
           {
             type: 'doc',
             docId: 'intro',
-            position: 'left',
-            label: 'Tutorial',
-          },
-          {to: '/blog', label: 'Blog', position: 'left'},
-          {
-            href: 'https://github.com/facebook/docusaurus',
-            label: 'GitHub',
             position: 'right',
+            label: '笔记',
           },
+          {to: '/blog', label: '文章', position: 'right'},
+          // {
+          //   href: 'https://github.com/facebook/docusaurus',
+          //   label: 'GitHub',
+          //   position: 'right',
+          // },
         ],
       },
       // footer: {
