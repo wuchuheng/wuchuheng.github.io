@@ -24,14 +24,13 @@ const config = {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
-          editUrl: 'https://github.com/facebook/docusaurus/edit/main/website/',
+          editUrl: 'https://github.com/wuchuheng/wuchuheng.github.io/edit/main/website/',
           remarkPlugins: [require('mdx-mermaid')]
         },
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
-          editUrl:
-            'https://github.com/facebook/docusaurus/edit/main/website/blog/',
+          editUrl: 'https://github.com/wuchuheng/wuchuheng.github.io/edit/main/website/blog/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -58,11 +57,11 @@ const config = {
           },
           {to: '/blog', label: 'Blog', position: 'right'},
           {to: '/tools', label: 'Tools', position: 'right'},
-          // {
-          //   href: 'https://github.com/facebook/docusaurus',
-          //   label: 'GitHub',
-          //   position: 'right',
-          // },
+          {
+            href: 'https://github.com/wuchuheng/wuchuheng.github.io',
+            label: 'GitHub',
+            position: 'right',
+          },
         ],
       },
       // footer: {

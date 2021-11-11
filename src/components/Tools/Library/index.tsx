@@ -1,5 +1,4 @@
 import React from "react";
-import {Tag} from "antd";
 import styles from "../styles.module.scss";
 
 declare interface LibraryProps extends ImgRenderProps, ARenderProps, TagsRenderProps, StarRenderProps{ }
@@ -59,7 +58,7 @@ const StarRender = ({rep, desc}: StarRenderProps): React.ReactElement => {
     )
 }
 
-const TagsRender = ({tags}: TagsRenderProps): React.ReactElement => {
+export const TagsRender = ({tags}: TagsRenderProps): React.ReactElement => {
     if (!tags) return (<></>)
     const classNames = [
         styles.grid,
@@ -70,11 +69,21 @@ const TagsRender = ({tags}: TagsRenderProps): React.ReactElement => {
         ...(tags.length === 4 ? [styles.gridColumn4] : []),
         ...(tags.length >= 5 ? [styles.gridColumn5] : []),
     ]
-    const colors: Array<string> =  ["magenta", "red", "volcano", "orange", "gold", "lime", "green", "cyan", "blue", "geekblue", "purple"];
+    const colors: Array<{color: string; background: string}> =  [
+        {color: '#D96868', background:'#FAEEEE'},
+        {color: '#DFB573', background:'#FBF4E9'},
+        {color: '#BABBBF', background:'#F2F2F3'},
+        {color: '#8EC358', background:'#F0F8E8'},
+        {color: '#5C97FC', background:'#ECF3FF'},
+    ];
     return (
         <div className={classNames.join(" ")}>
             {tags.map((tag, index) => {
-                return <Tag color={colors[index % colors.length]} key={index}>{tag}</Tag>
+                const {color, background} = colors[index % colors.length]
+                return <span
+                    style={{color, background}}
+                    className={styles.tag}
+                    key={index}>{tag}</span>
             })}
         </div>
     )
