@@ -21,6 +21,7 @@
     "@svgr/webpack": "^5.5.0",
     "antd": "^4.16.13",
     "clsx": "^1.1.1",
+    "disqus-react": "^1.1.2",
     "docusaurus-plugin-sass": "^0.2.1",
     "file-loader": "^6.2.0",
     "mdx-mermaid": "^1.1.1",
