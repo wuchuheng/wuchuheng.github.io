@@ -24,13 +24,14 @@ const config = {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
-          editUrl: 'https://github.com/wuchuheng/wuchuheng.github.io/edit/main/website/',
+          editUrl: 'https://github.com/wuchuheng/wuchuheng.github.io/edit/master/',
+
           remarkPlugins: [require('mdx-mermaid')]
         },
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
-          editUrl: 'https://github.com/wuchuheng/wuchuheng.github.io/edit/main/website/blog/',
+          editUrl: 'https://github.com/wuchuheng/wuchuheng.github.io/edit/master/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
