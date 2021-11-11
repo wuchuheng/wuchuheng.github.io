@@ -1,0 +1,44 @@
+---
+title: 初识Docker
+tags:
+- Docker
+categories:
+- Docker
+date: 2018-08-22 19:30:14
+---
+
+# MDX and React
+
+```mdx-code-block
+import Img from '@site/src/components/Img';
+```
+
+## 1 什么是docker?
+&emsp;`Docker`是一种将应用和相关联依赖集装打包到容器中隔离运行的技术。`Docker`的出现带来了许多改变，比如：
+
+## 2 DevOps解决方案
+&emsp;`Docker`是应用开发、打包和布署的标准化环境解决方案。由于开发到生产环境是一致，可以实现自动化部署省去大量重复运维成本。从开发、测试、打包到部署上线自动化流水线模式。使用拥抱变化的开发人员和坚守稳定的运维人员找到彼此共同的语言。
+
+## 3 高性能虚拟化
+&emsp;相对常见的单机虚拟化，这种硬件级虚拟化。那么`Docker`可以看作是基于内核级虚拟化，同一系统所有容器共享同一内核。在运行同样多的应用，并要求隔离的前提下。多系统虚拟化要为每一个应用虚拟一个系统出来，而`Docker`则共用一个来说。`Docker`会高性能得多。
+
+<Img src="/images/20181314docker-container.png" alt="高性能docker"/>
+
+&emsp;`Docker`是一个应用容器引擎，容器间沙箱隔离运行。将开发的应用、环境、配置、依赖等等放入可移植容器中开发和运行，并打包迁机快速布署。是一个devOps工具，由于开发交付快速过渡到布署上线的解决方案。方便快捷是Docker最大的优势。
+## 4 快速迁移布署
+&emsp;在编排配置文件和镜像配置文件写好项目的所需要的依赖环境后，快速把项目迁移到主机上，并自动化构建项目原来的环境并让项目跑起来。
+
+## 5 透明化管理
+&emsp;镜像透明化：镜像可以通过`Dockerfile`配置文件构建，任何的修改增加都是透明化。容器编排透明化，容器的启动顺序、网络IO、文件挂载等等都可通过配置后交给容器编排工具自动化处理。
+
+## 6 开发持续集成，项目持续交付
+&emsp;多人开发完项目新功能后台集成起来，测试通过后，提交代码并`webhook`给线上，让它自动构建并运行项目容器，快速自动迭代项目。
+
+## 3 镜像加速
+&emsp;`Docker`中国镜像加速。修改`/etc/docker/deamo.json`,并将镜像地址定到`registry-mirrors`键值;
+``` bash
+{
+  "registry-mirrors": ["https://registry.docker-cn.com"]
+}
+```
+并重启`dokcer`, [docker官方中文文档](https://www.docker-cn.com/registry-mirror)

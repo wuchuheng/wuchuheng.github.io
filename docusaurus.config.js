@@ -6,15 +6,15 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'My Site',
-  tagline: 'Dinosaurs are cool',
-  url: 'https://your-docusaurus-test-site.com',
+  title: 'wuchuheng\'s notes',
+  tagline: '来找我吧，我的目标是星辰大海',
+  url: 'https://wuchuheng.com',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
-  organizationName: 'facebook', // Usually your GitHub org/user name.
-  projectName: 'docusaurus', // Usually your repo name.
+  organizationName: 'wuchuheng', // Usually your GitHub org/user name.
+  projectName: 'wuchuheng.github.io', // Usually your repo name.
 
   presets: [
     [
@@ -25,6 +25,7 @@ const config = {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           editUrl: 'https://github.com/facebook/docusaurus/edit/main/website/',
+          remarkPlugins: [require('mdx-mermaid')]
         },
         blog: {
           showReadingTime: true,
@@ -43,9 +44,9 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
-        title: '楚衡.笔记',
+        title: 'wuchuheng\'s notes',
         logo: {
-          alt: '楚衡.笔记',
+          alt: 'wuchuheng\'s notes',
           src: 'img/favicon-96x96.png',
         },
         items: [
@@ -53,9 +54,10 @@ const config = {
             type: 'doc',
             docId: 'intro',
             position: 'right',
-            label: '笔记',
+            label: 'Docs',
           },
-          {to: '/blog', label: '文章', position: 'right'},
+          {to: '/blog', label: 'Blog', position: 'right'},
+          {to: '/tools', label: 'Tools', position: 'right'},
           // {
           //   href: 'https://github.com/facebook/docusaurus',
           //   label: 'GitHub',
@@ -111,6 +113,7 @@ const config = {
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
+        additionalLanguages: ['php', 'nginx', 'java', 'vim', 'dart'],
       },
       algolia: {
         appId: 'IEGAUEEF24',
@@ -118,6 +121,8 @@ const config = {
         indexName: 'wuchuheng',
       },
     }),
+
+  plugins: ['docusaurus-plugin-sass']
 };
 
 module.exports = config;

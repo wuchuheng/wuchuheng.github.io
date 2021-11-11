@@ -1,0 +1,21 @@
+.grid {
+  display: grid;
+  justify-items: center;
+  grid-gap: .5rem;
+  grid-template-rows: 1.5rem;
+}
+.gridColumn1 {
+  grid-template-columns: repeat(1, 1fr);
+}
+.gridColumn2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+.gridColumn3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.gridColumn4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+.gridColumn5 {
+  grid-template-columns: repeat(5, 1fr);
+}

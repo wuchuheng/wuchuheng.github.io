@@ -1,0 +1,271 @@
+---
+title: 03.扁平数据结构转Tree
+date: 2020-05-29
+tags:
+- Tree
+- JS
+- Golang
+- PHP
+categories:
+-  Algorithm
+---
+
+```mdx-code-block
+import CodesanboxRender from '@site/src/components/CodesanboxRender';
+```
+
+##  1 用`js`方式实现
+```javascript
+const pidMapNode = {};
+const nodes = [
+  { pid: 0, id: 1, content: "0-1" },
+  { pid: 1, id: 2, content: "0-1-2" },
+  { pid: 2, id: 3, content: "0-1-2-3" },
+  { pid: 0, id: 4, content: "0-4" },
+  { pid: 4, id: 5, content: "0-4-5" }
+];
+const tree = [];
+nodes.forEach((item) => {
+  pidMapNode[item.id] = item;
+  if (item.pid === 0) {
+    tree.push(pidMapNode[item.id]);
+  } else {
+    pidMapNode[item.pid]["children"] = pidMapNode[item.id];
+  }
+});
+```
+
+最终得到如果一个树状的对象。
+
+<CodesanboxRender url="https://codesandbox.io/embed/notebook-script-demo-c82g1?hidenavigation=1&amp;autoresize=1&amp;fontsize=14&amp;module=%2Fsrc%2Fapp.controller.ts" />
+
+:::tip
+这种转化数据结构的实现是利用`js`原型链的引用来实现的，在`js`中把自己贬值给另一个变量，在内存中并不是复制过去，而是引用过去。所以在遍历一维这种扁平
+的一维数组时，每次遍历就把遍历项引用到映射表中，然后再由映射表对象引用到要收集的变量中。 整个过程看起来是赋值，实际是引用。如当遍历到根素(pid = 0)
+则注册到映射对象表中，再由映射对象表把这个项引用给最终要收集的变量中， 而如果不是根节点(pid != 0),也是注册到映射表中， 由于当前节点的父节点（根节点）
+由于映射对象引用到`tree`变量中，所以把当前子节点，直接赋值给映射对象表中之前父节点注册的变量，由于引用的关系，也就相当于赋值到`tree`变量中。基于这样的机制，
+完成了数据结构的转化
+:::
+
+
+
+##  2 用`PHP`方式实现
+``` php
+function _arrToTree($items, $pid = 'parentId')
+{
+    $map  = [];
+    $tree = [];
+    foreach ($items as &$it){
+        $el = &$it;
+        $map[$it['id']] = &$it;
+    }  //数据的ID名生成新的引用索引树
+    foreach ($items as &$it){
+        $parent = &$map[$it[$pid]];
+        if($parent) {
+            $parent['children'][] = &$it;
+        }else{
+            $tree[] = &$it;
+        }
+    }
+    return $tree;
+}
+// 例子
+$arr = [
+['id' => 1, 'name' => 'A1', 'parentId' => 0],
+    ['id' => 2, 'name' => 'A1-B1', 'parentId' => 1],
+    ['id' => 3, 'name' => 'A1-B2', 'parentId' => 1],
+    ['id' => 4, 'name' => 'A1-B2-C1', 'parentId' => 3],
+    ['id' => 5, 'name' => 'B1', 'parentId' => 0],
+    // ...
+];
+var_dump(_arrToTree($arr));
+```
+> 结果输出为:
+``` bash
+array(2) {
+  [0]=>
+  array(4) {
+    ["id"]=>
+    int(1)
+    ["name"]=>
+    string(2) "A1"
+    ["parentId"]=>
+    int(0)
+    ["children"]=>
+    array(2) {
+      [0]=>
+      array(3) {
+        ["id"]=>
+        int(2)
+        ["name"]=>
+        string(5) "A1-B1"
+        ["parentId"]=>
+        int(1)
+      }
+      [1]=>
+      array(4) {
+        ["id"]=>
+        int(3)
+        ["name"]=>
+        string(5) "A1-B2"
+        ["parentId"]=>
+        int(1)
+        ["children"]=>
+        array(1) {
+          [0]=>
+          array(3) {
+            ["id"]=>
+            int(4)
+            ["name"]=>
+            string(8) "A1-B2-C1"
+            ["parentId"]=>
+            int(3)
+          }
+        }
+      }
+    }
+  }
+  [1]=>
+  array(3) {
+    ["id"]=>
+    int(5)
+    ["name"]=>
+    string(2) "B1"
+    ["parentId"]=>
+    int(0)
+  }
+}
+```
+
+
+## 3 用GO实现
+在数据表中，数据是以一条一条，这种扁平化的数据保存的，然后通过外键这种形式关联起来，如果是一个树形结构，在扁平化的一维列表中
+是这个样子的，
+> 扁平的为一维列表的树状结构
+
+``` go
+var items = []ItemType{
+		{Id: 1, Pid: 0,  Content: "1"},
+		{Id: 2, Pid: 1,  Content: "1-2"},
+		{Id: 3, Pid: 1,  Content: "1-3"},
+		{Id: 4, Pid: 3,  Content: "1-3-4"},
+		{Id: 5, Pid: 0,  Content: "5"},
+		{Id: 6, Pid: 5,  Content: "5-6"},
+		{Id:7 , Pid: 6,  Content: "5-6-7"},
+		{Id: 8, Pid: 6,  Content: "5-6-8"},
+	}
+```
+像这样的数据是可以保存在数据库中的，又通过外键的关联描述出了一个树状结构。那么把扁平的一维数据列表转化为树下状，大概是这样子:
+> 列表转化为树结构
+
+``` go
+package main
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type ItemType struct {
+	Content string
+	Pid     int64
+	Id      int64
+}
+type TreeItem struct {
+	ItemType
+	Children []*TreeItem
+}
+type IdMapTreeType map[int64]*TreeItem
+
+func main() {
+	var items = []ItemType{
+		{Id: 1, Pid: 0,  Content: "1"},
+		{Id: 2, Pid: 1,  Content: "1-2"},
+		{Id: 3, Pid: 1,  Content: "1-3"},
+		{Id: 4, Pid: 3,  Content: "1-3-4"},
+		{Id: 5, Pid: 0,  Content: "5"},
+		{Id: 6, Pid: 5,  Content: "5-6"},
+		{Id:7 , Pid: 6,  Content: "5-6-7"},
+		{Id: 8, Pid: 6,  Content: "5-6-8"},
+	}
+	var tree []*TreeItem
+	idMapTreeItem := make(IdMapTreeType)
+	for _, item := range items {
+		var treeItem TreeItem
+		treeItem.Id = item.Id
+		treeItem.Pid = item.Pid
+		treeItem.Content = item.Content
+		// 根节点收集
+		if item.Pid == 0 {
+			tree = append(tree, &treeItem)
+		} else {
+			// 子节点收集
+			idMapTreeItem[item.Pid].Children = append(idMapTreeItem[item.Pid].Children, &treeItem)
+		}
+		// 把节点映射到map表
+		idMapTreeItem[item.Id] = &treeItem
+	}
+	jsonRes, _ := json.Marshal(tree)
+	fmt.Println(string(jsonRes))
+}
+```
+
+> 运行结果输出json格式
+``` json
+[
+  {
+    "Content": "1",
+    "Pid": 0,
+    "Id": 1,
+    "Children": [
+      {
+        "Content": "1-2",
+        "Pid": 1,
+        "Id": 2,
+        "Children": null
+      },
+      {
+        "Content": "1-3",
+        "Pid": 1,
+        "Id": 3,
+        "Children": [
+          {
+            "Content": "1-3-4",
+            "Pid": 3,
+            "Id": 4,
+            "Children": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Content": "5",
+    "Pid": 0,
+    "Id": 5,
+    "Children": [
+      {
+        "Content": "5-6",
+        "Pid": 5,
+        "Id": 6,
+        "Children": [
+          {
+            "Content": "5-6-7",
+            "Pid": 6,
+            "Id": 7,
+            "Children": null
+          },
+          {
+            "Content": "5-6-8",
+            "Pid": 6,
+            "Id": 8,
+            "Children": null
+          }
+        ]
+      }
+    ]
+  }
+]
+```
+原理就是每一条数据在树中都有一个特定的位置，数据项是根节点则直接加入到根节点中， 并注册`id`映射到它的内存地址(指针)，
+如果不是根节点，则通过它的上级`pid`在映射表中把上级的内存地址拿到并把数据写进去,并也是一样把自己注册到映射表中。然后就还原出来了。
+

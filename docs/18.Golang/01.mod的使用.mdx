@@ -1,0 +1,49 @@
+---
+title: 01.mod的使用
+author: 吴楚衡
+tags:
+- Golang
+categories:
+- Golang
+date: 2021-03-26 19:59:00
+---
+```mdx-code-block
+import Img from '@site/src/components/Img';
+```
+
+<Img src="/image/go-modules-1.png" align="center" />
+
+&emsp;`mod`是`go`的一个依赖管理工。之前1.11之前的go版本是没有这个模块管理，由于所以依赖都放在`$GOPATH/src`会造成项目之间版本不一致，而可能出错。
+  &emsp;有使用前要把环境变量修改下,来启动模块管理:
+
+``` bash
+  $ export GO111MODULE=on # 启动后，项目的依赖是根据go.mod的配置来加载的。也可以脱离$GOPATH目录才能创建项目的情况。
+  $ export GO111MODULE=off # 反之关闭
+  $ export GO111MODULE=auto # 这个是自动识别，如果又想用模块管理又想让之前不是模块管理的应用也能跑起来，可以先用这个
+```
+选择好自己需要的模式后，把它写进`bash`或`zsh`的配置中，让它默认生效， 如:
+
+``` bash
+
+  $ echo "export GO111MODULE=<你的选择>" >> ~/.zshrc #写入zsh配置
+  $ echo "export GO111MODULE=<你的选择>" >> ~/.bashrc #写入bash配置
+```
+<!--more-->
+
+  而这些依赖会保存在`$GOPATH/pkg/mod`目录下。
+
+| 命令 | 说明 |
+  | --- | --- |
+| go mod init | 生成go.mod文件|
+| go mod download | 下载go.mod声明的依赖|
+| go mod tidy |  整理下依赖， 如删除没用的依赖|
+| go mod  graph | 查看依赖结构|
+| go mod edit | 编辑go.mod文件|
+| go mod vendor | 把依赖导入到项目的vendor目录中|
+| go mod verify | 校验模块是否被篡改|
+| go mod why | 查看为什么需要依赖模块|
+  
+  
+  
+  
+  
