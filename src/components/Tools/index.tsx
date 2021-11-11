@@ -13,7 +13,7 @@ const Tools = ({links, website, name, desc, cover, tags}: Props): React.ReactEle
         <div className={styles.itemRender}>
             <img src={cover} />
             <NameRender name={name} website={website}  />
-            <p>{desc}</p>
+            <p className="toolsDesc">{desc}</p>
             <TagsRender tags={tags} />
             <LinksRender links={links} />
         </div>
@@ -27,8 +27,8 @@ interface NameRenderPops {
 
 const NameRender = ({website, name}: NameRenderPops): React.ReactElement => {
     return website ?
-        (<a href={website} target="_blank">{name} →</a>) :
-        (<h3>{name}</h3>);
+        (<a href={website} target="_blank" className="toolsName">{name} →</a>) :
+        (<h3 className="toolsName">{name}</h3>);
 }
 
 interface TagsRenderProps {

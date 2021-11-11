@@ -3,6 +3,9 @@
   "start_urls": [
     {
       "url": "https://wuchuheng.com"
+    },
+    {
+      "url": "https://wuchuheng.com/tools"
     }
   ],
   "sitemap_urls": ["https://wuchuheng.com/sitemap.xml"],
@@ -13,8 +16,8 @@
         "global": true,
         "default_value": "Documentation"
       },
-      "lvl1": "header h1, body div div main div div div div a",
-      "lvl2": "article h2",
+      "lvl1": "header h1, .toolsName",
+      "lvl2": "article h2, .toolsDesc",
       "lvl3": "article h3",
       "lvl4": "article h4",
       "lvl5": "article h5, article td:first-child",
