@@ -16,10 +16,10 @@
         "global": true,
         "default_value": "Documentation"
       },
-      "lvl1": "header h1, .toolsName",
-      "lvl2": "article h2, .toolsDesc",
-      "lvl3": "article h3",
-      "lvl4": "article h4",
+      "lvl1": "header h1, body .main-wrapper  .container .row  .col h2",
+      "lvl2": "article h2, .toolsName",
+      "lvl3": "article h3, .toolsDesc",
+      "lvl4": "article h4, article > div.theme-doc-markdown.markdown > div > div > div > span",
       "lvl5": "article h5, article td:first-child",
       "lvl6": "article h6",
       "text": "article p, article li, article td:last-child"
