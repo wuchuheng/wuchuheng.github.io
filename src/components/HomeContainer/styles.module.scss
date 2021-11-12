@@ -1,0 +1,40 @@
+.mainWraper {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  .manRender {
+    width: 50%;
+    display: grid;
+    grid-template-columns: repeat(2, 50%);
+    grid-column-gap: 2rem;
+    justify-items: center;
+    align-items: center;
+  }
+}
+
+@media only screen and (max-width: 1024px) {
+  .mainWraper {
+    min-height: 40vh;
+  }
+  .manRender {
+    width: 90% !important;
+  }
+}
+
+@media only screen and (max-width: 1280px) {
+  .mainWraper {
+    min-height: 40vh;
+  }
+  .manRender {
+    width: 90% !important;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .manRender {
+    width: 100% !important;
+    grid-row-gap: 2rem;
+    grid-template-columns: repeat(1, 100%) !important;
+    grid-template-rows: repeat(2, 100%) !important;
+  }
+}

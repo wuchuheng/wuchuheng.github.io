@@ -1,0 +1,19 @@
+.mainWrapper {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  font-size: .8rem;
+  color: #a4a4a4;
+  a {
+    color: #a4a4a4;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .mainWrapper {
+    text-align: center;
+    padding: 0 1rem;
+  }
+}
