@@ -57,7 +57,6 @@ const VoxelDog = () => {
             const width = window.innerWidth <= wapDeviceWidth ? window.innerWidth : window.innerWidth * .4
             const scW = width
             const scH = width
-            console.log(window.innerWidth)
 
             const renderer = new THREE.WebGLRenderer({
                 antialias: true,
@@ -92,7 +91,7 @@ const VoxelDog = () => {
             controls.target = target
             setControls(controls)
 
-            loadGLTFModel(scene, '/dog.glb', {
+            loadGLTFModel(scene, 'https://qiniu.wuchuheng.com/static/notebook/dog.glb', {
                 receiveShadow: false,
                 castShadow: false
             }).then(() => {
