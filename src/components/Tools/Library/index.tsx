@@ -1,4 +1,5 @@
 import React from "react";
+// @ts-ignore
 import styles from "../styles.module.scss";
 
 declare interface LibraryProps extends ImgRenderProps, ARenderProps, TagsRenderProps, StarRenderProps{ }
@@ -100,7 +101,7 @@ const ARender = ({website, rep, name}: ARenderProps): React.ReactElement => {
 }
 
 const getRepName = (repName: string): string => {
-    const [, , rep] = repName.match(/github\.com\/([^\/]+)\/([\w|-|_]+)/)
+    const [, , rep] = repName.match(/github\.com\/([^\/]+)\/([\w|_|-]+)/)
 
     return rep
 

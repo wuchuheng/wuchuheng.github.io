@@ -1,6 +1,6 @@
 import React from "react";
-import { Button } from 'antd';
-import {TagsRender} from './Library/index'
+import {TagsRender} from './Library'
+// @ts-ignore
 import styles from "./styles.module.scss"
 
 interface Props extends NameRenderPops, TagsRenderProps, LinksRenderProps{
@@ -53,10 +53,10 @@ const LinksRender = ({links}: LinksRenderProps): React.ReactElement => {
             {names.map((name, index) => {
                 return (
                     <a key={index} href={links[name]}>
-                        <Button
+                        <button
                             // color={colors[ index % colors.length]}
                             className={styles.button}
-                        >{name}</Button>
+                        >{name}</button>
                     </a>
                 )
             })}

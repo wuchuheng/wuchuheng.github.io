@@ -1,0 +1,33 @@
+---
+title: 01 序言
+date: 2021-11-12 21:55:00
+tags:
+  - GraphQL
+---
+
+## 1 GraphQL有什么用?
+&emsp; `GraphQL`是`Facebook`开发出来的一种用于`API`的查询语言，其实这呀的,就是拿来做`web API`用的。而做出来的功能业务直接撞车到了隔壁家的
+`REST API`。同样是对资源进行`CURD`操作,已经有了简单好理解`REST API`为什么要用`GraphQL`呢？其实`GraphQL`具备`REST API`所没有的优势.
+### 1.1 `GraphQL`优势1 获取期望的数据 
+`REST API`获取的数据并没任何的约束，不看说明文档和直接测试看看，是无法确定会返回什么数据的，如以下是一个`GET`请求和响应的`json`数据的示例：
+
+```mdx-code-block
+import BrowserWindow from '@site/src/components/BrowserWindow';
+import CodesanboxPurePreviewRender from '@site/src/components/CodesanboxRender/CodesanboxPurePreviewRender';
+
+<BrowserWindow
+minHeight={240}
+url="https://tf63m.sse.codesandbox.io/banner"
+codesandboxUrl="https://codesandbox.io/embed/springbootgraphqldemowithnest-tf63m?fontsize=14&hidenavigation=1&initialpath=%2Fbanner&module=%2Fsrc%2Fcontroller%2Fbanner%2Fbanner.controller.ts&theme=light" >
+    <CodesanboxPurePreviewRender url={''}/>
+</BrowserWindow>
+```
+&emsp;&emsp;虽然`REST API`可以拿到数据，但能返回什么样的数据是客户端这边无法预测到,如果缺失部分主要数据，那么将直接影响到前稳定。为了接口的
+稳定而写测试是很常规的做法，但这在写`REST API`的集成测试时会是个灾难。<br />
+&emsp;&emsp; 想要对以上示例接口`GET https://tf63m.sse.codesandbox.io/banner` 进行集成测试，首先需要断言返回的数据是g 一组
+数组对象，然后还要遍历每个对象并对每个字段进行断言，如：有`id`字段且为`integer`类型，有`name`字段且为`string`类型等等,这还只是
+对一个接口的简单数据进行测试。 但如果是`GraphQL`呢？  <br />
+&emsp; `GraphQL`是一门应用于`API`的强类型查询语言。客户端声明要查询哪些数据，服务端响应后并返回客户端期望的数据,它返回的数据完全符合客户端的查询
+预期。如,
+
+
