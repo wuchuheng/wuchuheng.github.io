@@ -11,16 +11,19 @@ import {FiCodesandbox} from 'react-icons/Fi'
 import styles from './styles.module.scss';
 import MessageRender from "../MessageRender";
 import {copyStringToClipboard} from "@wuchuhengtools/helper"
+import {AiOutlineArrowRight} from 'react-icons/Ai'
 
 interface Props {
     children: ReactNode;
     minHeight: number;
     url: string;
     codesandboxUrl?: string;
+    isJump?: boolean
 }
 
-function BrowserWindow({children, minHeight, url, codesandboxUrl}: Props): JSX.Element {
+function BrowserWindow({children, minHeight, url, codesandboxUrl, isJump}: Props): JSX.Element {
     const handleNavigateUrl = () => window.open(codesandboxUrl, '_blank').focus()
+    const handleJumpUrl = () => window.open(url, '_blank').focus()
     const [showMessage, setShowMessage] = React.useState(false);
 
     const handleCopy = () => {
@@ -42,15 +45,15 @@ function BrowserWindow({children, minHeight, url, codesandboxUrl}: Props): JSX.E
                     </div>
                     <div className={styles.browserWindowAddressBar}>{url}</div>
                     <div className={styles.browserWindowMenuIcon}>
-                        {
-                            codesandboxUrl && (
-                                <div className={styles.iconWrapper}>
-                                    <FiCodesandbox className={styles.iconRender}
-                                                   onClick={handleNavigateUrl}/>
+                        <div className={styles.iconWrapper}>
+                            { isJump && <AiOutlineArrowRight className={styles.iconRender} onClick={handleJumpUrl}/>}
+                            { codesandboxUrl &&
+                                <>
+                                    <FiCodesandbox className={styles.iconRender} onClick={handleNavigateUrl}/>
                                     <MdContentCopy className={styles.iconRender} onClick={handleCopy}/>
-                                </div>
-                            )
-                        }
+                                </>
+                            }
+                        </div>
                     </div>
                 </div>
                 <div className={styles.browserWindowBody}>{children}</div>
