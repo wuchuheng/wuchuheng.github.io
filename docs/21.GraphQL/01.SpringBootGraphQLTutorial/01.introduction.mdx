@@ -5,10 +5,73 @@ tags:
   - GraphQL
 ---
 
-## 1 GraphQL有什么用?
-&emsp; `GraphQL`是`Facebook`开发出来的一种用于`API`的查询语言，其实这呀的,就是拿来做`web API`用的。而做出来的功能业务直接撞车到了隔壁家的
-`REST API`。同样是对资源进行`CURD`操作,已经有了简单好理解`REST API`为什么要用`GraphQL`呢？其实`GraphQL`具备`REST API`所没有的优势.
-### 1.1 `GraphQL`优势1 获取期望的数据 
+## 1 REST VS GraphQL
+`REST`是一种`API`的风格规范，而`GraphQL`是一种`API`查询语言，总的来说就是这2个都是用来做`API`的，最终的目的都是一样的。那么已经有好理解简单的
+`REST`为什么要用`GraphQL`呢？ <br />
+&emsp; `REST`好理解是它把要访问的链接看成是一个有层级的单一的资源，`url`能描述资源所在的层级关系，而通过不同的请求方式对该资源实现`CURD`的操作,
+从而实现`API`功能，如:
+
+| REST API |  body参数 | 描述 |
+| --- | --- |  --- |
+| `GET    http://localhost/authors`         | 无 | `GET`方式为读取，资源为`/authors`是作<br />家意思且复数示意作家列表,这个接口的<br />意思就 是获取一个作家的列表 |
+| `GET    http://localhost/authors/1/posts` | 无 | 资源层级位置为`/authors/1/posts`, <br />意为读取`id`为1的作家名下的文章数列|
+| `POST http://localhost/authors`| {...} | (解释同上, 为新增操作)|
+| `PUT/PATCH http://localhost/authors/1`| {...} | (解释同上, 为修改操作)|
+| `DELETE http://localhost/authors/1`| 无 | (解释同上, 为删除操作)|
+
+:::tip REST API在线测试沙盒
+<BrowserWindow
+minHeight={500}
+url="https://notedemo.wuchuheng.com/api"
+isJump
+codesandboxUrl="https://codesandbox.io/embed/github/wuchuhengdemo/note-demo-nestjs-impl/tree/master/?fontsize=14&hidenavigation=1&initialpath=%2Fgraphql&theme=dark" >
+    <iframe src='https://notedemo.wuchuheng.com/api' style={{width: '100%', height: '50vh'}}></iframe>
+</BrowserWindow>
+:::
+
+&emsp; 那`GraphQL`又是如何实现`API`的功能呢？`GraphQL`本质是种强类型的查询语言，只不过它的查询化为3种，为分别为:
+
+| 方式 |  说明 |
+| --- | --- |
+| `query` | 查询操作， 相当于`REST`的`GET` |
+| `mutation` |  变动操作， 相当于`REST`的`PUT/PATCH, DELETE， POST`,都放在这里操作|
+| `subscription` | 订阅操作，可以理解为订阅一个资源,如果<br />后端有变动，后端将通过`websocket`<br />方式通知过来,这也是`REST`欠缺的 |
+
+```mdx-code-block
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+```
+
+:::tip GraphQL在线测试沙盒
+
+```mdx-code-block
+<BrowserWindow
+minHeight={500}
+url="https://notedemo.wuchuheng.com/graphql"
+isJump
+codesandboxUrl="https://codesandbox.io/embed/github/wuchuhengdemo/note-demo-nestjs-impl/tree/master/?fontsize=14&hidenavigation=1&initialpath=%2Fgraphql&theme=dark" >
+    <iframe src='https://notedemo.wuchuheng.com/graphql' style={{width: '100%', height: '50vh'}}></iframe>
+</BrowserWindow>
+<Tabs>
+  <TabItem value="query" label="Query示例" default>
+    <img src="https://qiniu.wuchuheng.com/images/note-graphql20211118022512.png" />
+  </TabItem>
+  <TabItem value="mutation" label="Mutation示例">
+    <img src="https://qiniu.wuchuheng.com/images/graphql-notes20211118023352.png" />
+  </TabItem>
+  <TabItem value="subscription" label="Subscription示例">
+    <img src="https://qiniu.wuchuheng.com/images/graphql-note20211118033049.png" />
+  </TabItem>
+</Tabs>
+```
+:::
+
+小结: `REST`能实现的功能，`GraphQL`也能实现，还多了个订阅功能。另外`REST`的链接是有层级关系的，而`
+`GraphQL`没有，如果接口有上下层级关系的可能需要借助对应的接口的文档来帮助理解。
+
+## 2 GraphQL的优势
+### 优势1: 直观地获取到期望的数据
+
 `REST API`获取的数据并没任何的约束，不看说明文档和直接测试看看，是无法确定会返回什么数据的，如以下是一个`GET`请求和响应的`json`数据的示例：
 
 ```mdx-code-block
@@ -17,29 +80,23 @@ import CodesanboxPurePreviewRender from '@site/src/components/CodesanboxRender/C
 
 <BrowserWindow
 minHeight={240}
-url="https://tf63m.sse.codesandbox.io/banner"
+url="https://notedemo.wuchuheng.com/posts"
+isJump
 codesandboxUrl="https://codesandbox.io/embed/springbootgraphqldemowithnest-tf63m?fontsize=14&hidenavigation=1&initialpath=%2Fbanner&module=%2Fsrc%2Fcontroller%2Fbanner%2Fbanner.controller.ts&theme=light" >
     <CodesanboxPurePreviewRender url={''}/>
 </BrowserWindow>
 ```
-&emsp;&emsp;虽然`REST API`可以拿到数据，但能返回什么样的数据是客户端这边无法预测到,如果缺失部分主要数据，那么将直接影响到前稳定。为了接口的
-稳定而写测试是很常规的做法，但这在写`REST API`的集成测试时会是个灾难。<br />
-&emsp;&emsp; 想要对以上示例接口`GET https://tf63m.sse.codesandbox.io/banner` 进行集成测试，首先需要断言返回的数据是g 一组
-数组对象，然后还要遍历每个对象并对每个字段进行断言，如：有`id`字段且为`integer`类型，有`name`字段且为`string`类型等等,这还只是
-对一个接口的简单数据进行测试。 但如果是`GraphQL`呢？  <br />
+&emsp;&emsp;虽然`REST API`可以拿到数据，但能返回什么样的数据是客户端这边无法预测到，而开发者往往为了兼顾多种设备,而在写接口时会返回大量对单个
+设备来说不必要的数据，造成阅读的不便和请求加载数据过于缓慢。而`GraphQL`而能很好地实现解决一问题。  <br />
 &emsp; `GraphQL`是一门应用于`API`的强类型查询语言。客户端声明要查询哪些数据，服务端响应后并返回客户端期望的数据,它返回的数据完全符合客户端的查询
-预期。如,
-
-
-<BrowserWindow
-minHeight={500}
-url="http://notedemo.wuchuheng.com:3000/graphql"
-isJump
-codesandboxUrl="https://codesandbox.io/embed/github/wuchuhengdemo/note-demo-nestjs-impl/tree/master/?fontsize=14&hidenavigation=1&initialpath=%2Fgraphql&theme=dark" >
-    <iframe src='http://notedemo.wuchuheng.com:3000/graphql' style={{width: '100%', height: '50vh'}}></iframe>
-</BrowserWindow>
+预期,不会多也不会少。如,
 
 
 ### 资源的订阅
 ### 自定义响的参数别名
+### 直接测试
+稳定而写测试是很常规的做法，但这在写`REST API`的集成测试时会是个灾难。<br />
+&emsp;&emsp; 想要对以上示例接口`GET https://notedemo.wuchuheng.com/posts` 进行集成测试，首先需要断言返回的数据是一组
+数组对象，然后还要遍历每个对象并对每个字段进行断言，如：有`id`字段且为`integer`类型，有`title`字段且为`string`类型等等,这还只是
+对一个接口的简单数据进行测试。 但如果是`GraphQL`呢？  <br />
 
