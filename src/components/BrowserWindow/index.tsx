@@ -33,7 +33,9 @@ function BrowserWindow({children, minHeight, url, codesandboxUrl, isJump}: Props
     const handleCloseMessage = useCallback((isClose: boolean) => {
         setShowMessage(isClose)
     }, []);
-
+    let grid: number = 0;
+    isJump && ++grid;
+    codesandboxUrl && ++grid && ++grid
     return (
         <>
             <div className={styles.browserWindow} style={{minHeight}}>
@@ -45,7 +47,7 @@ function BrowserWindow({children, minHeight, url, codesandboxUrl, isJump}: Props
                     </div>
                     <div className={styles.browserWindowAddressBar}>{url}</div>
                     <div className={styles.browserWindowMenuIcon}>
-                        <div className={styles.iconWrapper}>
+                        <div className={styles.iconWrapper} style={{gridTemplateColumns: `repeat(${grid}, ${100 / grid}%)`}}>
                             { isJump && <AiOutlineArrowRight className={styles.iconRender} onClick={handleJumpUrl}/>}
                             { codesandboxUrl &&
                                 <>
