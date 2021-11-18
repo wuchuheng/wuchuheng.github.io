@@ -7,6 +7,11 @@ categories:
 - Linux
 ---
 
+```mdx-code-block
+import BrowserWindow from '@site/src/components/BrowserWindow';
+import IframeContainer from '@site/src/components/IframeContainer';
+```
+
 
 ### 1 什么是awk？
 `awk`是一门文本处理语言,其作用是对文本匹配,过滤，统计和基本的逻辑运算，最后文本中的过滤后或统计后的
@@ -35,10 +40,9 @@ udp6
 ### 3 `awk`在线测试工具
 
 ```mdx-code-block
-import BrowserWindow from '@site/src/components/BrowserWindow';
 
 <BrowserWindow url="https://awk.js.org/" isJump>
-    <iframe src="https://awk.js.org/" style={{width: '100%', height: '80vh'}} />
+    <IframeContainer src='https://awk.js.org/' style={{width: '100%', height: '80vh'}} />
 </BrowserWindow>
 ```
 ### 4 流程控制
@@ -47,9 +51,18 @@ import BrowserWindow from '@site/src/components/BrowserWindow';
 
 > 以下示例意图为:判断第二列的参数是否为algolia/docsearch-scraper, 如果是则输出第一列
 
-``` bash
-$awk '{if ($2 == "algolia/docsearch-scraper") print $1 }'
+``` bash title="找出第一列名为algolia/docsearch-scraper的镜像"
+$docker images | awk '{ \
+        if ($1 == "algolia/docsearch-scraper") { \
+            print \
+        } \
+     }'
 ```
+
+``` bash  title="输出"
+algolia/docsearch-scraper   latest                   04e04eaa5c7d   5 months ago   1.74GB
+```
+
 
 
 
