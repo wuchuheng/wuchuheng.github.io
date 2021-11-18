@@ -5,6 +5,14 @@ tags:
   - GraphQL
 ---
 
+```mdx-code-block
+import BrowserWindow from '@site/src/components/BrowserWindow';
+import CodesanboxPurePreviewRender from '@site/src/components/CodesanboxRender/CodesanboxPurePreviewRender';
+import IframeContainer from '@site/src/components/IframeContainer';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+```
+
 ## 1 REST VS GraphQL
 `REST`是一种`API`的风格规范，而`GraphQL`是一种`API`查询语言，总的来说就是这2个都是用来做`API`的，最终的目的都是一样的。那么已经有好理解简单的
 `REST`为什么要用`GraphQL`呢？ <br />
@@ -25,7 +33,7 @@ minHeight={500}
 url="https://notedemo.wuchuheng.com/api"
 isJump
 codesandboxUrl="https://codesandbox.io/embed/github/wuchuhengdemo/note-demo-nestjs-impl/tree/master/?fontsize=14&hidenavigation=1&initialpath=%2Fgraphql&theme=dark" >
-    <iframe src='https://notedemo.wuchuheng.com/api' style={{width: '100%', height: '50vh'}}></iframe>
+    <IframeContainer src="https://notedemo.wuchuheng.com/api" style={{width: "100%", height: "50vh"}}/>
 </BrowserWindow>
 :::
 
@@ -37,11 +45,6 @@ codesandboxUrl="https://codesandbox.io/embed/github/wuchuhengdemo/note-demo-nest
 | `mutation` |  变动操作， 相当于`REST`的`PUT/PATCH, DELETE， POST`,都放在这里操作|
 | `subscription` | 订阅操作，可以理解为订阅一个资源,如果<br />后端有变动，后端将通过`websocket`<br />方式通知过来,这也是`REST`欠缺的 |
 
-```mdx-code-block
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-```
-
 :::tip GraphQL在线测试沙盒
 
 ```mdx-code-block
@@ -50,7 +53,7 @@ minHeight={500}
 url="https://notedemo.wuchuheng.com/graphql"
 isJump
 codesandboxUrl="https://codesandbox.io/embed/github/wuchuhengdemo/note-demo-nestjs-impl/tree/master/?fontsize=14&hidenavigation=1&initialpath=%2Fgraphql&theme=dark" >
-    <iframe src='https://notedemo.wuchuheng.com/graphql' style={{width: '100%', height: '50vh'}}></iframe>
+    <IframeContainer src="https://notedemo.wuchuheng.com/graphql" style={{width: "100%", height: "50vh"}}/>
 </BrowserWindow>
 <Tabs>
   <TabItem value="query" label="Query示例" default>
@@ -75,8 +78,6 @@ codesandboxUrl="https://codesandbox.io/embed/github/wuchuhengdemo/note-demo-nest
 `REST API`获取的数据并没任何的约束，不看说明文档和直接测试看看，是无法确定会返回什么数据的，如以下是一个`GET`请求和响应的`json`数据的示例：
 
 ```mdx-code-block
-import BrowserWindow from '@site/src/components/BrowserWindow';
-import CodesanboxPurePreviewRender from '@site/src/components/CodesanboxRender/CodesanboxPurePreviewRender';
 
 <BrowserWindow
 minHeight={240}
