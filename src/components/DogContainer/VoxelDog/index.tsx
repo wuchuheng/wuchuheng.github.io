@@ -23,8 +23,11 @@ const DogContainer = forwardRef(({ children }, ref) => (
 function easeOutCirc(x) {
     return Math.sqrt(1 - Math.pow(x - 1, 4))
 }
+interface VoxelDogProps {
+    onLoad?: (isLoad: boolean) => void;
+}
 
-const VoxelDog = () => {
+const VoxelDog = ({onLoad}: VoxelDogProps) => {
     const refContainer = useRef()
     const [loading, setLoading] = useState(true)
     const [renderer, setRenderer] = useState()
@@ -45,7 +48,6 @@ const VoxelDog = () => {
         if (container && renderer) {
             const scW = container.clientWidth
             const scH = container.clientHeight
-
             renderer.setSize(scW, scH)
         }
     }, [renderer])
@@ -97,6 +99,7 @@ const VoxelDog = () => {
             }).then(() => {
                 animate()
                 setLoading(false)
+                onLoad && onLoad(true)
             })
 
             let req = null
