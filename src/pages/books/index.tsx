@@ -16,7 +16,7 @@ const Books = (): React.ReactElement => {
     return <Layout>
         <div className={styles.mainWrapper}>
             <SVG width={200} />
-            <p>Under construction
+            <p>Under developing
                 {Array.from(Array(pointNumber), (e, i) => <span key={`pointRenderNode${i}`}>.</span> )}
                 {Array.from(Array(4 - pointNumber), (e, i) => <span className={styles.fillPointRender} key={`pointFillNode${i}`}>.</span> )}
             </p>
