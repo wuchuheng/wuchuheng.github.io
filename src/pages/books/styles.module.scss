@@ -1,0 +1,23 @@
+.mainWrapper {
+  height: 90vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  >p {
+    margin-top: 1rem;
+    > span {
+      padding-left: .5rem;
+    }
+  }
+}
+
+.svgWrapper {
+  height: 20rem;
+  width: 20rem;
+}
+
+.fillPointRender {
+  color: transparent;
+}
