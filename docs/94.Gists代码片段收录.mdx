@@ -1,0 +1,24 @@
+---
+title: 94 Gists代码片段收录
+date: 2021-11-24 4:54
+---
+
+## 1 React
+> `React` 直接在`Dom`中遍历生成节点
+
+``` tsx
+let App = () => {
+  return <ul>{Array.from(Array(10), (e, i) => {
+    return <li key={i}>{i}</li>
+  })}</ul>
+}
+
+ReactDOM.render(
+  <App />,
+  document.getElementById('app')
+);
+```
+> 摘录自[How to loop over a number in React inside JSX - stackOverflow](https://stackoverflow.com/questions/47287177/how-to-loop-over-a-number-in-react-inside-jsx)
+
+
+
