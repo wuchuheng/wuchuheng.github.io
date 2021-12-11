@@ -1,0 +1,1 @@
+export const formatClassName = (...className: string[]): string => className.join(' ');

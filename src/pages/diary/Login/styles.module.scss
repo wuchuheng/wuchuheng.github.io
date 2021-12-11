@@ -1,0 +1,38 @@
+@import "../../../css/custom";
+
+.container {
+  @media only screen and (max-width: $phoneDeviceWidth) {
+    width: 20rem;
+  }
+  width: 35rem;
+  margin-top: 10rem;
+  button {
+    height: 2.5rem;
+    background: var(--ifm-color-primary);
+    color: white !important;
+    border: var(--docusaurus-tag-list-border);
+  }
+}
+.header {
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+  margin-bottom: 1rem;
+}
+.bodyWrapper {
+  grid-row-gap: 1rem;
+}
+
+.input {
+  height: 2rem;
+  box-shadow: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  &:focus-visible{
+    outline: none;
+  }
+  &:nth-child(2) {
+    margin-top: 1rem;
+  }
+}
