@@ -180,6 +180,24 @@ const config = {
                 // },
             },
         ],
+        [
+            '@docusaurus/plugin-content-blog',
+            {
+                /**
+                 * Required for any multi-instance plugin
+                 */
+                id: 'my-wandering-diary',
+                /**
+                 * URL route for the blog section of your site.
+                 * *DO NOT* include a trailing slash.
+                 */
+                routeBasePath: 'my-wandering-diary',
+                /**
+                 * Path to data on filesystem relative to site dir.
+                 */
+                path: './my-wandering-diary',
+            },
+        ],
     ]
 };
 
