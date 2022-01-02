@@ -1,0 +1,19 @@
+---
+title: 02 docker基本知识
+tags:
+- Docker
+categories:
+- Docker
+date: 2022-01-03 3:45
+---
+
+## 1 基本知识
+1.1 ` docker stats`查看`docker`的内存和程序等状态
+
+``` bash
+ docker stats
+CONTAINER ID   NAME                CPU %     MEM USAGE / LIMIT    MEM %     NET I/O       BLOCK I/O         PIDS
+f8e0a58cf485   mongodb_mongo_1     0.41%     167.1MiB / 1.94GiB   8.41%     1.6kB / 0B    77.2MB / 5.31MB   33
+c13f0b514356   com-db-1            0.33%     395MiB / 1.94GiB     19.89%    1.67kB / 0B   80.1MB / 13.8MB   37
+698fa491c612   toolbox_postgis_1   0.07%     25.82MiB / 1.94GiB   1.30%     1.6kB / 0B    28.3MB / 4.1kB    7
+```
