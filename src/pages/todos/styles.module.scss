@@ -1,0 +1,65 @@
+@import "../../css/global";
+.mainWrapper {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+}
+
+$itemHeight: 3rem;
+$itemPadding: 0 .75rem;
+$itemBorderColor: #EAEAEA;
+.container {
+  h2 {
+    @media only screen and (max-width: $phoneDeviceWidth) {
+      margin-top: 0;
+    }
+    margin-top: 2rem;
+    color: var(--ifm-color-primary);
+    width: 100%;
+    text-align: center;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+  margin-top: 1rem;
+  @media only screen and (max-width: $phoneDeviceWidth) {
+    width: 100%;
+  }
+  width: 30rem;
+ }
+
+.searchInput {
+  border: none;
+  width: 100%;
+  height: $itemHeight;
+  border-top: solid 1px $itemBorderColor;
+  font-size: 1rem;
+  padding: $itemPadding;
+  &:focus {
+    outline: none;
+  }
+}
+
+.todoItem {
+  padding: $itemPadding;
+  border-top: solid 1px $itemBorderColor;
+  box-sizing: border-box;
+  height: $itemHeight;
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  align-content: center;
+  height: $itemHeight;
+  p {
+    display: block;
+    margin: 0;
+  }
+}
+.closeIcon{
+  color: red;
+  font-size: 1.3rem;
+}
