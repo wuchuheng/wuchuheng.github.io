@@ -1,10 +1,21 @@
 import React, {useState} from "react";
 import styles from "./styles.module.scss";
 import { AiOutlineClose } from "react-icons/ai"
+import apolloClient from "../../utils/apolloClicent";
+import {gql} from "@apollo/client"
+import BrowserOnly from "@docusaurus/BrowserOnly";
 
 const Todos = (): React.ReactElement => {
     const [isShown, setIsShown] = useState(false);
-
+    apolloClient.query({
+        query: gql`
+            query {
+                hello
+            }
+        `
+    }).then(result => {
+        debugger
+    })
 
     return <>
         <div className={styles.mainWrapper}>
@@ -20,7 +31,6 @@ const Todos = (): React.ReactElement => {
                         {
                            isShown && <AiOutlineClose className={styles.closeIcon}/>
                         }
-
                     </li>
                 </ul>
             </div>
@@ -28,4 +38,12 @@ const Todos = (): React.ReactElement => {
     </>
 }
 
-export default Todos;
+export default (): React.ReactElement => {
+    return <>
+        <BrowserOnly >
+            {() =>
+                <Todos />
+            }
+        </BrowserOnly>
+    </>
+}
