@@ -2,11 +2,11 @@ type DebounceFunType  = () => void
 type DebounceWaitType  = number
 
 const debounce = (func: DebounceFunType, wait: DebounceWaitType): () => void => {
-    let timeoutHandle: number
+    let timer: ReturnType<typeof setTimeout>;
 
     return () => {
-        timeoutHandle && clearTimeout(timeoutHandle)
-        timeoutHandle = setTimeout(() => {
+        timer && clearTimeout(timer)
+        timer = setTimeout(() => {
             func()
         }, wait)
     }
