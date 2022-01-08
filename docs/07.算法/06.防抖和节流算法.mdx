@@ -1,0 +1,40 @@
+---
+title: 06.防抖和节流算法
+date: 2022-01-8
+tags:
+- React
+- 防抖
+- 节流
+- debounce
+---
+
+```mdx-code-block
+import CodesanboxRender from '@site/src/components/CodesanboxRender';
+import IframeContainer from '@site/src/components/IframeContainer';
+```
+
+## 1 防抖算法
+### 1.1 什么是防抖？
+在连续不停的输入中，要及时地针对每个输入都做出计算处理，这个计算量很密集，压力大。而人在往往在输入结束时，才代表着该输入才是要被处理的数据，而整个
+输入的过程并不是。所以在用户输入的过程中采样输入进行处理往往会造成计算的浪费和压力，所以需要有个防抖算法，当用户停下来时才取样输入再进行处理才对。
+所以防抖就是采样用户输入的同时，避免不必要的计算浪费,这就是防抖算法了。  
+而防抖算法的实现逻辑就是当用户停止输入后的间隔时间满足预定定时时长，则进行处理。
+
+### 2.1  防抖算法示例代码
+``` javascript title="JS 示例"
+type DebounceFunType  = () => void
+type DebounceWaitType  = number
+
+export const debounce = (func: DebounceFunType, wait: DebounceWaitType): () => void => {
+    let timer: ReturnType<typeof setTimeout>;
+
+    return () => {
+        timer && clearTimeout(timer)
+        timer = setTimeout(() => {
+            func()
+        }, wait)
+    }
+}
+```
+
+<IframeContainer src="https://codesandbox.io/embed/note-demo-for-react-q9w64?fontsize=14&amp;hidenavigation=1&amp;initialpath=%2Fdebounce&amp;module=%2Fsrc%2Fpages%2FDebounce%2FDebounce.tsx&amp;moduleview=1&amp;theme=dark" />
