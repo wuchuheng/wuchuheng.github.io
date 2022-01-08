@@ -1,37 +1,53 @@
-import React, {useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
+// @ts-ignore
 import styles from "./styles.module.scss";
-import { AiOutlineClose } from "react-icons/ai"
+import {ApolloProvider, gql, useMutation, useQuery} from "@apollo/client"
+import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
+import {setText, todoObservable} from "../../services/todoService";
 import apolloClient from "../../utils/apolloClicent";
-import {gql} from "@apollo/client"
-import BrowserOnly from "@docusaurus/BrowserOnly";
+import TodoItemRender from "./TodoItemRender";
+import InputRender from './InputRender';
+import debounce from "../../utils/debounce";
+
+
+export type TodoType = {
+    id: number
+    title: string
+    done: boolean
+    createdAt: string
+    doneAt: string
+};
+export type TodoListType = TodoType[];
 
 const Todos = (): React.ReactElement => {
-    const [isShown, setIsShown] = useState(false);
-    apolloClient.query({
-        query: gql`
+    const TODOS_QUERY = gql`
             query {
-                hello
+                  todos {
+                    id
+                    title
+                    done
+                    createdAt
+                    doneAt
+                  }
             }
-        `
-    }).then(result => {
-        debugger
-    })
+    `
+    const {data, loading} = useQuery(TODOS_QUERY)
+    useEffect(() => !loading && setText(data.todos), [loading])
+    let todos: TodoListType = [];
+    if (ExecutionEnvironment.canUseDOM) todos = todoObservable()
+    const [currentChangeId, setCurrentChangeId] = useState<number>(0)
 
     return <>
         <div className={styles.mainWrapper}>
             <div className={styles.container}>
                 <h2>todos</h2>
-                <input className={styles.searchInput} placeholder="Please enter a new todo." />
+                <InputRender/>
                 <ul>
-                    <li className={styles.todoItem}
-                        onMouseEnter={() => setIsShown(true)}
-                        onMouseLeave={() => setIsShown(false)}
-                    >
-                        <p>1</p>
-                        {
-                           isShown && <AiOutlineClose className={styles.closeIcon}/>
-                        }
-                    </li>
+                    {todos.length > 0 && todos.map(todo => <TodoItemRender
+                        todo={todo} key={todo.id}
+                        currentChangeId={currentChangeId}
+                        onChange={(newChangeId) => setCurrentChangeId(newChangeId) }
+                        />) }
                 </ul>
             </div>
         </div>
@@ -40,10 +56,8 @@ const Todos = (): React.ReactElement => {
 
 export default (): React.ReactElement => {
     return <>
-        <BrowserOnly >
-            {() =>
-                <Todos />
-            }
-        </BrowserOnly>
+        <ApolloProvider client={apolloClient}>
+            <Todos />
+        </ApolloProvider>
     </>
 }

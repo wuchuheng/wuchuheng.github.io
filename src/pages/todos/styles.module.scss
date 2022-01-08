@@ -36,7 +36,7 @@ $itemBorderColor: #EAEAEA;
   width: 100%;
   height: $itemHeight;
   border-top: solid 1px $itemBorderColor;
-  font-size: 1rem;
+  font-size: 1.3rem;
   padding: $itemPadding;
   &:focus {
     outline: none;
@@ -54,9 +54,14 @@ $itemBorderColor: #EAEAEA;
   align-items: center;
   align-content: center;
   height: $itemHeight;
-  p {
+  .titleRender {
+    flex: auto;
     display: block;
     margin: 0;
+    input {
+      flex: auto;
+      width: 85%;
+    }
   }
 }
 .closeIcon{

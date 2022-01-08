@@ -1,0 +1,10 @@
+@import "../styles.module";
+.editInput {
+  height: $itemHeight - .1rem;
+  border: none;
+  border: 0;
+  font-size: 1rem;
+  &:focus {
+    outline: none;
+  }
+}
