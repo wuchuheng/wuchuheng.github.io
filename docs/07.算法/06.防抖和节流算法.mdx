@@ -21,7 +21,7 @@ import IframeContainer from '@site/src/components/IframeContainer';
 而防抖算法的实现逻辑就是当用户停止输入后的间隔时间满足预定定时时长，则进行处理。
 
 ### 2.1  防抖算法示例代码
-``` javascript title="JS 示例"
+``` typescript title="TS 示例"
 type DebounceFunType  = () => void
 type DebounceWaitType  = number
 
@@ -38,3 +38,31 @@ export const debounce = (func: DebounceFunType, wait: DebounceWaitType): () => v
 ```
 
 <IframeContainer src="https://codesandbox.io/embed/note-demo-for-react-q9w64?fontsize=14&amp;hidenavigation=1&amp;initialpath=%2Fdebounce&amp;module=%2Fsrc%2Fpages%2FDebounce%2FDebounce.tsx&amp;moduleview=1&amp;theme=dark" />
+
+## 2 节流算法
+### 2.1 什么是节流算法？
+同以上的防抖的算法一样，不过数据的采样不再是用户停止一段时间触发，而是一个固定的时长间隔就是采样用户的输入数据。相当于在一条时间线上，只要用户有输入，
+那么隔一段固定时间后就直接采样。
+
+### 2.2 节流示例代码
+
+``` typescript title="TS 示例"
+type throttlingFunType = () => void;
+type throttlingWaitType = number;
+
+export const throttling = (fun: throttlingFunType, wait: throttlingWaitType) => {
+    type TimeOutType  = ReturnType<typeof setTimeout> ;
+    let timer: TimeOutType | boolean
+    return () => {
+        if (!timer) {
+            timer = setTimeout(() => {
+                fun()
+                clearTimeout(timer as TimeOutType)
+                timer = false
+            }, wait)
+        }
+    }
+}
+```
+
+<IframeContainer src="https://codesandbox.io/embed/note-demo-for-react-q9w64?fontsize=14&emsp;hidenavigation=1&emsp;initialpath=%2Fthrottling&emsp;module=%2Fsrc%2Fpages%2FThrottling%2Findex.tsx&emsp;theme=dark" />
