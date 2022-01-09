@@ -1,0 +1,151 @@
+---
+title: 03 React Hook的应用
+tags:
+- React
+- Hook
+date: 2021-11-19 3:05
+---
+
+```mdx-code-block
+import IframeContainer from '@site/src/components/IframeContainer';
+```
+
+## 1 Hook是什么？为什么要用它?
+`hook`本质是个有点不一样的函数,不一样在于返回的值，如常用的`useState`,用于保存状态，那么它是怎么保存其状态的。我们知道一个组件函数被调用（渲染）
+里面的引用函数就一定也会被调用了，之所以`useState`能保存状态是因为它能返回跟上次组件函数一样的结果，所以它是稳定的，也就是能保存组件的了状态.  
+这样一来，函数组件不就跟类组件一样有状态了吗。而这只是`hook`中的一个.   <br />
+&emsp; 好，回到标题的问题：`Hook`是什么？`Hook`本质是个函数，但会根据函数组件的情况，不同的`hook`有不同的实现功能。   <br />
+&emsp; 那为什么要用它？相较类组件，函数组件简单轻量，好拆分，但函数组件就是函数，没有类组件的对应的状态和生命周期功能，而这些功能或多或少可能通过
+`Hook`来弥补实现出来,这就是`Hook`的意义。
+
+## 2 `useCallback`的使用
+`userCallback` 和 `userCallback`的作用是什么? `React`有一个过滤调用(渲染)的情况,组件的更新本质上就是把该函数重新调用一遍，但往后的子组件,
+可能不需要调用了，就是没必要了。而组件的调用(渲染)触发条件是`state`或`props`发生变动才重新调用（渲染）自身。说白了，一但组件内有一丁点的关于`props`
+或`state`或其它`hook`的变化都会引发组件全部重新再运行一次，也直接波及到全部子组件的更新。这是是函数组件更新的方式，避免不了，但可以避免一些代码块
+就重复调用和子组件被动调用的渲染的情况。而组件内的代码块避免再次被调用则可以用`userCallback`来实现
+
+### 2.1 `useCallback`示例
+`useCallback`的接收2个参数，一个是不变的回调函数，一个是依赖的`state`，依赖变了，函数才会重新刷新一个新的版本，如果没有则，默认不变。
+
+``` typescript jsx
+import React, {useCallback, useState} from "react";
+
+const UseCallbackDemo = (): React.ReactElement => {
+    const [count, setCount] = useState<number>(0)
+
+    const callback = useCallback(() => {
+        console.log("callback的内部访问到的count值: " + count)
+        // todo some thing ...
+    }, [])
+
+    return (
+        <>
+            <p>count: {count}</p>
+            <button onClick={() => setCount(() => count + 1) }>修改count</button>
+            <button onClick={callback}>在useCallback内部打印count</button>
+        </>
+    )
+}
+
+export default UseCallbackDemo
+```
+后面不管理怎么修改`count`，而对于`callback`来说,`count`就是0，因为`callback`是不变的，哪怕由于外面的`count`引发组件多次刷新，可由于`callback`
+并没有更新，而`callback`内部一开始访问到的`count`也就是组件第一次初始化时的参数就是0. 所以它就只能在控制台中打印出"callback的内部访问到的count值: 0"这样
+的结果。
+
+<IframeContainer src="https://codesandbox.io/embed/note-demo-for-react-7b6mf?expanddevtools=1&amp;amp;fontsize=14&amp;hidenavigation=1&amp;initialpath=%2FUseCallbackDemo&amp;module=%2Fsrc%2Fpages%2FUseCallbackDemo%2Findex.tsx&amp;theme=dark" />
+
+而这样一来，我们是得到了一个不会随着组件渲染而产生的新的版本的函数了，但有时`userCallback`中还是需要使用最新的`state`的，最直接的方式有：
+* 1 把需要用到的最新`state`的加入`userCallback`的依赖数组中。
+* 2 也可以使用`useReducer`的方式，通过`dispatcher`的方式，把对`state`的处理委托给`useReducer`来处理， 这样的好处是相对于依赖的每次都要更新一次，
+不可以直观地在代码中决定要不要处理关于`state`的问题，另一个好处就是普通的防抖算法是基于时间的来采样的，这样把逻辑写`userCallback`可以避免产生新的
+版本，从而保证防抖算法的稳定，而需要处理最新的`state`时，则直接委托给`useReducer`来处理就可以了。
+
+## 3 `React.memo` 函数的使用
+这个函数的作用于子组件和父组件之间，如果父组件更新了，子组件也会被动更新，不管有没有`props`的变动。而`React.memo`的作用包裹子组件用的，充当一个中间者的作用，
+就是当父组件更新时，如果没有`props`的更新，那么`React.memo`就是不会让子组件渲染
+``` typescript title="React.memo示例代码"
+import React, {useState} from "react";
+
+const Children1 = () => {
+    console.log('Children1 reload.')
+    return <>Children1</>
+}
+const Children2 = React.memo(() => {
+    console.log('Children2 reload.')
+    return <>Children1</>
+})
+
+const UseMemoDemo = (): React.ReactElement => {
+    const [count, setCount] = useState<number>(0)
+    console.log("Parent component reload." + count)
+    return (<>
+        <Children1 />
+        <br />
+        <Children2 />
+        <br/>
+        <button onClick={() => setCount(() => count + 1)}>Reload component</button>
+    </>)
+}
+
+export default UseMemoDemo;
+```
+
+<IframeContainer src="https://codesandbox.io/embed/note-demo-for-react-7b6mf?expanddevtools=1&amp;fontsize=14&amp;hidenavigation=1&amp;initialpath=%2FmemoDemo&amp;module=%2Fsrc%2Fpages%2FMemoDemo%2Findex.tsx&amp;theme=light" />
+
+以上示例，在打印台中可以看出，如果父组件更新了，子组件也会被动更新，而使用了`React.memo`函数则避免了这种过多的渲染。
+
+## 4 `useMemo`的使用
+`useMemo`跟`useCallback`的用法一样，而跟后者返回一个函数不一样的是`useMemo`返回的是一个固定的变量。它的作用是，如果子组件接收的属性是复合类型，也就是
+一个自定义的对象时，尽管数值没变，但还是会引发子组件的更新，我猜这是因为在`js`中，自定义的复合类型尽管每次都值是一样的，但底层的内存地址已经不一样了，从而
+子组件把该属性判定为新的组件而触发子组件的更新。而`useMemo`则能保证被自定义的值是不一变的。
+``` typescript jsx title="useMemo示例代码"
+
+import React, {useMemo, useState} from "react";
+ type InfoType = {text: string}
+ type ChildrenPropsType = {info: InfoType}
+ const Children1 = () => {
+     console.log('Children1 reload.')
+     return <>Children1</>
+ }
+ const Children2 = React.memo(({info}: ChildrenPropsType) => {
+     console.log('Children2 reload.' + JSON.stringify(info))
+     return <>Children1</>
+ })
+ const Children3 = React.memo(({info}: ChildrenPropsType) => {
+     console.log('Children3 reload.' + JSON.stringify(info))
+     return <>Children1</>
+ })
+ const UseMemoDemo = (): React.ReactElement => {
+     const [count, setCount] = useState<number>(0)
+     console.log("Parent component reload." + count)
+     const text2: InfoType = {text: 'text2'}
+     const text3 = useMemo((): InfoType => ({text: "text3"}), [])
+     return (<>
+         <Children1 />
+         <br />
+         <Children2 info={text2} />
+         <br/>
+         <Children3 info={text3} />
+         <button onClick={() => setCount(() => count + 1)}>Reload component</button>
+     </>)
+ }
+
+export default UseMemoDemo;
+
+```
+
+<IframeContainer src="https://codesandbox.io/embed/note-demo-for-react-7b6mf?expanddevtools=1&amp;fontsize=14&amp;hidenavigation=1&amp;initialpath=%2FuseMemoDemo&amp;module=%2Fsrc%2Fpages%2FUseMemoDemo%2Findex.tsx&amp;theme=dark" />
+
+以上示例中会打印:
+
+``` bash title="控制台打印"
+Parent component reload.2
+index.tsx:5 Children1 reload.
+index.tsx:9 Children2 reload.{"text":"text2"}
+```
+
+## 参考资料
+[useCallback()、useMemo() 解决了什么问题？](https://www.jianshu.com/p/014ee0ebe959)
+[React useCallback的实际应用 为什么要用这个函数？ ](https://blog.csdn.net/weixin_39107093/article/details/119514549)
+
