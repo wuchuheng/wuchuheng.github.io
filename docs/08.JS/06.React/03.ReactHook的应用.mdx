@@ -110,11 +110,11 @@ import React, {useMemo, useState} from "react";
  }
  const Children2 = React.memo(({info}: ChildrenPropsType) => {
      console.log('Children2 reload.' + JSON.stringify(info))
-     return <>Children1</>
+     return <>Children2</>
  })
  const Children3 = React.memo(({info}: ChildrenPropsType) => {
      console.log('Children3 reload.' + JSON.stringify(info))
-     return <>Children1</>
+     return <>Children3</>
  })
  const UseMemoDemo = (): React.ReactElement => {
      const [count, setCount] = useState<number>(0)
