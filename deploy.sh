@@ -4,6 +4,14 @@ localDir=build
 remoteDir=/www/wwwroot/wuchuheng.com
 yarn build
 
+if [ $? != 0 ]; then
+  RED='\033[0;31m'
+  echo -e "❌ ❌ ❌ ${RED} React build failure."
+  exit
+fi
+
+echo $?
+
 sftp root@demo.jds.wuchuheng.com <<EOF
   cd $remoteDir
   lcd $localDir

@@ -3,7 +3,7 @@ import React, {useCallback, useEffect, useState} from "react";
 import styles from "./styles.module.scss";
 import {ApolloProvider, gql, useMutation, useQuery} from "@apollo/client"
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
-import {setText, todoObservable} from "../../services/todoService";
+import {demo, setText, todoObservable} from "../../services/todoService";
 import apolloClient from "../../utils/apolloClicent";
 import TodoItemRender from "./TodoItemRender";
 import InputRender from './InputRender';
@@ -37,6 +37,9 @@ const Todos = (): React.ReactElement => {
     let todos: TodoListType = [];
     if (ExecutionEnvironment.canUseDOM) todos = todoObservable()
     const [currentChangeId, setCurrentChangeId] = useState<number>(0)
+    console.log(demo)
+    demo = true
+    console.log(demo)
 
     return <>
         <div className={styles.mainWrapper}>
@@ -56,8 +59,8 @@ const Todos = (): React.ReactElement => {
 }
 
 export default (): React.ReactElement => {
-    const isLayout = !(document.location.search.substr(1) === "layout=false")
-    console.log(document.location.search.substr(1))
+    let isLayout = true
+    if (ExecutionEnvironment.canUseDOM) isLayout = !(document.location.search.substr(1) === "layout=false")
 
     return <>
         {

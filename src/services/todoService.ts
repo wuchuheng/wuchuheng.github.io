@@ -16,6 +16,7 @@ const [useText, text$] = bind<TodoListType>(textChange$, [
 ]);
 
 let isTodoObservable = false;
+export let demo = false
 
 export const todoObservable = () => {
     const TODOS_SUBSCRIPTION = `
