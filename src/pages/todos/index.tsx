@@ -8,6 +8,7 @@ import apolloClient from "../../utils/apolloClicent";
 import TodoItemRender from "./TodoItemRender";
 import InputRender from './InputRender';
 import debounce from "../../utils/debounce";
+import Layout from "@theme/Layout";
 
 
 export type TodoType = {
@@ -55,9 +56,23 @@ const Todos = (): React.ReactElement => {
 }
 
 export default (): React.ReactElement => {
+    const isLayout = !(document.location.search.substr(1) === "layout=false")
+    console.log(document.location.search.substr(1))
+
     return <>
-        <ApolloProvider client={apolloClient}>
-            <Todos />
-        </ApolloProvider>
+        {
+            isLayout &&
+            <Layout>
+                <ApolloProvider client={apolloClient}>
+                    <Todos />
+                </ApolloProvider>
+            </Layout>
+        }
+        {
+            !isLayout &&
+            <ApolloProvider client={apolloClient}>
+                <Todos />
+            </ApolloProvider>
+        }
     </>
 }
