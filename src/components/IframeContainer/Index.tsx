@@ -14,7 +14,6 @@ const IframeContainer = ({src, style, ...props}: IframeContainerProps): React.Re
         allow: "accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
     }
     const isCodesandboxAttr = src.match(/codesandbox\.io/) != null
-    console.log(isCodesandboxAttr)
     const CodesandboxIframe = (): React.ReactElement => {
         return (
             <>

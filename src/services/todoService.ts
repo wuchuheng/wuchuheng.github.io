@@ -1,25 +1,64 @@
 import graphQLWSClient from "../utils/graphQLWSClient";
-import {bind} from "@react-rxjs/core"
-import {createSignal} from "@react-rxjs/utils"
 import {TodoListType} from "../pages/todos";
+import ApolloClient from "../utils/apolloClicent"
+import {gql} from "@apollo/client";
 
-export const [textChange$, setText] = createSignal<TodoListType>();
-const [useText, text$] = bind<TodoListType>(textChange$, [
-    {
-        "id":180,
-        "title":"开发租车应用的后台服务",
-        "done":false,
-        "createdAt":"2022-01-07",
-        "doneAt": null,
+type SubscriptionId = number
+type SubscriptionCallbackType = (todos: TodoListType) => void
+export default class TodoService {
+    private static todos: TodoListType = []
+    private static isSubscription: boolean = false
+    private static callbackList: Map<SubscriptionId, SubscriptionCallbackType> = new Map<SubscriptionId, SubscriptionCallbackType>()
+    private static callbackListLastId: SubscriptionId = 0
+    private static isInisializeTodo: boolean = false
+
+    constructor() {
+        TodoService.isSubscription === false && this.connectSubscription()
     }
 
-]);
+    public getTodos():TodoListType {
+        TodoService.isInisializeTodo === false && this.initializeTodos()
+        return TodoService.todos
+    }
 
-let isTodoObservable = false;
-export let demo = false
+    public subscription(callback: (todos: TodoListType) => void): SubscriptionId {
+        const newSubscriptionId = TodoService.callbackListLastId + 1;
+        TodoService.callbackList.set(newSubscriptionId, callback)
+        TodoService.callbackListLastId = newSubscriptionId
 
-export const todoObservable = () => {
-    const TODOS_SUBSCRIPTION = `
+        return TodoService.callbackListLastId
+    }
+
+    public unsubscription(subscriptionId: SubscriptionId): boolean {
+        return TodoService.callbackList.delete(subscriptionId)
+    }
+
+    private initializeTodos(): void {
+        const TODOS_QUERY = gql`
+            query {
+                todos {
+                    id
+                    title
+                    done
+                    createdAt
+                    doneAt
+                }
+            }
+        `
+        ApolloClient.query({query: TODOS_QUERY}).then(({data}) => {
+            TodoService.todos = data.todos as TodoListType
+            this.pushDataByCallback()
+            TodoService.isInisializeTodo = true
+        })
+    }
+
+    private pushDataByCallback(): void {
+
+        TodoService.callbackList.forEach(callback => callback(TodoService.todos))
+    }
+
+    private connectSubscription(): void {
+        const TODOS_SUBSCRIPTION = `
         subscription {
           todos{
             id
@@ -30,18 +69,17 @@ export const todoObservable = () => {
           }
         }
     `
-    if (!isTodoObservable) {
-        isTodoObservable = true
-        graphQLWSClient().request( { query: TODOS_SUBSCRIPTION})
-            .subscribe({
-                next: ({data}) => {
-                    data && setText(data.todos as TodoListType)
-                }
-            })
+        if (!TodoService.isSubscription) {
+            TodoService.isSubscription = true
+            graphQLWSClient().request( { query: TODOS_SUBSCRIPTION})
+                .subscribe({
+                    next: ({data}) => {
+                        if (data) {
+                            TodoService.todos = data.todos as TodoListType
+                            this.pushDataByCallback()
+                        }
+                    }
+                })
+        }
     }
-
-    return useText()
 }
-
-
-

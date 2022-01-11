@@ -1,13 +1,12 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 // @ts-ignore
 import styles from "./styles.module.scss";
-import {ApolloProvider, gql, useMutation, useQuery} from "@apollo/client"
+import {ApolloProvider} from "@apollo/client"
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
-import {demo, setText, todoObservable} from "../../services/todoService";
+import TodoService from "../../services/todoService";
 import apolloClient from "../../utils/apolloClicent";
 import TodoItemRender from "./TodoItemRender";
 import InputRender from './InputRender';
-import debounce from "../../utils/debounce";
 import Layout from "@theme/Layout";
 
 
@@ -21,25 +20,17 @@ export type TodoType = {
 export type TodoListType = TodoType[];
 
 const Todos = (): React.ReactElement => {
-    const TODOS_QUERY = gql`
-            query {
-                  todos {
-                    id
-                    title
-                    done
-                    createdAt
-                    doneAt
-                  }
-            }
-    `
-    const {data, loading} = useQuery(TODOS_QUERY)
-    useEffect(() => !loading && setText(data.todos), [loading])
-    let todos: TodoListType = [];
-    if (ExecutionEnvironment.canUseDOM) todos = todoObservable()
     const [currentChangeId, setCurrentChangeId] = useState<number>(0)
-    console.log(demo)
-    demo = true
-    console.log(demo)
+    const [todos, setTodos] = useState<TodoListType>([])
+    if (ExecutionEnvironment.canUseDOM) {
+        useEffect(() => {
+            const todoService = new TodoService()
+            const subscriptionId = todoService.subscription((newTodos) => setTodos(newTodos) )
+            setTodos(todoService.getTodos())
+
+            return () => {todoService.unsubscription(subscriptionId)}
+        }, [])
+    }
 
     return <>
         <div className={styles.mainWrapper}>
