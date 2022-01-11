@@ -4,9 +4,14 @@ localDir=build
 remoteDir=/www/wwwroot/wuchuheng.com
 yarn build
 
-if [ $? != 0 ]; then
+if [ $? !== 0 ]; then
   RED='\033[0;31m'
   echo -e "❌ ❌ ❌ ${RED} React build failure."
+    if command -v notificationTool-darwin-amd64 &> /dev/null
+      then
+        notificationTool-darwin-amd64 "The notes failed to be build."
+    fi
+
   exit
 fi
 
