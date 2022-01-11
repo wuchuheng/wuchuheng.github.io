@@ -4,7 +4,7 @@ import ExecutionEnvironment from "@docusaurus/ExecutionEnvironment";
 import {useMutation, gql} from "@apollo/client";
 
 const Index = () => {
-    const [title, setTitle] = useState<String>('hello');
+    const [title, setTitle] = useState<String>('');
     let handleCreateTodo = () => {}
     if (ExecutionEnvironment.canUseDOM) {
         const CREATE_TODO_MUTATION = gql`
