@@ -72,6 +72,7 @@ const config = {
                     },
                     {to: '/blog', label: 'Blog', position: 'right'},
                     {to: '/tools', label: 'Tools', position: 'right'},
+                    {to: '/docs/收录优秀的开源库', label: 'libraries', position: 'right'},
                     {to: '/todos', label: 'Todos', position: 'right'},
                     {to: '/books', label: 'Books', position: 'right'},
                     {
