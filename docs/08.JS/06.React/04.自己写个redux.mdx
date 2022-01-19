@@ -1,0 +1,174 @@
+---
+title: 04 自己写个redux
+tags:
+- React
+- Hook
+- redux
+date: 2022-01-20 3:05
+---
+
+
+```mdx-code-block
+import IframeContainer from '@site/src/components/IframeContainer';
+
+```
+
+在写`react`是需要组件和组件之间的通信，本来想用`redux`，但自己忘了怎么用了，翻文档案卷又太累，感觉很麻烦，所以就只能自己动手写一个，才能维持下生活这样子。
+其实核心也就不到70行代码这个样子, 就下面这样子。
+``` typescript
+import { useEffect, useState } from 'react';
+
+type SubscriptionHandler = number;
+
+interface SubscriptionServiceInterface<T> {
+  value: T;
+
+  next(patchData: T): boolean;
+
+  subscription(patchDataCallback: (patchData: T) => void): SubscriptionHandler;
+
+  unSubscription(subscriptionHandler: SubscriptionHandler): boolean;
+
+  complete(): void;
+}
+
+export default class SubscriptionService<T> implements SubscriptionServiceInterface<T> {
+  history: { time: Date; data: T }[] = [];
+  private subscriptions: Map<number, (patchData: T) => void> = new Map<number, (patchData: T) => void>();
+  value: T;
+
+  isComplete: boolean = false;
+
+  constructor(value: T) {
+    this.value = value;
+  }
+
+  next(patchData: T): boolean {
+    if (this.isComplete) {
+      return false;
+    }
+    this.history = [...this.history, { time: new Date(), data: this.value }];
+    this.value = patchData;
+    this.subscriptions.forEach((callback) => callback(this.value));
+
+    return true;
+  }
+
+  subscription(patchDataCallback: (patchData: T) => void): SubscriptionHandler {
+    const subscriptionHandler = this.subscriptions.size + 1;
+    this.subscriptions.set(subscriptionHandler, patchDataCallback);
+
+    return subscriptionHandler;
+  }
+
+  unSubscription(subscriptionHandler: SubscriptionHandler): boolean {
+    return !this.subscriptions.has(subscriptionHandler) ? false : this.subscriptions.delete(subscriptionHandler);
+  }
+
+  complete(): void {
+    this.isComplete = true;
+    this.subscriptions.clear();
+  }
+}
+
+export const useObserve = <T>(observe: SubscriptionService<T>): [T, SubscriptionService<T>] => {
+  const [value, setValue] = useState<T>(observe.value);
+  useEffect(() => {
+    const subscriptionHandler = observe.subscription((newValue) => setValue(newValue));
+
+    return () => {
+      observe.unSubscription(subscriptionHandler);
+    };
+  }, []);
+
+  return [value, observe];
+};
+```
+本质就是一个事件订阅和事件发布。
+
+## 2 使用前需要声明一个公共的类作为组件和组件之间的调度器
+其实这个调度器，其实就是一个有静态属性的类，作用就是保证组件和组件之间使用的是一个内存，这样一来，有一个组件发布事件了，另一个也是使用这一内存作为事件的订阅的组件，就能被回调了，从而实现了组件和组件之间的通信。调度器的代码就这样了：
+``` typescript
+import SubscriptionService from "@wuchuheng/rxjs";
+
+export default class Scheduler {
+    // 声明一个共享会话的聊天室
+    public static chatGroupObserve = new SubscriptionService<string>('');
+}
+```
+
+## 3然后就可以直接在各个组件中使用了
+如:
+``` tsx
+import React from "react";
+import style from './style.module.scss';
+import {useObserve} from "@wuchuheng/rxjs";
+import Scheduler from "./Scheduler";
+
+type BossPropsType = {name: string, quotes: string[]}
+const bosses: BossPropsType[] = [
+    {name: '雷不死', quotes: ['Hello!', 'Thank you very mach!', 'Are you ok!', '这他妈的绝对是来捣乱的！！!']},
+    {name: '王一亿', quotes: ['定个小目标', '赚它一个亿']},
+    {name: '杰克马', quotes: ['996是福报', '向社会输送人才']},
+    {name: '麻花疼', quotes: ['充钱让你更强', '南山必胜客']},
+]
+
+const formatTime = (time: Date): string => `${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`
+
+const Boss = (props: BossPropsType): React.ReactElement => {
+    const [message, dispatcher] = useObserve(Scheduler.chatGroupObserve)
+    const handleChange = (e: string) => dispatcher.next(`${props.name}: ${e}`)
+
+    return (
+        <div className={style.bossWrapper}>
+            <div>大佬: {props.name}</div>
+            <div>
+                <div>他想说:</div>
+                <select onChange={(e) => handleChange(e.target.value) }>
+                    {props.quotes.map(q => <option value={q} key={q}>{q}</option>)}
+                </select>
+                <div>最新消息: <span>{message}</span></div>
+            </div>
+            <div className={style.history}>
+                <div>历史记录:</div>
+                <div className={style.history}>
+                    {
+                        dispatcher.history.map(
+                            (m, k) =>
+                                <p key={k}>
+                                    {formatTime(m.time)} {m.data}
+                                </p>
+                        )
+                    }
+                </div>
+            </div>
+        </div>
+    )
+}
+const CustomRedux = (): React.ReactElement => {
+    const BossesRender = (
+        bosses.map(
+            (bossInfo, k) => <Boss
+                name={bossInfo.name}
+                quotes={bossInfo.quotes} key={k}
+            />
+        )
+    )
+    return (
+        <div className={style.main}>
+            <h1>看看大佬们都说了什么？</h1>
+            <div className={style.container}>
+                {BossesRender}
+            </div>
+        </div>
+    )
+}
+
+export default CustomRedux
+
+```
+![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f37a129bc13343b6981ad30c60d945ed~tplv-k3u1fbpfcp-zoom-1.image)
+
+<IframeContainer src="https://codesandbox.io/embed/note-demo-for-react-7b6mf?fontsize=14&amp;initialpath=%2FcustomRedux&amp;theme=dark" />
+
+[![Edit note-demo-for-react](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d021098cec9845929ad3118080ff03a1~tplv-k3u1fbpfcp-zoom-1.image)](https://codesandbox.io/s/note-demo-for-react-7b6mf?fontsize=14&initialpath=%2FcustomRedux&theme=dark)
