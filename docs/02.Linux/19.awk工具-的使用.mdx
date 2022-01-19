@@ -64,5 +64,62 @@ algolia/docsearch-scraper   latest                   04e04eaa5c7d   5 months ago
 ```
 
 
+### 5 正则匹配
+``` bash title="awk的正则用法"
+$ awk'[column] ~ [regex] {print [column]}'
+```
+比如有一个场景， `git`中有一些忽略文件被添加到暂存区，由于数据很多，手动找太麻烦了，这时就可以使用正则的方式把这些都找出来：
+``` bash {9-11}
+$ git status
+On branch master
+
+No commits yet
+
+Changes to be committed:
+  (use "git rm --cached <file>..." to unstage)
+        new file:   .gitignore
+        new file:   .idea/.gitignore
+        new file:   .idea/misc.xml
+        new file:   .idea/modules.xml
+        new file:   .idea/observe.iml
+        new file:   .idea/vcs.xml
+        new file:   jest.config.js
+        new file:   lib/SubscriptionService.ts
+        new file:   lib/SubscriptionServiceI.ts
+        new file:   lib/useObserve.ts
+        new file:   package.json
+        new file:   test/index.test.tsx
+        new file:   tsconfig.json
+        new file:   tslint.json
+        new file:   yarn.lock
+$ git status | awk '$3 ~ /\.idea/ {print $3}' # <-- 通过 awk'[column] ~ [regex] {print [column]}'
+.idea/.gitignore
+.idea/misc.xml
+.idea/modules.xml
+.idea/observe.iml
+.idea/vcs.xml
+```
+
+:::tip
+以上是只把需要的文件找出来了，但有多行，需要转换为一行才能当成`git`的参数使用；所以可以用`tr`把换行符替换成空格，如:
+
+``` bash  title="tr把多行参数输入转换成单行输出"
+$ git status | awk '$3 ~ /\.idea/ {print $3}' | tr '\n' ' '
+.idea/.gitignore .idea/misc.xml .idea/modules.xml .idea/observe.iml .idea/vcs.xml %                                                                                                                                                            ~/Desktop/myprojects/a1001-zhuche/observe  on   master +15                                                                                                                                                  ✔  at 17:21:40 
+```
+
+然后直接当成`git`的删除暂存区参数，就可以直接删除这些文件了
+
+``` bash
+$ git rm --cached $(git status | awk '$3 ~ /\.idea/ {print $3}' | tr '\n' ' ' )
+$ git status
+rm '.idea/.gitignore'
+rm '.idea/misc.xml'
+rm '.idea/modules.xml'
+rm '.idea/observe.iml'
+rm '.idea/vcs.xml'
+```
+:::
+
 
 
