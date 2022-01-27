@@ -130,7 +130,7 @@ const config = {
             prism: {
                 theme: lightCodeTheme,
                 darkTheme: darkCodeTheme,
-                additionalLanguages: ['php', 'nginx', 'java', 'vim', 'dart', 'applescript', 'makefile', 'groovy'],
+                additionalLanguages: ['php', 'nginx', 'java', 'vim', 'dart', 'applescript', 'makefile', 'groovy', 'jsx', 'tsx'],
             },
             algolia: {
                 appId: 'IEGAUEEF24',

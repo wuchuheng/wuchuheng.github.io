@@ -11,7 +11,7 @@ date: 2022-01-24 3:05
 
 ## 1 阻止事件在`react`中冒泡
 事件在`react`组件中是由目标组件开始冒泡，只要其中一个环节中断事件的传递，就是能阻止上层组件监听到事件。如:
-``` react
+``` tsx
     <div onClick="() => console.log('click event')">
         <button
           onClick={(e) =>  e.stopPropagation()} // <-- 这个环节中断了事件，上层则不能监听到该点击事件
