@@ -122,4 +122,11 @@ rm '.idea/vcs.xml'
 :::
 
 
+### 6 指定行号
+
+``` bash title="指定从第二行开始, 输出第一列"
+ awk 'NR > 1 {print $1}'
+```
+
+
 
