@@ -1,0 +1,165 @@
+---
+title: 16.Mapstruct类型转换处理框架
+tags:
+- Mapstruct
+- Java类型转换
+date: 2022-03-03
+---
+
+由于`java`是强类型显示声明和赋值的编程语言，这导致`Java`中从一个类型转换成另一个类型，就是把一个类型的值赋值到另一个类型的值时，需要一个参数一个参数
+去赋值，这让编码的工作增加以及一点都不酷。所以， `mapstruct`就是解决2个类型之间的转换能直接转换的这么一种方案。其实使用方式是通过声明一个接口和接口的方法
+声明，然后使用者就可能通过这些声明的接口方法直接转换类型了. 原理是`mapstruct`通过接口以及注解的方式，自动生成转换的代码来实现类型与类型之间的转换，
+从而来减轻开发者的心智负担。如:
+
+
+## 1 直接转换
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Tabs>
+  <TabItem value="area" label="1 原类型" default >
+
+  ```java title="Area"
+  @Data
+  public class Area {
+      private String code;
+
+      private String name;
+  }
+  ```
+
+  </TabItem>
+
+  <TabItem value="areaResponse" label="2 目标类型" >
+
+  ```java title="AreaResponse"
+  @Data
+  public class AreaResponse {
+      private String code;
+
+      private String name;
+  }
+  ```
+
+  </TabItem>
+
+  <TabItem value="apple" label="3 声明转换关系" >
+
+  ```java title="DivisionMapper"
+@Mapper(componentModel = "spring")
+public interface DivisionMapper {
+    DivisionMapper INSTANCE = Mappers.getMapper(DivisionMapper.class);
+
+    AreaResponse areaToAreaResponse(Area area); // <-- Area 类型转换为 AreaResponse
+}
+  ```
+
+  </TabItem>
+  <TabItem value="usage" label="4 Area转换为AreaResponse" >
+
+  ```java
+  final var area = new Area();
+  // AreaResponse <-- Area
+  AreaResponse areaResponse = divisionMapper.areaToAreaResponse(area);
+  ```
+
+  </TabItem>
+</Tabs>
+
+
+## 2 自定义转换属性
+
+有些属性需要自定义转换，这时注解已经不能满足了，转换的情况了，需要为这部分的转换写转换逻辑.
+
+### 2.1 List&lt;String&gt;转List&lt;&gt;复合对象
+这里使用的是`qualifiedByName`注解来声明属性的转换方法名
+
+<Tabs>
+  <TabItem value="createStoreRequest" label="1 原类型" default >
+
+  ```java title="CreateStoreRequest"
+  @Data
+  @Builder
+  public class CreateStoreRequest {
+      private String name;
+
+      private List<String> banners; // 这里一个单一数组类型
+    }
+  ```
+
+  </TabItem>
+
+  <TabItem value="areaResponse" label="2 目标类型" >
+
+  ```java title="Store"
+  public class Store extends BaseEntity{
+      private String name;
+
+      private List<StoreBanner> banners;
+  }
+  ```
+
+  </TabItem>
+
+  <TabItem value="apple" label="3 banners的元素类型" >
+
+  ```java title="StoreBanner"
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Entity
+  @SuperBuilder
+  public class StoreBanner extends BaseEntity{
+      private Long id;
+
+      String imgKey;
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="declare" label="4 声明转换关系" >
+
+  ```java
+    // 1 把CreateStoreRequest 转换为 Store
+    @Mappings({
+        // 2 声明banners的转换处理业务名
+        @Mapping(source = "banners", target = "banners", qualifiedByName = "fromMapToBanners")
+    })
+    Store createRequestToStore(CreateStoreRequest request);
+
+    // 3 标记这里为处理banners属性业务的地方
+    @Named("fromMapToBanners")
+    default List<StoreBanner> fromMapToBanners(List<String> bannerKeys) {
+        var storeBanners = new ArrayList<StoreBanner>();
+        bannerKeys.stream().forEach(el -> {
+            var storeBannerItem = StoreBanner.builder()
+                .imgKey(el)
+                .build();
+            storeBanners.add(storeBannerItem);
+        });
+
+        return storeBanners;
+    }
+  ```
+  </TabItem>
+  <TabItem value="usage" label="5 使用" >
+
+  ```java
+    final var request = new CreateStoreRequest();
+    final var storeDto = storeMapper.createRequestToStore(request);
+  ```
+  </TabItem>
+</Tabs>
+
+## 3 默认值
+
+### 3.1 `constant`设定`target`属性默认值
+在`source`属性不存在而`target`属性存在的情况下，可以用`constant`为`target`设定默认值
+
+``` java
+    @Mappings({
+        @Mapping(target = "isEnable", constant = "true")  // <-- 设定target的isEnable的参数为true
+    })
+    Store createRequestToStore(CreateStoreRequest request);
+```
