@@ -3,7 +3,7 @@ name: deploy blog to  server
 on:
   push:
     branches:
-      - master
+      - deploy-test
 jobs:
   build:
     runs-on: ubuntu-latest
