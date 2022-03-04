@@ -23,6 +23,8 @@ jobs:
       # build
       - name: doc build
         run: |
+          node -v
+          ls -ahl
           yarn build
         env:
           CI: true
