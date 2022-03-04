@@ -10,7 +10,7 @@ jobs:
     steps:
       # 切换分支
       - name: Checkout
-        uses: actions/checkout@deploy-test
+        uses: actions/checkout@master
       # 使用 node
       - name: use Node.js 16
         uses: actions/setup-node@v1
