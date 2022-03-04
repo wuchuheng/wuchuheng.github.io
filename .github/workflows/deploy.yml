@@ -29,6 +29,9 @@ jobs:
           node -v
           cat package.json
           ls -ahl
+          yarn install
+          ls -ahl
+          ls -ahl node_modules
           yarn build
         env:
           CI: true
