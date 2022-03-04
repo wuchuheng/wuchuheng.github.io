@@ -27,6 +27,7 @@ jobs:
       - name: doc build
         run: |
           node -v
+          cat package.json
           ls -ahl
           yarn build
         env:
