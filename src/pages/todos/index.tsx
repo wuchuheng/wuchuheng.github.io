@@ -8,6 +8,7 @@ import apolloClient from "../../utils/apolloClicent";
 import TodoItemRender from "./TodoItemRender";
 import InputRender from './InputRender';
 import Layout from "@theme/Layout";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 
 export type TodoType = {
@@ -38,6 +39,7 @@ const Todos = (): React.ReactElement => {
                 <h2>todos</h2>
                 <InputRender/>
                 <ul>
+                    { todos.length === 0 && <LoadingSpinner style={{height: '100%', width: '100%'}} /> }
                     {todos.length > 0 && todos.map(todo => <TodoItemRender
                         todo={todo} key={todo.id}
                         currentChangeId={currentChangeId}
