@@ -1,0 +1,28 @@
+---
+title: 02 安装与hello world
+date: 2022-03-28
+---
+
+## 1 安装 
+打开[官网安装页面链接](https://www.rust-lang.org/tools/install),然后官网就是根据你当前的系统生成一个安装的命令行，然后在本机输入回车后
+根据提示安装就行了。 
+安装成功时： 在本机终端输入
+
+``` bash 
+
+$ rustc -- version
+rustc 1.59.0 (9d1b2106e 2022-02-23) # <-- 会输出版本的相关信息
+```
+
+## 2 hello world
+添加一个文件
+``` rust  title='main.rs'
+fn main() {
+    println!("Hello world!");
+}
+```
+
+``` bash titl="编译并执行"
+$ rustc marn.rs && ./marn
+hello wordl!
+```
