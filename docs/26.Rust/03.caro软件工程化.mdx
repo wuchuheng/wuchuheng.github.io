@@ -1,0 +1,29 @@
+---
+title: 03 Cargo软件工程化
+date: 2022-03-28
+---
+
+## 1 什么是cargo?
+cargo是`rust`的一个软件工程管理工具，在依赖库方面可以直接下载使用[carate](https://crates.io/)社区的开源库。
+在开发方面能接管编译和运行等工作。  
+`cargo`是`rust`官方指定的项目管理工具，安装了`rust`也就顺带安装了`cargo`，直接使用就行。 
+
+## 2 常用的作用
+
+### 2.1 初始化项目
+``` bash 
+$ caro new [projectName]
+```
+
+### 2.2 启动项目
+``` bash 
+$ caro run
+```
+
+### 2.3 编译项目
+``` bash 
+$ caro build # <-- 开发的编译
+$ caro build --release # <-- 用于发行的编译，性能更好，相对的时间更长
+```
+
+
