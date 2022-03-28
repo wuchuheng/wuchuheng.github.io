@@ -26,6 +26,8 @@ import Tools from '@site/src/components/Tools/Index';
 import Grid from '@site/src/components/Tools/Grid';
 import Library from '@site/src/components/Tools/Library';
 import CodesanboxRender from '@site/src/components/CodesanboxRender';
+import BrowserWindow from '@site/src/components/BrowserWindow';
+import IframeContainer from '@site/src/components/IframeContainer';
 ```
 
 ## 1数据库工具
@@ -209,6 +211,15 @@ windows: 'https://github.com/graphql/graphql-playground/releases/download/v1.8.1
 />
 
 </Grid>
+
+### 6.1 graphql playground 
+
+```mdx-code-block
+
+<BrowserWindow url="https://www.graphqlbin.com/v2/new" isJump>
+    <IframeContainer src='https://www.graphqlbin.com/v2/new' style={{width: '100%', height: '80vh'}} />
+</BrowserWindow>
+```
 
 ## 7 IP链路测试工具
 <Grid>
@@ -745,3 +756,22 @@ tags={['mac RSS阅读器']}
 />
 
 </Grid>
+
+## 31 Rust 测试沙盒
+
+```mdx-code-block
+
+<BrowserWindow url="https://play.rust-lang.org" isJump>
+    <IframeContainer src='https://play.rust-lang.org' style={{width: '100%', height: '80vh'}} />
+</BrowserWindow>
+```
+
+## 32 `awk`测试沙盒
+
+```mdx-code-block
+
+<BrowserWindow url="https://awk.js.org/" isJump>
+    <IframeContainer src='https://awk.js.org/' style={{width: '100%', height: '80vh'}} />
+</BrowserWindow>
+```
+
