@@ -19,6 +19,12 @@ $ caro new [projectName]
 ``` bash 
 $ caro run
 ```
+#### 2.4 自动启动项目
+``` bash
+$ cargo install cargo-watch # <-- 安装cargo-watch
+$ cargo watch -x run  # <-- 监听文件的变动，一旦有变动，则重新启动
+$ cargo watch -c -w src -x run # <-- 监听src目录，一旦有变动，则重新启动
+```
 
 ### 2.3 编译项目
 ``` bash 
