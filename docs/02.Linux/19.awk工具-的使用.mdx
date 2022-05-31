@@ -65,6 +65,9 @@ algolia/docsearch-scraper   latest                   04e04eaa5c7d   5 months ago
 
 
 ### 5 正则匹配
+
+#### 5.1 正向匹配
+
 ``` bash title="awk的正则用法"
 $ awk'[column] ~ [regex] {print [column]}'
 ```
@@ -121,7 +124,38 @@ rm '.idea/vcs.xml'
 ```
 :::
 
+#### 5.2 反向匹配
+``` bash title="awk的正则用法"
+$ awk'[column] !~ [regex] {print [column]}'
 
+```
+``` bash
+$ git status
+On branch master
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        deleted:    .idea/.gitignore
+        deleted:    .idea/inspectionProfiles/Project_Default.xml
+        deleted:    .idea/modules.xml
+        deleted:    .idea/pnote-app.iml
+        deleted:    .idea/vcs.xml
+        modified:   package.json
+        modified:   src/index.ts
+        renamed:    src/windows/mainWindow/createMainWindow.ts -> src/mainProcess/windows/mainWindow/createMainWindow.ts
+        renamed:    src/windows/mainWindow/events/windowMaximizeToggleEvent.ts -> src/mainProcess/windows/mainWindow/events/windowMaximizeToggleEvent.ts
+        renamed:    src/windows/mainWindow/preload.ts -> src/mainProcess/windows/mainWindow/preload.ts
+        deleted:    yarn.lock
+```
+如以上中需要找出不是`.idea`开头的文件，且是第3行开始的，则`awk`表达式`为:
+``` bash
+$  g status | awk 'NR > 3 && $2 !~ /ide/ {print $2}'
+package.json
+src/index.ts
+src/windows/mainWindow/createMainWindow.ts
+src/windows/mainWindow/events/windowMaximizeToggleEvent.ts
+src/windows/mainWindow/preload.ts
+yarn.lock
+```
 ### 6 指定行号
 
 ``` bash title="指定从第二行开始, 输出第一列"
