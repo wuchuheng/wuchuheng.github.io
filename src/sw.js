@@ -19,9 +19,8 @@ export default function swCustom(params) {
                 /assets\/js\/.*/,
                 /img\/.*/,
                 /assets\/css\/.*/,
-            ].some((regex) => context.url.href.match(regex))
-
-            console.log(res)
+                /\/.*/,
+            ].some((regex) => context.url.href.match(regex));
 
             return res
         },
