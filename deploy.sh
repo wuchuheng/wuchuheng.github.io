@@ -2,7 +2,7 @@
 
 localDir=build
 remoteDir=/www/wwwroot/wuchuheng.com
-yarn build
+pnpm build
 
 if [ $? !== 0 ]; then
   RED='\033[0;31m'
