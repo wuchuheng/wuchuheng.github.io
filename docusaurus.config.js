@@ -74,7 +74,7 @@ const config = {
                     {to: '/tools', label: 'Tools', position: 'right'},
                     {to: '/docs/收录优秀的开源库', label: 'libraries', position: 'right'},
                     {to: '/todos', label: 'Todos', position: 'right'},
-                    {to: '/books', label: 'Books', position: 'right'},
+                    {to: '/docs/收录开源书籍', label: 'Books', position: 'right'},
                     {to: '/docs/友情链接收录', label: 'FriendlyLink', position: 'right'},
                     {
                         href: 'https://github.com/wuchuheng/wuchuheng.github.io',
