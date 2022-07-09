@@ -17,7 +17,7 @@ fi
 
 echo $?
 
-sftp root@demo.jds.wuchuheng.com <<EOF
+sftp root@wuchuheng.com <<EOF
   cd $remoteDir
   lcd $localDir
   put -r * ./
