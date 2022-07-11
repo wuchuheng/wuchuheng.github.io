@@ -13,7 +13,7 @@ import IframeContainer from '@site/src/components/IframeContainer';
 ```
 
 
-### 1 什么是awk？
+## 1 什么是awk？
 `awk`是一门文本处理语言,其作用是对文本匹配,过滤，统计和基本的逻辑运算，最后文本中的过滤后或统计后的
 结果。`awk`于1977年在贝尔实验室被创造出来，其命名取自
 [Alfred Aho](https://en.wikipedia.org/wiki/Alfred_Aho),
@@ -21,7 +21,7 @@ import IframeContainer from '@site/src/components/IframeContainer';
 [Brian Kernighan](https://en.wikipedia.org/wiki/Brian_Kernighan) 这三位
 创始人的名称首字母。
 
-### 2 直观的使用示例
+## 2 直观的使用示例
 >  只展示文本的第一列信息
 ``` bash
 $ netstat -tulpen | awk '{print $1}'
@@ -37,7 +37,7 @@ udp
 udp6
 udp6
 ```
-### 3 `awk`在线测试工具
+## 3 `awk`在线测试工具
 
 ```mdx-code-block
 
@@ -45,9 +45,9 @@ udp6
     <IframeContainer src='https://awk.js.org/' style={{width: '100%', height: '80vh'}} />
 </BrowserWindow>
 ```
-### 4 流程控制
+## 4 流程控制
 
-#### 4.1 `if` 流程
+### 4.1 `if` 流程
 
 > 以下示例意图为:判断第二列的参数是否为algolia/docsearch-scraper, 如果是则输出第一列
 
@@ -64,9 +64,9 @@ algolia/docsearch-scraper   latest                   04e04eaa5c7d   5 months ago
 ```
 
 
-### 5 正则匹配
+## 5 正则匹配
 
-#### 5.1 正向匹配
+### 5.1 正向匹配
 
 ``` bash title="awk的正则用法"
 $ awk'[column] ~ [regex] {print [column]}'
@@ -124,7 +124,7 @@ rm '.idea/vcs.xml'
 ```
 :::
 
-#### 5.2 反向匹配
+### 5.2 反向匹配
 ``` bash title="awk的正则用法"
 $ awk'[column] !~ [regex] {print [column]}'
 
@@ -156,11 +156,47 @@ src/windows/mainWindow/events/windowMaximizeToggleEvent.ts
 src/windows/mainWindow/preload.ts
 yarn.lock
 ```
-### 6 指定行号
+## 6 指定行号
 
 ``` bash title="指定从第二行开始, 输出第一列"
  awk 'NR > 1 {print $1}'
 ```
 
+## 7 正则匹配
 
+``` bash title="示例样本"
+demoTxt=$( cat <<EOF
+vim/cocvim/coc/extensions/package.json
+vim/cocvim/config/coc-settings.json
+vim/cocvim/config/init.lua
+vim/cocvim/config/lua/plugin-configs/coc/init.lua
+vim/cocvim/config/lua/plugin-configs/telescope.lua
+vim/cocvim/config/lua/plugins.lua
+vim/cocvim/config/plugin/packer_compiled.lua
+vim/cocvim/config/coc-extensions/
+EOF
+)
+```
+
+### 7.1 匹配运算符 `~`
+
+匹配行中有`init.lua`和`coc-extensions`关键词的行。
+``` bash
+$ echo $demoTxt | awk '$0 ~ "coc-extensions|init.lua" {print $0}'
+ vim/cocvim/config/init.lua
+ vim/cocvim/config/lua/plugin-configs/coc/init.lua
+ vim/cocvim/config/coc-extensions/
+```
+
+### 7.2 不匹配运算符`!~`
+
+不匹配行中有`init.lua`和`coc-extensions`关键词的行。
+``` bash
+$ echo $demoTxt | awk '$0 !~ "coc-extensions|init.lua" {print $0}'
+ vim/cocvim/coc/extensions/package.json
+ vim/cocvim/config/coc-settings.json
+ vim/cocvim/config/lua/plugin-configs/telescope.lua
+ vim/cocvim/config/lua/plugins.lua
+ vim/cocvim/config/plugin/packer_compiled.lua
+```
 
