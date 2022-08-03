@@ -1,0 +1,94 @@
+---
+title: 07.多路任务复用的算法实现
+date: 2022-08-3 23:52
+---
+## 1 什么是"多路任务复用"?
+在多次调用同一个任务时，且这个任务耗时较长。这样一来每调用一次任务就要生成一个任务，然后等待。这样就会形成多个任务在执行。且要从头开始等待任务的返回结果。
+这样一来不仅会有大量重任务被创建，且也不能节省时间。
+
+![](https://qiniu.wuchuheng.com/images/tmp.png)
+
+既然多将创建任务的都是同一个任务，那么为什么不复用同一个任务呢？可以只创建一个任务，而然后任务都给阻塞住，等有任务返回结果后，再把结果返回给阻塞的
+调用。这样就可以节省资源的开销和等待的时间。
+
+![](https://qiniu.wuchuheng.com/images/WX20220804-002147.png)
+
+## 2 代码实现
+
+``` dart title="multiplex_task_pool.dart"
+import 'dart:async';
+
+/// 多路任务复用池
+class MultiplexTaskPool {
+  List<Function<T>({required bool isResult, T? result})> callbackList = [];
+
+  static MultiplexTaskPool builder() {
+    return MultiplexTaskPool();
+  }
+
+  Future<T> start<T>(Future<T> Function() callback) async {
+    Completer<T> completer = Completer();
+    callbackList.add(
+      <B>({required bool isResult, B? result}) async {
+        if (isResult) {
+          return completer.complete(result as T);
+        } else {
+          T finalResult = await callback();
+          for (var i = 0; i < callbackList.length; i++) {
+            await callbackList[i](isResult: true, result: finalResult);
+          }
+          callbackList.clear();
+        }
+      },
+    );
+    if (callbackList.length == 1) {
+      callbackList[0](isResult: false);
+    }
+
+    return completer.future;
+  }
+}
+```
+
+> 代码的思路是，把任务的逻辑通过回调方式传入进来，并把任务注册到任务池中，然后调用任务。而后面也会创建相同的任务时，也是把任务加入到任务池中，但
+> 由于已经调用过一次了，有任务有处理了，所以不创建相同的任务了，等任务一结束，就解放阻塞，向各个任务池中的回调中返回任务的结果。然后清空任务池。
+
+## 3 使用示例
+
+``` dart  title="使用示例"
+class RegisterService  {
+  static List<Function({required bool isResult, bool? result})> callbackList = [];
+  static MultiplexTaskPool hasRegisterTaskPool = MultiplexTaskPool.builder(); // 多路任务复用池
+
+  @override
+  Future<bool> hasRegister() async {
+    return await hasRegisterTaskPool.start<bool>(() async {
+      await Future.delayed(const Duration(seconds: 4));
+      print('hello! 有人吗?');
+      reutrn true;
+    });
+  }
+
+  /// 并发执行
+  void run() async {
+      final results = await Future.wait([
+        hasRegister(),
+        hasRegister(),
+        hasRegister(),
+        hasRegister(),
+      ]);
+  }
+}
+```
+
+``` bash title="最终执行的打印结果"
+$ hello! 有人吗?
+```
+
+
+
+
+
+
+
+
