@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 localDir=build
-remoteDir=/www/wwwroot/wuchuheng.com
+remoteDir=/home/admin/web/wuchuheng.com/public_html
 pnpm build
 
 if [ $? !== 0 ]; then
@@ -17,7 +17,7 @@ fi
 
 echo $?
 
-sftp root@wuchuheng.com <<EOF
+sftp admin@wuchuheng.com <<EOF
   cd $remoteDir
   lcd $localDir
   put -r * ./
