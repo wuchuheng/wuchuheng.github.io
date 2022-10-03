@@ -1,0 +1,101 @@
+---
+title: Resume
+date: 2021-08-21
+---
+
+```mdx-code-block
+import QRCode from 'qrcode.react';
+```
+
+
+
+<h1 align="center">Flutter求职-吴楚衡(5年经验)</h1>
+
+<div style={{display: 'grid', gridTemplateColumns: 'auto 20%'  }} >
+    <div>
+        <div  style={{display: 'grid', gridTemplateColumns: 'repeat(2, 50%)' , }} >
+            <div>手机: 13427969604</div>
+            <div>博客: <a href="https://(wuchuheng.)com">wuchuheng.com</a></div>
+            <div>邮件: <a href="mailto:root@imspeng.com">root@wuchuheng.com</a></div>
+            <div>Github: <a href="https://github.com/wuchuheng">wuchuheng</a></div>
+            <div>性别: 男</div>
+            <div>出生: 1994</div>
+        </div>
+    </div>
+    <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+    }}>
+        <QRCode value="https://wuchuheng.com/resume" renderAs="canvas" size={75} />
+        <div  style={{fontSize: 11.5}} >(扫码查看简历)</div>
+    </div>
+</div>
+
+
+## 1 技能
+* 编程语言: Flutter | Java | Typescript/Javascript/NodeJs | Golang | PHP | Lua | vimscript
+* 后端框架: SpringBoot(java) | Nestjs |  hyperf(php)  | Express(js)
+* 数据库和缓存: Mysql | sqlite | Postgre | Redis
+* 单元测试: Jest | golang test | typescript test | dart library unit test | java unit test
+* web端: React/Redux | Angular/rxjs | Vue | ant design(ui库) | Less/Sass(css)
+* 小程序端: Taro(react) | uniapp(vue)
+* 移动端UI:  Material Design(flutter)
+* 开发工具: Git | Makefile | Vim
+* API接口: Graphql/apolloGraphql | Restfull
+* 运维工具: Docker/docker-compose | Shell/OhMyZsh(Linux/Centos/Ubuntu/Debian/Macos)
+* 网关工具: nginx
+
+## 2 工作经历
+
+<div style={{display: "flex", justifyContent: "space-between" }}>
+    <h3>2.1 落用网络工作室</h3><h3>工作室负责人/首席工程师</h3><h3>07/2021 -> 至今</h3>
+</div>
+
+* 负责小程序项目的设计和开发后.
+* 根据用户需求定制出可行可靠的解决方案并负责技术的落实.
+* 参与项目的开发并采用如: react/typescript实现管理后台, sprintboot实现服务商端,taro/react实现微信支付宝等多个端的小程序.
+* 根据自己的需求开发满足自己工作需要的工具,如基于`flutter`实现在`Ios`,`Ipad`,`Android`,`Macos`,`Windows`,`Linux`等平台的`markdown`笔记等.
+和完成后续苹果上架等工作
+* 根据自己的需求写出满足自己的开源库并发布出去,如: `react UI`库, `ts`库, `dart`库或`php`库,涉及`UI`，路由管理,状态管理及订阅，数据缓存等等
+
+
+<div style={{display: "flex", justifyContent: "space-between" }}>
+    <h3>2.2 拾点拾分网络科技有限公司</h3><h3>全栈开发工程师</h3><h3>10/2019 -> 06/2021</h3>
+</div>
+
+* 项目主程。根据用户需求制定解决方案并安排协调相关人员参与方案的实施，以及管理代码的相关审查等工作
+* 主导项目从制定到交付以及维护，从而保障几十万项目资金的顺利交付和后期的迭代工作。
+
+## 3 项目
+### 3.1 我的产品
+#### 3.1.1 车租婆租车小程序(微信端/支付宝端)
+
+* 技术栈: SpringBoot + React/Typescript + Taro
+* 交付方式: docker-compose
+* 产品功能: 本产品是专门为中小企业的租车公司提供线上租车功能，支付功能，分销功能，多门店功能，推广功能，优惠券功能。为中小租车企业在互联网时代下创造出能与有与其它大企业竞争的条件。
+* 项目源码:  [ github.com/chezupo ](https://github.com/chezupo)
+
+#### 3.1.2 My revelation(Markdown笔记软件)
+
+* 初衷: 人们可以使用大量的软件，但是没一个软件是属于用户的，用户创造了数据，而平台收集了数据，至于数据是怎么处理的，创造者无权决定，也不能删除。 那么有没有一种应用，用户的数据可以自己去管理甚至去删除而且使用起来也很简单?目前只有一类应用，那就是邮件，所以，我便基于用户自己可创造可删除这一特性之上，再创造出一个`markdown`笔记工具，数据完全是保存在用户自己的邮箱之下。而使用也很简单， 有邮件账号就可以登录并使用了。
+
+* `IOS`/`Ipad`端: https://apps.apple.com/cn/app/my-revelation/id1645708224?l=en
+
+### 3.2 开源库项目
+
+* [wuchuheng_router](https://pub.dev/packages/wuchuheng_router) `flutter`路由库，解决了原生`url`与路由栈不一致的问题,并加入路由跳转前的中间拦截异步事件
+* [wuchuheng_env](https://pub.dev/packages/wuchuheng_env) `dart`的 `env`解析库
+* [imspeng_hooks](https://pub.dev/packages/wuchuheng_hooks) `flutter`的全局状态管理库和变更事件订阅
+* [wuchuheng_logger](https://pub.dev/packages/wuchuheng_logger) `dart` 日志库
+* [wuchuheng_task_util](https://pub.dev/packages/wuchuheng_task_util )`dart`的任务处理库，解决多任务复或多任务并发时单个任务调试等场景问题
+* [wuchuheng_imap_cache](https://pub.dev/packages/wuchuheng_imap_cache )`dart`的基于`imap`的缓存库
+* [wuchuheng_ui](https://pub.dev/packages/wuchuheng_ui) `flutter` UI库
+* [wuchuheng_isolate_channel](https://pub.dev/packages/wuchuheng_isolate_channel) `flutter`的多线程通信管道库
+* [wuchuheng_local_cache](https://pub.dev/packages/wuchuheng_local_cache) `dart`本地键值缓存库
+* [更多的库](http://wuchuheng.com/docs/myLiberies)
+
+
+
+
+
+
