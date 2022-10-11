@@ -22,3 +22,10 @@ jobs:
       - run: npm install -g pnpm
       - run: pnpm install
       - run: pnpm build
+      - name: SFTP uploader
+        uses: wangyucode/sftp-upload-action@v1.4.6
+        with:
+          host: 'wuchuheng.com'
+          password: ${{ secrets.password }}
+          localDir: 'build'
+          remoteDir: '/home/admin/web/wuchuheng.com/public_html'
