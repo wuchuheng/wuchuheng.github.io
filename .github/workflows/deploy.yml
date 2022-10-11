@@ -1,10 +1,10 @@
+
 name: Website Deployment
 
 on:
   push:
     branches:
       - tmp
-      -
 jobs:
   build:
     runs-on: ubuntu-latest
