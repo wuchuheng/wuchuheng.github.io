@@ -72,6 +72,7 @@ const config = {
         },
         {to: '/blog', label: 'Blog', position: 'right'},
         {to: '/docs/myLiberies', label: 'MyLibraries', position: 'right'},
+        {to: 'revelation', label: 'RevelationAPP', position: 'right'},
         {to: '/tools', label: 'Tools', position: 'right'},
         {to: '/docs/收录优秀的开源库', label: 'libraries', position: 'right'},
         {to: '/todos', label: 'Todos', position: 'right'},
