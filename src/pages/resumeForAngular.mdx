@@ -1,0 +1,100 @@
+---
+title: Resume
+date: 2021-08-21
+---
+
+```mdx-code-block
+import QRCode from 'qrcode.react';
+```
+
+
+
+<h1 align="center">Flutter求职-吴楚衡(5年经验)</h1>
+
+<div style={{display: 'grid', gridTemplateColumns: 'auto 15% 15%' }} >
+    <div>
+        <div  style={{display: 'grid', gridTemplateColumns: 'repeat(2, 50%)' , }} >
+            <div>手机: 13427969604</div>
+            <div>博客: <a href="https://(wuchuheng.)com">wuchuheng.com</a></div>
+            <div>邮件: <a href="mailto:root@imspeng.com">root@wuchuheng.com</a></div>
+            <div>Github: <a href="https://github.com/wuchuheng">wuchuheng</a></div>
+            <div>性别: 男</div>
+            <div>出生: 1994</div>
+        </div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <img src='https://qiniu.wuchuheng.com/images/IMG_0514.JPG' width={75} />
+    </div>
+
+<div style={{ display: 'flex', flexDirection: 'column' }}>
+    <QRCode value="https://wuchuheng.com/resume" renderAs="canvas" size={85} />
+    <div  style={{fontSize: 11.5}} >(扫码查看简历)</div>
+</div>
+</div>
+
+
+## 1 技能
+
+* 后端框架:  Nestjs | Express(js)
+* 数据库和缓存: Mysql | sqlite | Postgre | Redis
+* 单元测试: Jest
+* web端: React/Redux | Angular/rxjs |  Less/Sass | html/css/javascript
+* API接口: Graphql/Apollo
+* 运维工具: Docker/docker-compose
+* 网关工具: nginx
+
+## 2 工作经历
+
+<div style={{display: "flex", justifyContent: "space-between" }}>
+    <h3>2.1 落用网络工作室</h3><h3>工作室负责人/首席工程师</h3><h3>07/2021 -> 至今</h3>
+</div>
+
+* 公司介绍: 外接各种互联网项目
+* 成员规模: 2人
+* 我的职责: 工作室负责人, 负责项目的设计和开发,根据用户需求定制出可行可靠的解决方案并负责技术的落。
+
+## 3 项目
+### 3.1 我的产品
+#### 3.1.1 APP展示网页
+
+* 产品介绍: 用于为外包公司对外展示各种应用，如： 小程序，安卓和`ios`这些。方便客户能方便查看公司的以前做过的产品应用，相关预览和应用下载。
+#####  我实现的功能:
+* 响应式页面，能适配电脑和手机设备
+* 实现各种页面： 如: 主页(展示各种应用列表和预览图)， 详情页(应用的说明和下载)等等。
+* 管理后台: 应用的上传，编辑，修改和删除等操作
+
+##### 我解决的难题:
+* `Graphql`接口方案的实现的鉴权等等功能的
+* 后台的文件上传的进度订阅用于展示上传进度条
+* 更合理的状态管理，把状态委托在`service`业务层进行管理，以`rxjs`方式进行声明于视图层进行展示，而状态的变更只能限定于当前的`service`中
+* 路由的管理和鉴权
+* 需要解决更甚高效的样式和更开发效率，我使用了`less`样式预处理器。
+
+#### 3.1.2 Telegram机器人实现广告投放系统
+
+* 产品介绍: 基于机器人去管理`TG`群的用于发出的关键词并进行搜索。
+* 所采用的技术: Nestjs(Angular的后端应用)
+##### 我要实现的功能:
+* 1 监听新用户加入和会员注册引导消息的发送
+* 2 实现`TG`对应的指令要菜单功能的实现，比如，引导用户购买会员，广告投放，广告关键词检索的目标用户群有哪些。
+* 3 采集群的用户发言的关键词，并保存相关人信息方便进行后面检索使用
+* 4 关键词搜索功能: 收集到关键词，并返回给用户符合广告主的投放的广告内容。
+
+##### 我解决的难题:
+* 代码的业务分层难题: `TG`机器管理涉及`指令`解析,操作解析和事件解析。而每一种解析后，对应一项处理业务。这里划分一个机器人模块。专门来处理这些事。
+* 数据层管理难: 数据持久化是用`myql`,使用了`ORM`来管理数据，把数据的`模型层`和数据的`操作层`划分为一个模块进行处理.
+
+### 3.2 我对开源社区的贡献
+
+#### 3.2.1 开源应用`Revelation`
+软件的多端数据同步通常都是`CS`或`BS`架构，而这是一个`Markdown`笔记。只要任何人有`QQ`邮箱账号就可以使用了。是一种颠覆他人认知的软件开发方式和使用方式。这是真的。
+* 应用平台: IOS, Android, MacOS, Linux, Windows.
+* 实现技术: Flutter/Dart
+* 下载链接: [wuchuheng.com/revelation](https://wuchuheng.com/revelation)
+* 实现原理: 基于`IMAP`协议，用户能对邮件进行`CRUD`，那么假设把邮件抽象成缓存媒介或是多客户端之间的消息传递媒介，那不就是能实现服务器所能实现的数据保存和数据通讯的功能吗？所以
+基于这一特性，我就做出了不用自己去创建服务器也能进行数据保存在线上和同步数据在各个客户端之间，实现通讯功能的`Markdown`笔记软件,理论上每个人都可以使用，只要它有邮件账号就行。而数据是保存在
+对方邮件账号下的一个文件夹下。
+
+#### 3.2.1 `NPM`社区开源库
+* `@wuchuheng/rxjs`，一个用于`React`的`rxjs`库。
+* `@wuchuhengtools/type-writer`， 一个打字效果的`React`组件库和一些其它的组件。
