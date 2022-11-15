@@ -1,0 +1,37 @@
+---
+title: 18.Gradle发布Java库
+date: 2022-11-14
+---
+
+## 1 本文的目标是什么?
+* 创建一个`java`库
+* 发布到`mvnrepository`
+
+## 2 准备工作
+
+* `java` 环境, 如果没有可以去[官网](https://www.oracle.com/java/technologies/downloads)下载。
+* 一个邮箱，用于注册[sonatype](https://issues.sonatype.org)时使用。本次演示我用的是`root@wuchuheng.cn`
+* 一个域名，用于[sonatype](https://issues.sonatype.org)中声明自己包的`groupId`
+* 本机已已安装了[`GPG`](https://gpgtools.org)加密工具,用于在发包时，对包进行非对称加密，防止在发布时被第3方篡改。
+* 本机已安装了[`Gradle`](https://docs.gradle.org/current/userguide/userguide.html), 不知道方法的,可以去[官网](https://docs.gradle.org/current/userguide/userguide.html) 查看相关说明.
+
+
+
+<details>
+
+<summary>Markdown is declarative</summary>
+
+Some may assume a 1-1 correlation between Markdown and HTML, e.g., `![Preview](/img/docusaurus.png)` will always become `<img src="/img/docusaurus.png" alt="Preview" />`, as-is. However, _that is not the case_.
+
+The Markdown syntax `![message](url)` only declaratively tells Docusaurus that an image needs to be inserted here, but we may do other things like transforming a [file path to URL path](./markdown-features-assets.mdx#images), so the generated markup may differ from the output of other Markdown renderers, or a naïve hand-transcription to the equivalent JSX/HTML code.
+
+In general, you should only assume the _semantics_ of the markup (` ``` ` fences become [code blocks](./markdown-features-code-blocks.mdx); `>` becomes [quotes](#quotes), etc.), but not the actual compiled output.
+
+</details>
+
+
+
+
+
+
+
