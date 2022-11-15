@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from "react";
 import styles from "../styles.module.scss";
 import ExecutionEnvironment from "@docusaurus/ExecutionEnvironment";
-import {useMutation, gql} from "@apollo/client";
+import {gql, useMutation} from "@apollo/client";
 
 const Index = () => {
-    const [title, setTitle] = useState<String>('');
+    const [title, setTitle] = useState<string>('');
     let handleCreateTodo = () => {}
     if (ExecutionEnvironment.canUseDOM) {
         const CREATE_TODO_MUTATION = gql`
@@ -30,7 +30,7 @@ const Index = () => {
         }
     }
 
-    const input = <input
+    return <input
         value={title}
         type='text'
         onChange={(newTitle) => setTitle(newTitle.target.value)}
@@ -38,7 +38,6 @@ const Index = () => {
         onKeyDown={handleKeyDown}
         placeholder="Please enter a new todo."
     />;
-    return input;
 }
 
 export default Index
