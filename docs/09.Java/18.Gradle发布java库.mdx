@@ -1,7 +1,13 @@
 ---
-title: 18.Gradle发布Java库
+title: 18.Gradle如何发布Java库?
 date: 2022-11-14
 ---
+
+```mdx-code-block
+import Tools from '@site/src/components/Tools/Index';
+import LightBox from '@site/src/components/Lightbox/Lightbox';
+
+```
 
 ## 1 本文的目标是什么?
 * 创建一个`java`库
@@ -9,29 +15,839 @@ date: 2022-11-14
 
 ## 2 准备工作
 
-* `java` 环境, 如果没有可以去[官网](https://www.oracle.com/java/technologies/downloads)下载。
-* 一个邮箱，用于注册[sonatype](https://issues.sonatype.org)时使用。本次演示我用的是`root@wuchuheng.cn`
-* 一个域名，用于[sonatype](https://issues.sonatype.org)中声明自己包的`groupId`
-* 本机已已安装了[`GPG`](https://gpgtools.org)加密工具,用于在发包时，对包进行非对称加密，防止在发布时被第3方篡改。
-* 本机已安装了[`Gradle`](https://docs.gradle.org/current/userguide/userguide.html), 不知道方法的,可以去[官网](https://docs.gradle.org/current/userguide/userguide.html) 查看相关说明.
+| 名称 | 必要 | 文中示例 | 说明 |
+| --- | --- | --- | --- |
+| java | ✅ | java17 |如果没有可以去[官网](https://www.oracle.com/java/technologies/downloads)下载。  |
+| 邮箱  | ✅ | root@wuchuheng.cn | 用于注册[sonatype](https://issues.sonatype.org)和`GPG`密钥生成  |
+| 域名 | ✅ |  wuchuheng.cn | 用于申请`cn.wuchuheng`的groupId` |
+| `GPG` | ✅ | [gpg](https://gpgtools.org) | 用于生成非对称公钥和私钥，并上传公钥出去，这样平来在发布自己的包时，对其进行加密，防止被中间人篡改|
+| `Gradl` | ✅ | `Gradle 7.5` | 包的生成初始化生成和包的发布都是需要这个工具来完成 |
+| github仓库 | ✅ | [`gradle-libery-demo-java`](https://github.com/wuchuheng/gradle-libery-demo-java) | 创建一个空仓库，用于存放代码和申请`groupId`时填写表单使用 |
+| Git | ✅ | | 版本控制工具，用于保存代码使用 |
+| base64 | ✅ |  | base64是一个把二进制数据编码成字符串的工具,本文中用于转换`GPG`二进制私钥为base64文本  |
+| 编辑器 | ❌ | `IntelliJ IDEA`  | 准备一个编辑器，用的顺手就行 |
+| OS | ❌ | `Mac OS 12`  | 演示使用的操作系统 |
 
 
+## 3 获取sonatype仓库的发包许可
+当我们把`java`库打包出来后，想要发布到公共的仓库才能为他人所用时，我们需要获取仓库的发布许可，包才有可以上传上去。所以我们需要创建创建一个
+[`sonatype`](https://issues.sonatype.org/)账号, 并获取发包的许可。
+
+:::tip 为什么要这么做?
+
+当我们把包发布到[`sonatype`](https://issues.sonatype.org/)的仓库后，这些包确认没有问题，可以正式公布出去时，便可以同步到`mvnrepository`。
+这要其他人也可以发布我们所发布的包，从而下载并使用它们.
+
+:::
+
+### 3.1 注册sonatype(OSSRH)账号
+> 去[issues.sonatype.org](https://issues.sonatype.org/secure/Signup!default.jspa)注册一个账号.
 
 <details>
+<summary>注册、登录、语言向导截图</summary>
 
-<summary>Markdown is declarative</summary>
+> 注册
+<LightBox url="https://qiniu.wuchuheng.com/images/WX20221115-130426.png" alt="Gradle发布Java库到mvnrepository" />
 
-Some may assume a 1-1 correlation between Markdown and HTML, e.g., `![Preview](/img/docusaurus.png)` will always become `<img src="/img/docusaurus.png" alt="Preview" />`, as-is. However, _that is not the case_.
+> 登录
+<LightBox url="https://qiniu.wuchuheng.com/images/howToPublishJavaLiberyToMvn1.png" alt="Gradle发布Java库到mvnrepository" />
 
-The Markdown syntax `![message](url)` only declaratively tells Docusaurus that an image needs to be inserted here, but we may do other things like transforming a [file path to URL path](./markdown-features-assets.mdx#images), so the generated markup may differ from the output of other Markdown renderers, or a naïve hand-transcription to the equivalent JSX/HTML code.
+> 新手向导
+<LightBox url="https://qiniu.wuchuheng.com/images/howToPublishJavaLiberyToMvn2.png" alt="Gradle发布Java库到mvnrepository" />
 
-In general, you should only assume the _semantics_ of the markup (` ``` ` fences become [code blocks](./markdown-features-code-blocks.mdx); `>` becomes [quotes](#quotes), etc.), but not the actual compiled output.
+</details>
+
+### 3.2 提交创建项目的issue
+
+:::tip 为什么要提交创建项目的issue?
+因为我们需要为`wuchuheng.cn`申请`cn.wuchuheng`的`groupId`
+:::
+
+在创建`issue`时,在表单中需要填写:
+
+1. project 选择: Community Support - Open Source Project Repository Hosting (OSSRH)
+2. Issue Type: Improvement
+3. Summary: Create repository for [你的域名倒置]
+4. Group Id: [你的域名倒置]
+5. Project URL: 写上你的代码仓库链接，如: https://github.com/wuchuheng/gradle-libery-demo-java
+7. SMC URL: 写上你的代码仓库链接，如: https://github.com/wuchuheng/gradle-libery-demo-java
+7. 创建Issue
+
+<details>
+<summary>创建Issue截图</summary>
+
+> 创建Issue
+
+<LightBox url="https://qiniu.wuchuheng.com/images/https-%3A%3Aqiniu.wuchuheng.com%3Aimages%3AhowToPublishJavaLiberyToMvn3.png" alt="Gradle发布Java库到mvnrepository" />
+
+> 填写Issue表单
+
+<LightBox url="https://qiniu.wuchuheng.com/images/howToCreateAJavaLiberyAndPublishToMvn2.png" alt="Gradle发布Java库到mvnrepository" />
+<LightBox url="https://qiniu.wuchuheng.com/images/howToCreateAJavaLiberyAndPublishToMvn4.png" alt="Gradle发布Java库到mvnrepository" />
+
+> Issue 创建成功
+
+<LightBox url="https://qiniu.wuchuheng.com/images/howToCreateAJavaLiberyAndPublishToMvn5.png" alt="Gradle发布Java库到mvnrepository" />
+</details>
+
+
+### 3.3 等待审核机器人回复Issue
+快的话几分钟，慢的话就再等等. 😂😂😂
+
+### 3.4 添加TXT域名解析
+:::note 根据帖子的回复内容: 需要用`wuchuheng.cn`添加一个TXT域名解析,参数值为:OSSRH-86264
+
+<LightBox url="https://qiniu.wuchuheng.com/images/howToCreateAJavaLiberyAndPublishToMvn6.png" alt="Gradle发布Java库到mvnrepository" width={40}/>
+
+:::
+
+> 这需要去找域名服务提供商进行解析配置。比如我的域名服务来自阿里云，同理就找阿里云添加相关配置。
+
+<details>
+    <summary>阿里云添加TXT记录示例</summary>
+    <LightBox url="https://qiniu.wuchuheng.com/images/howToCreateAJavaLiberyAndPublishToMvn7.png" alt="Gradle发布Java库到mvnrepository" />
+</details>
+
+
+### 3.5 回复Issue并告知对方Txt记录已添加
+
+<LightBox url="https://qiniu.wuchuheng.com/images/howToCreateAJavaLiberyAndPublishToMvn8.png" alt="Gradle发布Java库到mvnrepository" width={40} />
+
+> 然后等待对方回复.也许几分钟吧. 😂😂😂
+
+### 3.6 完成仓库的发包许可
+<LightBox url="https://qiniu.wuchuheng.com/images/howToCreateAJavaLiberyAndPublishToMvn9.png" alt="Gradle发布Java库到mvnrepository" width={40} />
+
+> 从对方的回复中，本账号已经被允许上传包到[`s01.oss.sonatype.org`](https://s01.oss.sonatype.org/)中。而后面我们制作出来的`artifacts`便是提交到这个仓库中的。
+> 至此，包的发布渠道问题算是解决了.
+
+## 4 初始化GPG密钥以用于发包时对包进行加密
+
+:::note 什么是GPG?为什么要在发包时使用它？起到什么作用?
+
+GPG是一个非对称密钥生成和管理工具。它通常的一个使用方式就是生成密钥对，公钥和私钥. 然后使用者上传它的公钥到公网上公布自己的公钥为他人所知,而私钥自己保存。
+然后就可以用另一个私钥，对文件进行加密，然后把文件发送给其他人，由于是非对称加密，中间人无法对其进行篡改，而使用者只需要去下载公布出来的密钥就可以解密文件的内容了。
+
+而使用加密就是为了确保发包时，不被中间人所篡改。
+
+:::
+
+### 4.1 生成密钥
+
+``` sh title="生成密钥"
+$ gpg --generate-key
+gpg (GnuPG/MacGPG2) 2.2.40; Copyright (C) 2022 g10 Code GmbH
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Note: Use "gpg --full-generate-key" for a full featured key generation dialog.
+
+GnuPG needs to construct a user ID to identify your key.
+
+
+// highlight-start
+Real name: wuchuhengcn # <-- 输入用户名
+Email address: root@wuchuheng.cn # <-- 输入邮箱
+// highlight-end
+
+You selected this USER-ID:
+    "wuchuhengcn <root@wuchuheng.cn>"
+
+// highlight-start
+Change (N)ame, (E)mail, or (O)kay/(Q)uit? o # <-- 选择o
+// highlight-end
+We need to generate a lot of random bytes. It is a good idea to perform
+some other action (type on the keyboard, move the mouse, utilize the
+disks) during the prime generation; this gives the random number
+generator a better chance to gain enough entropy.
+We need to generate a lot of random bytes. It is a good idea to perform
+some other action (type on the keyboard, move the mouse, utilize the
+disks) during the prime generation; this gives the random number
+generator a better chance to gain enough entropy.
+gpg: revocation certificate stored as '/Users/wuchuheng/.gnupg/openpgp-revocs.d/30D55DBBAF2D0F957FC5AA9347BF092C7C49CDB8.rev'
+public and secret key created and signed.
+
+pub   rsa3072 2022-11-15 [SC] [expires: 2024-11-14]
+// highlight-start
+      30D55DBBAF2D0F957FC5AA9347BF092C7C49CDB8   #<-- 密钥指纹
+// highlight-end
+uid                      wuchuhengcn <root@wuchuheng.cn>
+sub   rsa3072 2022-11-15 [E] [expires: 2024-11-14]
+```
+
+:::tip 输入保存密钥的密码
+
+在生成的密钥的过程中要求操作人输入一个密码，用于保存密钥用，输入一个，且不能忘记
+
+:::
+
+### 4.2 把生成的密钥上传到公网上
+
+``` bash title="上传公钥到公网"
+$ gpg --keyserver keyserver.ubuntu.com --send-keys [输入指纹]# <-- 上传公钥到 https://keyserver.ubuntu.com/
+gpg: sending key 47BF092C7C49CDB8 to hkp://keyserver.ubuntu.com
+
+$ gpg --keyserver keys.openpgp.org --send-keys [输入指纹] # <-- 上传公钥到 https://keys.openpgp.org
+gpg: sending key 47BF092C7C49CDB8 to hkp://keys.openpgp.org
+```
+
+### 4.3 导出私钥用于发布时加密使用
+
+> 注意: 导出需输入生成密钥时的密码
+
+``` shell title="导出私钥保存于~/root@wuchuheng.cn.gpg"
+$ gpg --export-secret-keys 30D55DBBAF2D0F957FC5AA9347BF092C7C49CDB8 > ~/root@wuchuheng.cn.gpg
+```
+
+## 5 初始化java包
+
+``` shell
+// highlight-start
+$ mkdir cn.wuchuheng.tmp # <-- 创建空目录
+$ cd cn.wuchuheng.tmp # <-- 进入目录
+$ gradle init # <-- 开始初始化gradle项目
+// highlight-end
+Starting a Gradle Daemon (subsequent builds will be faster)
+
+Select type of project to generate:
+  1: basic
+  2: application
+  3: library
+  4: Gradle plugin
+// highlight-start
+Enter selection (default: basic) [1..4] 3 # <-- 选择 libery
+// highlight-end
+
+Select implementation language:
+  1: C++
+  2: Groovy
+  3: Java
+  4: Kotlin
+  5: Scala
+  6: Swift
+// highlight-start
+Enter selection (default: Java) [1..6] 3 #<-- 选择java
+// highlight-end
+
+Select build script DSL:
+  1: Groovy
+  2: Kotlin
+// highlight-start
+Enter selection (default: Groovy) [1..2] 1
+// highlight-end
+
+// highlight-start
+Generate build using new APIs and behavior (some features may change in the next minor release)? (default: no) [yes, no] #<-- 回车默认
+// highlight-end
+Select test framework:
+  1: JUnit 4
+  2: TestNG
+  3: Spock
+  4: JUnit Jupiter
+// highlight-start
+Enter selection (default: JUnit Jupiter) [1..4]
+Please enter a value between 1 and 4: 4 #<-- 选择 JUnit Jupiter
+// highlight-end
+
+// highlight-start
+Project name (default: cn.wuchuheng.tmp):  # <-- 回车
+// highlight-end
+
+Source package (default: cn.wuchuheng.tmp):
+
+
+> Task :init
+Get more help with your project: https://docs.gradle.org/7.5.1/samples/sample_building_java_libraries.html
+
+BUILD SUCCESSFUL in 23h 53m 5s
+
+// highlight-start
+$ git init # <-- 初始化git项目
+$ g add -A # <-- 把全部文件添加到git中
+$ g commit -m init # <-- 提交下git
+// highlight-end
+[master (root-commit) 32cf1cc] init
+ 10 files changed, 418 insertions(+)
+ create mode 100644 .gitattributes
+ create mode 100644 .gitignore
+ create mode 100644 gradle/wrapper/gradle-wrapper.jar
+ create mode 100644 gradle/wrapper/gradle-wrapper.properties
+ create mode 100755 gradlew
+ create mode 100644 gradlew.bat
+ create mode 100644 lib/build.gradle
+ create mode 100644 lib/src/main/java/cn/wuchuheng/tmp/Library.java
+ create mode 100644 lib/src/test/java/cn/wuchuheng/tmp/LibraryTest.java
+ create mode 100644 settings.gradle
+```
+
+<details>
+<summary>初始化后的gradle库项目目录结构</summary>
+
+``` shell
+.
+├── gradle
+│     └── wrapper
+│         ├── gradle-wrapper.jar
+│         └── gradle-wrapper.properties
+├── gradlew
+├── gradlew.bat
+├── lib
+│     ├── build.gradle
+│     └── src
+│         ├── main
+│         │     ├── java
+│         │     │     └── cn
+│         │     │         └── wuchuheng
+│         │     │             └── tmp
+│         │     │                 └── Library.java
+│         │     └── resources
+│         └── test
+│             ├── java
+│             │     └── cn
+│             │         └── wuchuheng
+│             │             └── tmp
+│             │                 └── LibraryTest.java
+│             └── resources
+└── settings.gradle
+
+```
+
+</details>
+
+## 6 发布相关包的配置
+
+### 6.1 配置Gradle配置文件
+
+用`idea`打开项目，然后配置`lib/build.gradle`.
+
+``` groovy title="lib/build.gradle"
+/*
+ * This file was generated by the Gradle 'init' task.
+ *
+ * This generated file contains a sample Java library project to get you started.
+ * For more details take a look at the 'Building Java & JVM projects' chapter in the Gradle
+ * User Manual available at https://docs.gradle.org/7.5.1/userguide/building_java_projects.html
+ */
+
+plugins {
+    // Apply the java-library plugin for API and implementation separation.
+    id 'java-library'
+    // highlight-start
+    // 1 添加相关插件
+    id 'maven-publish'
+    id 'signing'
+    // highlight-end
+}
+
+// highlight-start
+// 2 定义要发行的版本号
+version = "0.0.1"
+// highlight-end
+
+repositories {
+    // Use Maven Central for resolving dependencies.
+    mavenCentral()
+}
+
+// highlight-start
+publishing {
+    // 3 发行的包的相关信息说明
+    publications {
+        mavenJava(MavenPublication) {
+            // 这个填写我们申请的groupId,即: cn.wuchuheng
+            groupId ="cn.wuchuheng"
+            // 这个是制品id, 起到包名的作用
+            artifactId = "tmp"
+            from(components["java"])
+            pom {
+                // 同artifactId一样即可
+                name.set("tmp")
+                description.set("库的使用简要说明...")
+                url.set("https://wuchuheng.cn") // 库的官方文档
+                inceptionYear.set("2022")
+                developers {
+                    developer {
+                        // 开发者信息
+                        id.set("wuchuhengcn")
+                        name.set("wuchuhengcn")
+                        email.set("root@wuchuheng.cn")
+                    }
+                }
+                // 协议信息
+                licenses {
+                    license {
+                        name.set("MIT")
+                        url.set("https://github.com/wuchuheng/gradle-libery-demo-java")
+                        distribution.set("repo")
+                    }
+                }
+                // 源代码仓库信息
+                scm {
+                    url.set("https://github.com/wuchuheng/gradle-libery-demo-java")
+                    connection.set("scm:git:git@github.com:wuchuheng/gradle-libery-demo-java.git")
+                    developerConnection.set("scm:git:ssh:git@github.com:wuchuheng/gradle-libery-demo-java.git")
+                }
+            }
+        }
+    }
+    repositories {
+        // 4 要上传的仓库信息
+        maven {
+            name = "OSSRH"
+            credentials {
+                username = "wuchuhengcn"
+                password = "[写上仓库的密码]"
+            }
+            // 根据版本名中是否以"SNAPSHOT"为结尾，则上传到"SNAPSHOT"仓库，通常作为开发测试使用，反之则正式版本使用
+            if (project.version.toString().endsWith("-SNAPSHOT")) {
+                url = "https://s01.oss.sonatype.org/content/repositories/snapshots"
+            } else {
+                url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            }
+        }
+    }
+}
+
+signing {
+    sign(publishing.publications.mavenJava)
+}
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+// 生成文档。在上传包时，有文档包含要求。
+javadoc {
+    options.addStringOption("charset", "UTF-8")
+    if (JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
+}
+
+// highlight-end
+
+dependencies {
+    // Use JUnit Jupiter for testing.
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+
+    // This dependency is exported to consumers, that is to say found on their compile classpath.
+    api 'org.apache.commons:commons-math3:3.6.1'
+
+    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
+    implementation 'com.google.guava:guava:31.0.1-jre'
+}
+
+tasks.named('test') {
+    // Use JUnit Platform for unit tests.
+    useJUnitPlatform()
+}
+
+```
+
+> 配置好后就点击重置右上角的`gradle`的重载配置按键，使配置生效.
+
+<details>
+    <summary>操作截图</summary>
+    <LightBox url="https://qiniu.wuchuheng.com/howToPublishJavaLiberyToMvn11.png" alt="Gradle发布Java库到mvnrepository" width={40}/>
+</details>
+
+### 6.1 编写包的代码
+
+``` java title="lib/src/main/java/cn/wuchuheng/tmp/Library.java"
+/*
+ * This Java source file was generated by the Gradle 'init' task.
+ */
+package cn.wuchuheng.tmp;
+
+/**
+ * Library {
+ */
+public class Library {
+    Library(){}
+    /**
+     *  Print message.
+     */
+    public void printMessage() {
+        System.out.print("Are you ok?");
+    }
+
+    /**
+     * someLibraryMethod
+     *
+     * @return boolean
+     */
+    public boolean someLibraryMethod() {
+        return true;
+    }
+}
+```
+
+
+## 7 手动发布
+
+### 7.1 生成发布包
+``` shell title="项目根目录下"
+$  ./gradlew buildg # <-- 打包
+```
+
+<details>
+<summary>打包出来的文件</summary>
+
+```bash title="lib/build"
+.
+├── classes
+│         └── java
+│             ├── main
+│             │         └── cn
+│             │             └── wuchuheng
+│             │                 └── tmp
+│             │                     └── Library.class
+│             └── test
+│                 └── cn
+│                     └── wuchuheng
+│                         └── tmp
+│                             └── LibraryTest.class
+├── docs
+│         └── javadoc
+│             ├── allclasses-index.html
+│             ├── allpackages-index.html
+│             ├── cn
+│             │         └── wuchuheng
+│             │             └── tmp
+│             │                 ├── Library.html
+│             │                 ├── package-summary.html
+│             │                 └── package-tree.html
+│             ├── copy.svg
+│             ├── element-list
+│             ├── help-doc.html
+│             ├── index-all.html
+│             ├── index.html
+│             ├── jquery-ui.overrides.css
+│             ├── legal
+│             │         ├── COPYRIGHT
+│             │         ├── LICENSE
+│             │         ├── jquery.md
+│             │         └── jqueryUI.md
+│             ├── member-search-index.js
+│             ├── module-search-index.js
+│             ├── overview-tree.html
+│             ├── package-search-index.js
+│             ├── resources
+│             │         ├── glass.png
+│             │         └── x.png
+│             ├── script-dir
+│             │         ├── jquery-3.6.0.min.js
+│             │         ├── jquery-ui.min.css
+│             │         └── jquery-ui.min.js
+│             ├── script.js
+│             ├── search-page.js
+│             ├── search.html
+│             ├── search.js
+│             ├── stylesheet.css
+│             ├── tag-search-index.js
+│             └── type-search-index.js
+├── generated
+│         └── sources
+│             ├── annotationProcessor
+│             │         └── java
+│             │             ├── main
+│             │             └── test
+│             └── headers
+│                 └── java
+│                     ├── main
+│                     └── test
+├── libs
+│         ├── lib-0.0.1-javadoc.jar
+│         ├── lib-0.0.1-sources.jar
+│         └── lib-0.0.1.jar
+├── reports
+│         └── tests
+│             └── test
+│                 ├── classes
+│                 │         └── cn.wuchuheng.tmp.LibraryTest.html
+│                 ├── css
+│                 │         ├── base-style.css
+│                 │         └── style.css
+│                 ├── index.html
+│                 ├── js
+│                 │         └── report.js
+│                 └── packages
+│                     └── cn.wuchuheng.tmp.html
+├── test-results
+│         └── test
+│             ├── TEST-cn.wuchuheng.tmp.LibraryTest.xml
+│             └── binary
+│                 ├── output.bin
+│                 ├── output.bin.idx
+│                 └── results.bin
+└── tmp
+├── compileJava
+│         └── previous-compilation-data.bin
+├── compileTestJava
+│         └── previous-compilation-data.bin
+├── jar
+│         └── MANIFEST.MF
+├── javadoc
+│         └── javadoc.options
+├── javadocJar
+│         └── MANIFEST.MF
+├── sourcesJar
+│         └── MANIFEST.MF
+└── test
+
+47 directories, 52 files
+
+```
+
 
 </details>
 
 
+### 7.2 上传到仓库中
+在发包时需要采用`GPG`加密来发布。 需要使用3个参数:
+* `Psigning.keyId`: `GPG`的指纹的后8位数如: 如本文生成的指纹为: 30D55DBBAF2D0F957FC5AA9347BF092C7C49CDB8， 后8位则是: 7C49CDB8
+* `Psigning.password`: `GPG`的私钥的密码，用于保护私钥,使用时必须要有密码配合使用才行
+* `-Psigning.secretKeyRingFile`: `GPG`的私钥的路径，本文这私钥导出为`~/root@wuchuheng.cn.gpg`
+
+> 使用`GPG`加密就是为了防止在发布时，被中间方私自篡改。
+
+``` bash title="项目要目录下"
+$ gradle publish -Psigning.keyId=7C49CDB8 -Psigning.password=[密钥的密码] -Psigning.secretKeyRingFile=$(echo ~/root@wuchuheng.cn.gpg)
+BUILD SUCCESSFUL in 24s
+9 actionable tasks: 3 executed, 6 up-to-date
+```
+
+### 7.3 去仓库后台查看刚上传的包
+
+还记得账号申请通过时，对方是怎么回复我们的吗？
+> Congratulations! Welcome to the Central Repository!
+> cn.wuchuheng has been prepared, now user(s) wuchuhengcn can:
+> Publish snapshot and release artifacts to [s01.oss.sonatype.org](https://s01.oss.sonatype.org)
+> Have a look at this section of our official guide for deployment instructions:
+
+是的，它让我们把包上传到这个[s01.oss.sonatype.org](https://s01.oss.sonatype.org/), 我们已经做了;而同样的这个链接也正是仓库的后台，
+使用我们的之前注册的账号(wuchuhengcn)就能使用上去，查看我们刚才上传的包了
+
+<LightBox url="https://qiniu.wuchuheng.com/howToPublishJavaLiberyToMvn12.png" alt="" width={40} />
+
+<LightBox url="https://qiniu.wuchuheng.com/howToPublishJavaLiberyToMvn13.png" alt="" width={40} />
 
 
+:::warning
+
+而在这个阶段当中，上传的包还只是待确定状态。后面还要经过一确定和测试才能发布。
+
+:::
+
+### 7.4 正式发布
+正在离我们上传的包正式发布只需:
+* 选上传的中包
+* 保存在oss临时库中(在这一阶段可以从该仓库中把包下载回来测试等工作)
+* 正式发布
+
+<details>
+<summary>选上传的中包并保存到临时仓库中</summary>
+<LightBox url="https://qiniu.wuchuheng.com/howToPublishJavaLiberyToMvn14.png" alt="" width={40} />
+<LightBox url="https://qiniu.wuchuheng.com/howToPublishJavaLiberyToMvn15.png" alt="" width={40} />
+
+> 等待处理的状态为"确定"时, 包就会被放置在一个临时的仓库中. 并提供仓库的链接，供开发者把包下载回来并进行测试等开发工作。
+
+</details>
+
+<details>
+
+<summary>确认发布</summary>
+
+> 要是真的没什么问题了， 那么就发布吧
+
+<LightBox url="https://qiniu.wuchuheng.com/howToPublishJavaLiberyToMvn16.png" alt="" width={40} />
+
+> 到这时， [https://repo1.maven.org/maven2/cn/wuchuheng/ ](https://repo1.maven.org/maven2/cn/wuchuheng/)就是我们上传的包了，现在其它的开发者也都可以使用我们上传的包了。
+>  而[mvnrepository](https://mvnrepository.com/repos/central)当然也是会收录这个包的。
+
+</details>
+
+## 8 后续小改动
+
+### 8.1 解决`lib/build.gradle`配置中账号暴露问题
+如果我们把账号和密码写进`lib/build.gradle`中而后提交到代码中，肯定是不行的。解决这一问题，可以用环境变量来解决。
+
+``` groovy title="用环境变量替代账号和密码"
+
+...
+// 4 要上传的仓库信息
+        maven {
+            name = "OSSRH"
+            credentials {
+                username = System.getenv("OSSRH_USERNAME")
+                password = System.getenv("OSSRH_PASSWORD")
+            }
+...
+```
+
+``` shell title="而上传包时，需要用密码时，则把账号密码赋值给环境变量"
+OSSRH_USERNAME="[仓库的账号]" OSSRH_PASSWORD="[仓库的密码]" gradle publish -Psigning.keyId=7C49CDB8 -Psigning.password=[密钥的密码] -Psigning.secretKeyRingFile=$(echo ~/root@wuchuheng.cn.gpg)
+```
+好了，到了这一步，我们终于可以放心地提交代码而不用担心账号被泄漏的问题了。
+``` shell
+$ git commit -m 'feat: 实现发布制品到OSSRH'
+[master f435998] feat: 实现发布制品到OSSRH
+ 3 files changed, 95 insertions(+)
+```
+
+### 8.2 自动上传制品，避免反复手动上传的问题
+我们可以通过`Github action`的流程化`CI/CD`，来帮助我们自动提交制品,从而避免手动操作这种容易出错且繁琐的操作。
+
+<details>
+<summary>Step 1: 配置Github action workflows 脚本</summary>
+
+```yaml title=".github/workflows/publishArtifact.yml"
+name: Publish package to the Maven Central Repository
+
+#  构建触发条件为源代码版本号变动
+on:
+  push:
+    tags:
+      - '**'
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 71
+        uses: actions/setup-java@v2
+        with:
+          java-version: "17"
+          distribution: "adopt"
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build with Gradle
+        run: ./gradlew build
+      - name: Decode
+        run: |
+          echo "${{secrets.GPG_SIGNING_SECRET_KEY_BASE64}}" > ~/.gradle/secring.gpg.base64
+          base64 -d ~/.gradle/secring.gpg.base64 > ~/.gradle/secring.gpg
+      - name: Publish package
+        run: gradle publish  -Psigning.keyId=${{secrets.GPG_SIGNING_KEY_ID}} -Psigning.password=${{secrets.GPG_SIGNING_KEY_PASSWORD}} -Psigning.secretKeyRingFile=$(echo ~/.gradle/secring.gpg)
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+
+```
+</details>
+
+<details>
+    <summary>Step 2: GPG私钥转码为base64文本并用于流程化脚本中的变量使用</summary>
+
+``` shell
+$ base64 ~/root@wuchuheng.cn.gpg
+lQWGBGNzbw0BDADJG0gP5wpw6PFV4Egyvhzssa/YFaeDP+LeW...base64文本...k4jlW8g=
+
+```
+
+</details>
+
+<details>
+<summary>Step 3: 配置Github action workflows脚本的变量</summary>
+<LightBox url="https://qiniu.wuchuheng.com/howToPublishJavaLiberyToMvn17.png" alt="" width={40} />
+
+>  当前示例的源代码都在[gradle-libery-demo-java](https://github.com/wuchuheng/gradle-libery-demo-java)中.
+>  提交下当前的修改,
+
+``` bash
+$ git add .github/workflows/publishArtifact.yml
+$ git commit -m "chore: 添加github workflows."
+```
+
+</details>
+
+<details>
+    <summary>Step 4: 提交版本号然后推送代码并触发构建脚本</summary>
+
+```yaml title="更新lib/build.gradle版本号"
+...
+// 2 定义要发行的版本号
+version = "0.0.4"
+...
+```
 
 
+```bash title="提交、打上版本号并推送代码触发构建脚本"
+$ git add -A
+$ git commit -m "version: 0.0.4"
+$ git tag 0.0.4
+$ git push origin master # <-- 推送代码
+$ git push 0.0.4 # <-- 推送版本号且源代码的版本号变动会触发构建流程
+```
+
+</details>
+
+<details>
+    <summary>Final step: 查看流程执行的结果</summary>
+    <LightBox url="https://qiniu.wuchuheng.com/howToCreateAJavaLiberyAndPublishToMvn18.png" alt="" width={40} />
+    <LightBox url="https://qiniu.wuchuheng.com/howToCreateAJavaLiberyAndPublishToMvn19.png" alt="" width={40} />
+</details>
+
+### 8.3 关闭sonatype(OSSRH)Issue
+到了这一步，我们创建`issue`其目的是要创建一个开源、能发布的项目出来，现在我们已经做到了，而这个`issue`也就到了关闭的时候了。
+
+<details>
+    <summary>操作截图</summary>
+<LightBox url="https://qiniu.wuchuheng.com/howToCreateAJavaLiberyAndPublishToMvn20.png" alt="" width={40} />
+</details>
+
+## 9 重要参数合集
+
+<details>
+<summary>5.1 snonatype 账号</summary>
+
+- OSSRH账号: root@wuchuheng.cn
+- OSSRH密码: (不能说)
+- groupID: cn.wuchuheng
+
+> 注意: 发布时需要使用
+
+</details>
+
+
+<details>
+    <summary>5.2 gpg 密钥</summary>
+
+- GPG指纹: 30D55DBBAF2D0F957FC5AA9347BF092C7C49CDB8
+- GPG私钥保存密码: (不能说)
+- GPG私钥: ~/root@wuchuheng.cn.gpg
+
+> 注意: 发布时需要使用
+
+</details>
+
+
+## 10 小结
+
+总体来说,想要从0去发布一个`java`的`package`，其过程步骤还是比较繁杂的。但其主干步骤也就4步，分别:
+
+1. 创建`OSSRH`账号和项目
+2. 制作`GPG`密钥等
+3. 初始化一个`java`库
+4. 用户`GPG`加密和使用`OSSRH`账号把库发布出去
+
+最后本文的示例代码放在文中的最后，希望能为你提供个参考用。
+
+## 11 Q&A
+
+### 11.1 为什么要在配置中有2个推的链接?
+2条链接分别是:
+* https://s01.oss.sonatype.org/content/repositories/snapshots
+* https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/
+
+他们之间的最大的区别就是往`snapshots`这个推送时，包的版本号是可以覆盖的， 而另一个条则不行。 可以覆盖的仓库可以很好解决开发时，对同一个版本号
+的多次提交，比如说我开发`0.0.1`版本时，已经上传了，而测试人员在使用时发现了问题时，这时我修复好问题后，又可以重新上传同样的`0.0.1`版本，而不用
+再次迭代一个版本号。
+
+## 12 参考资料
+
+* [Gradle 将 Java 类库发布到 Maven 中心仓库](https://segmentfault.com/a/1190000040411812?u_atoken=39db0774-68e5-4017-8d1d-4e5a77d7bef8&u_asession=01RX42zUhbaLhLbMGGXawkRYVCEI2seql81EOlIQyrN8H_hSulNkJwDLVvJT2dme_wX0KNBwm7Lovlpxjd_P_q4JsKWYrT3W_NKPr8w6oU7K9954p5BlAeQ1BAxrE-CNYBXrFRrFEwkAXlkkWTaFgeRmBkFo3NEHBv0PZUm6pbxQU&u_asig=05_QksrQ7iDyD_0_R2DPmHbl1vu7S2qr99Pc_cJ52FdA5YvSKqdQtPcJmOG21h4tM8BOdrfn3oOb_LVsfRM01MhoBbAZsDKGsh5gAttD6yn_5lkUoNXXWCIEgPkK9x-xvGfzTPG0E_sVEccifWxj8L395sOf1VkStI3YrW4yvnMPv9JS7q8ZD7Xtz2Ly-b0kmuyAKRFSVJkkdwVUnyHAIJzc3ChDeLVnL7d7qdeLky1nb6pcNPnRNHXFGHz5V_OAA-7DOpsDkA_bmTlLhsyWRKzO3h9VXwMyh6PgyDIVSG1W_zHWrR6Je6anami5oj0wz4XMLExHdtQofSCYzmLqspAuHAX5GcOD-ccH6MM0TMYDQWY-zeVmeUWXJE_Fj-YFgimWspDxyAEEo4kbsryBKb9Q&u_aref=%2B8m1isFAxzFaw4ZkwIl6WVoNWZQ%3D)
+* [发布自己的 jar 包到 Maven 中央仓库 ( mvnrepository.com )](https://woodwhales.cn/2021/09/19/083/)
+* [maven搜索](https://search.maven.org/)
+* [本文演示的源代码gradle-libery-demo-java](https://github.com/wuchuheng/gradle-libery-demo-java)
 
