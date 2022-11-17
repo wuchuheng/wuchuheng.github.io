@@ -23,6 +23,6 @@ sftp admin@wuchuheng.com <<EOF
   put -r * ./
 EOF
 
-docker run -it --env-file=.env -e "CONFIG=$(cat ./config.json | jq -r tostring)" --name crawler algolia/docsearch-scraper
+docker run -it --env-file=.env -e "CONFIG=$(json5 ./config.json5)" --name crawler algolia/docsearch-scraper
 
 docker rm crawler
