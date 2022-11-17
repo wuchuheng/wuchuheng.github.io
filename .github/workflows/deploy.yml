@@ -19,6 +19,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: node -v
+      - run: ls -ahl
       - run: yarn add
       - run: yarn build
       - name: SFTP uploader
