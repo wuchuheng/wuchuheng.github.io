@@ -20,7 +20,7 @@ jobs:
           node-version: ${{ matrix.node }}
       - run: node -v
       - run: ls -ahl
-      - run: yarn add
+      - run: yarn
       - run: yarn build
       - name: SFTP uploader
         uses: wangyucode/sftp-upload-action@v1.4.6
