@@ -12,7 +12,7 @@ jobs:
       matrix:
         node: [ 16 ]
     name: Node ${{ matrix.node }} sample
-    steps:
+    stepsreact-icons:
       - uses: actions/checkout@v3
       - name: Setup node
         uses: actions/setup-node@v3
@@ -21,7 +21,7 @@ jobs:
       - run: node -v
       - run: npm install -g pnpm
       - run: pnpm install
-      - run: pnpm react-icons
+      - run: pnpm install react-icons
       - run: pnpm build
       - name: SFTP uploader
         uses: wangyucode/sftp-upload-action@v1.4.6
