@@ -19,10 +19,8 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: node -v
-      - run: npm install -g pnpm
-      - run: pnpm install
-      - run: pnpm install react-icons
-      - run: pnpm build
+      - run: yarn add
+      - run: yarn build
       - name: SFTP uploader
         uses: wangyucode/sftp-upload-action@v1.4.6
         with:
