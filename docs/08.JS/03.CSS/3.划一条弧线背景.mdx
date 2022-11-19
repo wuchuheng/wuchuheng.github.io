@@ -1,0 +1,62 @@
+---
+title: 3 划一条弧线背景
+tags:
+- CSS
+date: 2022-11-19
+---
+
+```mdx-code-block
+import Curvedbackground from '@site/src/components/Curvedbackground/Curvedbackground';
+```
+
+## 1 示例
+
+<Curvedbackground />
+
+## 2 实现说明
+就是先写个`div`写在这个`div`中再写个一元素， 然后这个元素的边修改成弧边，就可以了。
+
+``` tsx  title="html文件"
+import React from "react";
+import style from "./style.module.scss"
+
+const Curvedbackground: React.FC = () => {
+    return (<div className={style.main}/>)
+
+}
+
+export default  Curvedbackground
+
+```
+
+``` scss title="样式文件scss"
+
+.main {
+  $size: 20rem;
+  height:$size;
+  position: relative;
+  width: $size;
+  background: white;
+  border: 1px solid gray;
+  overflow: hidden;
+  &:after {
+    width: 140%;
+    height: 200px;
+    position: absolute;
+    left: -20%;
+    top:0;
+    z-index: 1;
+    content: '';
+    $borderRadius: 70%;
+    border-radius: 0 0 $borderRadius $borderRadius;
+    background: red;
+  }
+}
+
+```
+
+
+
+
+
+

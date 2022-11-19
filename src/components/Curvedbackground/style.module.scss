@@ -1,0 +1,21 @@
+.main {
+  $size: 20rem;
+  height:$size;
+  position: relative;
+  width: $size;
+  background: white;
+  border: 1px solid gray;
+  overflow: hidden;
+  &:after {
+    width: 140%;
+    height: 200px;
+    position: absolute;
+    left: -20%;
+    top:0;
+    z-index: 1;
+    content: '';
+    $borderRadius: 70%;
+    border-radius: 0 0 $borderRadius $borderRadius;
+    background: red;
+  }
+}
