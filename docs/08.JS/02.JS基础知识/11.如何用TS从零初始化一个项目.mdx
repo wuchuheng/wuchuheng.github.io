@@ -11,7 +11,8 @@ date: 2022-11-22 00:26
 
 ## 1 本文的目标是什么?
 
-有时候我就是想从零开始去做写个项目，就是那种创建一个空目录然后一步一步来的那种，而这个项目主要用的就是`TS`. 
+有时候我就是想从零开始去做写个项目，就是那种创建一个空目录然后一步一步来的那种，而这个项目主要用的就是`TS`.
+而`ts`当前的`node`是不能执行的， 所以本项目本质上就是用`ts`写代码，然后编译成`js`代码，最后交给`node`运行，这就是本项目最主要的事了。
 
 ## 2 相关准备
 
@@ -28,7 +29,7 @@ date: 2022-11-22 00:26
 
 ``` bash  title="初始化项目"
 
-$ mkdir dynamicDNS # 创建一个名为 dynamicDNS目录
+$ mkdir dynamicDNS # 创建一个名为 howToInitTSProject
 $ cd dynamicDNS    # 进入目录
 $ pnpm init        # 初始化软件工程
 pnpm init
@@ -71,29 +72,918 @@ About to write to /Users/wuchuheng/tmp/dynamicDNS/package.json:
 Is this OK? (yes)
 ```
 
-### 3.2 配置代码版本控制git
+<details>
+<summary>当前项目文件树</summary>
 
+```bash
+.
+└── package.json
+```
+</details>
+
+### 3.2 配置代码版本控制git
+这一步目的是为了更好地管理代码
 
 > 配置git忽略文件
-``` bash title=".gitignore"
+
+```bash title=".gitignore"
 dist # 用于存放编译后的代码
 node_modules
 .pnpm-debug.log
 
 ```
 
-``` bash title="初始化git"
+```bash title="初始化git"
 $ git init
-$ git add -A 
+$ git add -A
 $ git commit -m init
 ```
+
+<details>
+    <summary>当前项目文件树</summary>
+
+```bash
+├── .git
+├── .gitignore
+├── package.json
+└── package.json
+
+```
+</details>
 
 ## 4 添加typescript到项目中
 
 ### 4.1 安装`typescript`并初始化配置
+我们只有安装好`ts`和配置好`ts`的配置，`ts`代码编译成`js`代码。这是我们这一步要做的工作
 
 ```bash title="安装typescript并初始化配置"
 $ pnpm i -D typescript # 安装typescript到项目中
 $ pnpx tsc --init      # 为项目根目录生成ts的配置文件 tsconfig.json
 ```
+
+```bash title="修改tsconfig.json"
+{
+  "compilerOptions": {
+    "target": "es2016", // 编译后的js版本
+    "module": "commonjs", // js的导出模块类型
+    "declaration": true, // 编译导出包含类型文件
+    "outDir": "dist", // 编译后导出的目录
+    "esModuleInterop": true,                             /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
+    "rootDir": "src", // 要编译的代码开始目录
+    "forceConsistentCasingInFileNames": true,            /* Ensure that casing is correct in imports. */
+    "strict": true,                                      /* Enable all strict type-checking options. */
+    "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
+  },
+  // ts编译时忽略的文件
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
+```
+### 4.2 添加项目源代码
+
+```ts title="src/index.ts"
+const main = () => {
+    console.log("Hello world!!!")
+}
+
+export default main()
+```
+
+### 4.3 配置编译配置
+
+```json title="package.json"
+{
+  "name": "dynamicdns",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+// highlight-start
+    "dev:build": "tsc --sourceMap true --declarationMap true", // 用于开发模式下使用，在编译成js的同时也会生成与源代码关联找配置文件，方便定位编译的代码与源代码之间的位置
+    "build": "tsc", // 直接编译成js
+// highlight-end
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^4.9.3"
+  }
+}
+```
+### 4.4 ts和源代码已经准备好，可以进行编译了
+
+```bash
+$ pnpm build # 然后会在`dist`目录生成编译好的`js`文件。
+
+> dynamicdns@0.0.1 build /Users/wuchuheng/Desktop/myprojects/wuchuheng/npm/dynamicDNS
+> tsc
+
+$ node dist/index.js # 执行代码
+Hello world!!!
+```
+
+
+### 4.5 提交下代码
+
+``` bash
+$ git commit -m 'chore: 安装ts和相关配置'
+[master 71b0131] chore: 安装ts和相关配置
+ 4 files changed, 42 insertions(+), 2 deletions(-)
+ create mode 100644 pnpm-lock.yaml
+ create mode 100644 tsconfig.json
+
+```
+
+<details>
+    <summary>当前项目文件树</summary>
+
+```bash
+.
+├── .git
+├── .gitignore
+├── .pnpm-debug.log
+├── dist
+│   ├── index.d.ts
+│   ├── index.js
+├── node_modules
+├── package.json
+├── pnpm-lock.yaml
+├── src
+│   └── index.ts
+└── tsconfig.json
+```
+</details>
+
+## 5 自动编译ts
+
+> 在开发过程中，如何每一次修改都要手动去编译很麻烦，所以这里需要引入自动编译流程来提高开发效率.
+而`nodemon`是一个能监听文件变动时自动执行相关命令的工具，通过它就能实现源代码变动时，然后自动去执行编译命令。从而实现编译自动化。
+
+### 5.1 安装nodemon并配置
+```bash title="安装nodemon"
+$ pnpm install --save-dev nodemon
+```
+
+### 5.2 添加nodemon配置文件
+```json title="nodemon.json"
+{
+  "watch": ["src/**"],
+  "ext": "ts"
+}
+```
+> `watch`字段指明只监听`src`目录下的文件变动,而`ext`指明变动文件的后缀。
+
+
+### 5.3 添加`package.json`的启动脚本
+
+```json title="package.json"
+{
+  "name": "dynamicdns",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+// highlight-start
+    "dev": "nodemon --exec \"npm run dev:build\"",
+// highlight-end
+    "dev:build": "tsc --sourceMap true --declarationMap true",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.20",
+    "typescript": "^4.9.3"
+  }
+}
+```
+
+### 5.4 启动自动编译功能
+
+``` bash
+$ pnpm run dev # <-- 启动自动编译的脚本命令
+
+> dynamicdns@0.0.1 dev /Users/wuchuheng/Desktop/myprojects/wuchuheng/npm/dynamicDNS
+> nodemon --exec "npm run dev:build"
+
+[nodemon] 2.0.20
+[nodemon] to restart at any time, enter `rs`
+[nodemon] watching path(s): src/**
+[nodemon] watching extensions: ts
+[nodemon] starting `npm run dev:build`
+
+```
+
+> 然后在`src`目录下的`ts`文件变动时就会自动编译成`js`文件导出到`dist`目录中，而不用手动去操作，节省开发时间提高效率。
+
+### 5.4 提交关于"启动自动编译功能"的代码
+
+<details>
+<summary>此次功能变动的文件</summary>
+
+```bash
+
+$ git add -A
+$ git status
+On branch master
+Changes to be committed:
+(use "git restore --staged file ..." to unstage)
+new file:   nodemon.json
+modified:   package.json
+modified:   pnpm-lock.yaml
+```
+</details>
+
+```bash title="提交代码"
+$ git commit -m 'chore: 开发自动编译ts.'
+```
+
+<details>
+    <summary>当前项目文件树</summary>
+
+```bash
+.
+├── .git
+├── .gitignore
+├── .pnpm-debug.log
+├── dist
+├── node_modules
+├── nodemon.json
+├── package.json
+├── pnpm-lock.yaml
+├── src
+│   └── index.ts
+└── tsconfig.json
+```
+</details>
+
+## 6 自动启动程序
+尽管我们以上的开发流程已经实现自动化编译了，可是还是要手动去重启下，这是很费时间的，应该在自动编译完代码后就也自动启动程序这才可以.
+所在`package.json`中加入自动编译后就自动重启程序。
+
+```json title="为自动重启程序而配置package.json"
+{
+// ...
+  "scripts": {
+// highlight-start
+    "dev": "nodemon --exec \"npm run dev:build && npm run start\"",
+    "start": "node dist/index.js",
+// highlight-end
+    "dev:build": "tsc --sourceMap true --declarationMap true",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+// ...
+}
+```
+
+这样一来，当执行`pnpm run dev`时，就会自动编译程序并启动程序，而`src`的`ts`文件被修改后也会自动编译并重启的，如:
+
+<details>
+    <summary>step 1: 先启动开发模式`pnpm run dev`</summary>
+
+```bash
+
+> dynamicdns@0.0.1 dev /Users/wuchuheng/Desktop/myprojects/wuchuheng/npm/dynamicDNS
+> nodemon --exec "npm run dev:build && npm run start"
+
+[nodemon] 2.0.20
+[nodemon] to restart at any time, enter `rs`
+[nodemon] watching path(s): src/**
+[nodemon] watching extensions: ts
+[nodemon] starting `npm run dev:build && npm run start`
+
+> dynamicdns@0.0.1 dev:build
+> tsc --sourceMap true --declarationMap true
+
+
+> dynamicdns@0.0.1 start
+> node dist/index.js
+
+Hello world!!!
+```
+</details>
+
+<details>
+    <summary>step 2: 修改源代码 src/index.ts</summary>
+
+```ts
+const main = () => {
+// highlight-start
+    console.log("Are you ok?")
+// highlight-end
+}
+
+export default main()
+```
+</details>
+
+<details>
+    <summary>step 3: 自动重启修改后的代码</summary>
+
+
+```bash
+$ pnpm run dev
+
+> dynamicdns@0.0.1 dev /Users/wuchuheng/Desktop/myprojects/wuchuheng/npm/dynamicDNS
+> nodemon --exec "npm run dev:build && npm run start"
+
+[nodemon] 2.0.20
+[nodemon] to restart at any time, enter `rs`
+[nodemon] watching path(s): src/**
+[nodemon] watching extensions: ts
+[nodemon] starting `npm run dev:build && npm run start`
+
+> dynamicdns@0.0.1 dev:build
+> tsc --sourceMap true --declarationMap true
+
+
+> dynamicdns@0.0.1 start
+> node dist/index.js
+
+Hello world!!!
+[nodemon] clean exit - waiting for changes before restart
+[nodemon] restarting due to changes...
+[nodemon] starting `npm run dev:build && npm run start`
+
+> dynamicdns@0.0.1 dev:build
+> tsc --sourceMap true --declarationMap true
+
+
+> dynamicdns@0.0.1 start
+> node dist/index.js
+
+
+Are you ok? # 输入修改后的结果
+[nodemon] clean exit - waiting for changes before restart
+
+```
+</details>
+
+### 6.1 自动重启小结
+
+<details>
+    <summary> 本次实现开发模式下自动重启功能，并有了如下的代码发动: </summary>
+
+```git
+diff --git a/package.json b/package.json
+index 26a18f7..edce3cb 100644
+--- a/package.json
++++ b/package.json
+@@ -4,7 +4,8 @@
+   "description": "",
+   "main": "dist/index.js",
+   "scripts": {
+-    "dev": "nodemon --exec \"npm run dev:build\"",
++    "dev": "nodemon --exec \"npm run dev:build && npm run start\"",
++    "start": "node dist/index.js",
+     "dev:build": "tsc --sourceMap true --declarationMap true",
+     "build": "tsc",
+     "test": "echo \"Error: no test specified\" && exit 1"
+diff --git a/src/index.ts b/src/index.ts
+index f423bb8..33b639f 100644
+--- a/src/index.ts
++++ b/src/index.ts
+@@ -7,7 +7,7 @@
+  */
+
+ const main = () => {
+-    console.log("Hello world!!!")
++    console.log("Are you ok?")
+ }
+
+```
+
+</details>
+
+
+> 提交代码:
+    * `git add -A`
+    * `git commit -m "chore: 添加自动重启配置"`
+
+## 7 代码错误检查功能Eslint
+
+### 7.1 eslint是什么？为什么要用eslint?
+`eslint`是一个代码检查工具，它能识别代码中的错误。并帮助开发者修复错误。就是这是一款有效防止开发者犯错提高代码稳定性的工具。
+而开发者也是人，人就一定会犯错，有这样的工具，没理由不用它吧？
+
+### 7.2 安装Eslint
+
+```bash
+$ pnpm init @eslint/config
+
+✔ How would you like to use ESLint? · style
+✔ What type of modules does your project use? · esm
+✔ Which framework does your project use? · none
+✔ Does your project use TypeScript? · No / Yes
+✔ Where does your code run? · browser
+✔ How would you like to define a style for your project? · prompt
+✔ What format do you want your config file to be in? · JavaScript
+✔ What style of indentation do you use? · tab
+✔ What quotes do you use for strings? · double
+✔ What line endings do you use? · unix
+✔ Do you require semicolons? · No / Yes
+Local ESLint installation not found.
+The config that you've selected requires the following dependencies:
+
+// ...
+
+```
+> 安装完成后会在项目根目录下生成eslint的配置文件`.eslintrc.js`。
+
+<details>
+    <summary>.eslintrc.js</summary>
+
+```json
+module.exports = {
+	"env": {
+		"browser": true,
+		"es2021": true,
+		"node": true
+	},
+	"extends": [
+		"eslint:recommended",
+		"plugin:@typescript-eslint/recommended"
+	],
+	"overrides": [
+	],
+	"parser": "@typescript-eslint/parser",
+	"parserOptions": {
+		"ecmaVersion": "latest",
+		"sourceType": "module"
+	},
+	"plugins": [
+		"@typescript-eslint"
+	],
+	"rules": {
+		"indent": [
+			"error",
+			2
+		],
+		"linebreak-style": [
+			"error",
+			"unix"
+		],
+		"quotes": [
+			"error",
+			"double"
+		],
+		"semi": [
+			"error",
+			"always"
+		]
+	}
+};
+```
+</details>
+
+
+
+### 7.3 配置eslint的修复到开发模式中
+`eslint`有修复功能，用于自动修复代码的错误，这样有些代码出错时是可以自动修复，减少工作量。
+
+<details>
+    <summary>配置package.json</summary>
+
+```json
+
+// ...
+  "scripts": {
+// highlight-start
+    "dev": "nodemon --exec \"npm run lint:fix && npm run dev:build && npm run start\"",
+// highlight-end
+    "start": "node dist/index.js",
+// highlight-start
+    "lint:fix": "eslint 'src/**/*.ts' --fix",
+// highlight-end
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+// ...
+
+```
+
+</details>
+
+> 这样配置后，每当代码保存后，就会自动用eslint去检查代码并自动修复。
+
+
+### 7.4 提交代码
+
+<details>
+    <summary>本次代码变动</summary>
+
+
+```git
+diff --git a/package.json b/package.json
+index edce3cb..25fb2f9 100644
+--- a/package.json
++++ b/package.json
+@@ -4,8 +4,9 @@
+   "description": "",
+   "main": "dist/index.js",
+   "scripts": {
+-    "dev": "nodemon --exec \"npm run dev:build && npm run start\"",
++    "dev": "nodemon --exec \"npm run lint:fix && npm run dev:build && npm run start\"",
+     "start": "node dist/index.js",
++    "lint:fix": "eslint 'src/**/*.ts' --fix",
+     "dev:build": "tsc --sourceMap true --declarationMap true",
+     "build": "tsc",
+     "test": "echo \"Error: no test specified\" && exit 1"
+@@ -13,6 +14,9 @@
+   "author": "",
+   "license": "ISC",
+   "devDependencies": {
++    "@typescript-eslint/eslint-plugin": "^5.44.0",
++    "@typescript-eslint/parser": "^5.44.0",
++    "eslint": "^8.28.0",
+     "nodemon": "^2.0.20",
+     "typescript": "^4.9.3"
+   }
+diff --git a/src/index.ts b/src/index.ts
+index 33b639f..f97a4db 100644
+--- a/src/index.ts
++++ b/src/index.ts
+@@ -7,7 +7,7 @@
+  */
+
+ const main = () => {
+-    console.log("Are you ok?")
+-}
++       console.log("Are you ok?");
++};
+
+-export default main()
+\ No newline at end of file
++export default main;
+```
+</details>
+
+```bash title="提交代码"
+$git commit -m 'chore: 添加eslint功能'
+
+```
+
+## 8 代码自动格式化--prettier
+为什么要用代码格式化？保持代码风格的统一很重要，特别是在团队合作的下，每个人的代码风格都不同，这样很可能导致代码的
+不规范,可读性变差. 所以代码的风格的统一化很重要。
+
+### 8.1 安装prettier
+```bash
+$ pnpm install --save-dev --save-exact prettier
+```
+### 8.2 添加格式化配置和忽略配置
+``` title="格式化配置文件.perttierrc.json"
+{
+  "arrowParens": "always",
+  "bracketSameLine": false,
+  "bracketSpacing": true,
+  "embeddedLanguageFormatting": "auto",
+  "htmlWhitespaceSensitivity": "css",
+  "insertPragma": false,
+  "jsxSingleQuote": false,
+  "printWidth": 80,
+  "proseWrap": "preserve",
+  "quoteProps": "as-needed",
+  "requirePragma": false,
+  "semi": true,
+  "singleQuote": false,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "useTabs": false,
+  "vueIndentScriptAndStyle": false
+}
+```
+
+``` title="忽略格式化配置文件.prettierignore"
+node_modules
+dist
+.git
+.idea
+.pnpm-debug.log
+pnpm-lock.yaml
+```
+
+### 8.3 解决eslint与prettier冲突的规则
+```bash
+$ pnpm install --save-dev eslint-config-prettier
+```
+
+```json title="修复.eslintrc.js"
+
+// ...
+
+  extends: [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+// highlight-start
+    "prettier"
+// highlight-end
+ ],
+// ...
+```
+
+### 8.4 开发模式下自动格式化
+
+```json title="package.json"
+// ...
+"scripts": {
+// highlight-start
+"dev": "nodemon --exec \"npm run prettier && npm run lint:fix && npm run dev:build && npm run start\"",
+// highlight-end
+"start": "node dist/index.js",
+"lint:fix": "eslint 'src/**/*.ts' --fix",
+"dev:build": "tsc --sourceMap true --declarationMap true",
+// highlight-start
+"prettier": "prettier --write .",
+// highlight-end
+"build": "tsc",
+"test": "echo \"Error: no test specified\" && exit 1"
+},
+// ...
+
+```
+
+> 然后当运行`pnpm run dev`后，每当保存代码时，就会自动格式化代码格式。
+
+<details>
+<summary>监听代码变动时，自动格式化代码</summary>
+
+```bash
+ $ pnpm run dev
+
+    > dynamicdns@0.0.1 dev /Users/wuchuheng/Desktop/myprojects/wuchuheng/npm/dynamicDNS
+    > nodemon --exec "npm run prettier && npm run lint:fix && npm run dev:build && npm run start"
+
+    [nodemon] 2.0.20
+    [nodemon] to restart at any time, enter `rs`
+    [nodemon] watching path(s): src/**
+    [nodemon] watching extensions: ts
+    [nodemon] starting `npm run prettier && npm run lint:fix && npm run dev:build && npm run start`
+
+    > dynamicdns@0.0.1 prettier
+    > prettier --write .
+
+    .eslintrc.js 68ms
+    .prettierrc.json 6ms
+    nodemon.json 3ms
+    package.json 3ms
+    src/index.ts 363ms
+    tsconfig.json 14ms
+
+    > dynamicdns@0.0.1 lint:fix
+    > eslint 'src/**/*.ts' --fix
+
+
+    > dynamicdns@0.0.1 dev:build
+    > tsc --sourceMap true --declarationMap true
+
+
+    > dynamicdns@0.0.1 start
+    > node dist/index.js
+
+    [nodemon] clean exit - waiting for changes before restart
+```
+
+</details>
+
+### 8.5 本次代码变动
+
+<details>
+<summary>本次代码变动</summary>
+
+```bash title="new file .prettierignore"
+node_modules
+dist
+.git
+.idea
+.pnpm-debug.log
+pnpm-lock.yaml
+```
+
+```git title="new file .prettierrc.json"
+{
+  "arrowParens": "always",
+  "bracketSameLine": false,
+  "bracketSpacing": true,
+  "embeddedLanguageFormatting": "auto",
+  "htmlWhitespaceSensitivity": "css",
+  "insertPragma": false,
+  "jsxSingleQuote": false,
+  "printWidth": 80,
+  "proseWrap": "preserve",
+  "quoteProps": "as-needed",
+  "requirePragma": false,
+  "semi": true,
+  "singleQuote": false,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "useTabs": false,
+  "vueIndentScriptAndStyle": false
+}
+```
+
+```bash title="changed files"
+diff --git a/.eslintrc.js b/.eslintrc.js
+index dc5c0b4..57ab1b4 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -1,39 +1,25 @@
+ module.exports = {
+-       "env": {
+-               "browser": true,
+-               "es2021": true,
+-               "node": true
+-       },
+-       "extends": [
+-               "eslint:recommended",
+-               "plugin:@typescript-eslint/recommended"
+-       ],
+-       "overrides": [
+-       ],
+-       "parser": "@typescript-eslint/parser",
+-       "parserOptions": {
+-               "ecmaVersion": "latest",
+-               "sourceType": "module"
+-       },
+-       "plugins": [
+-               "@typescript-eslint"
+-       ],
+-       "rules": {
+-               "indent": [
+-                       "error",
+-                       "tab"
+-               ],
+-               "linebreak-style": [
+-                       "error",
+-                       "unix"
+-               ],
+-               "quotes": [
+-                       "error",
+-                       "double"
+-               ],
+-               "semi": [
+-                       "error",
+-                       "always"
+-               ]
+-       }
++  env: {
++    browser: true,
++    es2021: true,
++    node: true,
++  },
++  extends: [
++    "eslint:recommended",
++    "plugin:@typescript-eslint/recommended",
++    "prettier",
++  ],
++  overrides: [],
++  parser: "@typescript-eslint/parser",
++  parserOptions: {
++    ecmaVersion: "latest",
++    sourceType: "module",
++  },
++  plugins: ["@typescript-eslint"],
++  rules: {
++    indent: ["error", 2],
++    "linebreak-style": ["error", "unix"],
++    quotes: ["error", "double"],
++    semi: ["error", "always"],
++  },
+ };
+diff --git a/.prettierignore b/.prettierignore
+index e69de29..c65f4f1 100644
+--- a/.prettierignore
++++ b/.prettierignore
+@@ -0,0 +1,6 @@
++node_modules
++dist
++.git
++.idea
++.pnpm-debug.log
++pnpm-lock.yaml
+diff --git a/.prettierrc.json b/.prettierrc.json
+index e69de29..d0a82a7 100644
+--- a/.prettierrc.json
++++ b/.prettierrc.json
+@@ -0,0 +1,19 @@
++{
++  "arrowParens": "always",
++  "bracketSameLine": false,
++  "bracketSpacing": true,
++  "embeddedLanguageFormatting": "auto",
++  "htmlWhitespaceSensitivity": "css",
++  "insertPragma": false,
++  "jsxSingleQuote": false,
++  "printWidth": 80,
++  "proseWrap": "preserve",
++  "quoteProps": "as-needed",
++  "requirePragma": false,
++  "semi": true,
++  "singleQuote": false,
++  "tabWidth": 2,
++  "trailingComma": "es5",
++  "useTabs": false,
++  "vueIndentScriptAndStyle": false
++}
+diff --git a/nodemon.json b/nodemon.json
+index 59b6cda..657f5aa 100644
+--- a/nodemon.json
++++ b/nodemon.json
+@@ -1,4 +1,4 @@
+ {
+   "watch": ["src/**"],
+   "ext": "ts"
+-}
+\ No newline at end of file
++}
+diff --git a/package.json b/package.json
+index 25fb2f9..f64f1c4 100644
+--- a/package.json
++++ b/package.json
+@@ -4,10 +4,11 @@
+   "description": "",
+   "main": "dist/index.js",
+   "scripts": {
+-    "dev": "nodemon --exec \"npm run lint:fix && npm run dev:build && npm run start\"",
++    "dev": "nodemon --exec \"npm run prettier && npm run lint:fix && npm run dev:build && npm run start\"",
+     "start": "node dist/index.js",
+     "lint:fix": "eslint 'src/**/*.ts' --fix",
+     "dev:build": "tsc --sourceMap true --declarationMap true",
++    "prettier": "prettier --write .",
+     "build": "tsc",
+     "test": "echo \"Error: no test specified\" && exit 1"
+   },
+@@ -17,7 +18,9 @@
+     "@typescript-eslint/eslint-plugin": "^5.44.0",
+     "@typescript-eslint/parser": "^5.44.0",
+     "eslint": "^8.28.0",
++    "eslint-config-prettier": "^8.5.0",
+     "nodemon": "^2.0.20",
++    "prettier": "2.7.1",
+     "typescript": "^4.9.3"
+   }
+ }
+diff --git a/src/index.ts b/src/index.ts
+index f97a4db..e776ee5 100644
+--- a/src/index.ts
++++ b/src/index.ts
+@@ -7,7 +7,7 @@
+  */
+
+ const main = () => {
+-       console.log("Are you ok?");
++  console.log("Are you ok?");
+ };
+
+ export default main;
+diff --git a/tsconfig.json b/tsconfig.json
+index 1eb8c87..b7d95a2 100644
+--- a/tsconfig.json
++++ b/tsconfig.json
+@@ -4,15 +4,12 @@
+     "module": "commonjs", // js的导出模块类型
+     "declaration": true, // 编译导出包含类型文件
+     "outDir": "dist", // 编译后导出的目录
+-    "esModuleInterop": true,                             /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
++    "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
+     "rootDir": "src", // 要编译的代码开始目录
+-    "forceConsistentCasingInFileNames": true,            /* Ensure that casing is correct in imports. */
+-    "strict": true,                                      /* Enable all strict type-checking options. */
+-    "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
++    "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
++    "strict": true /* Enable all strict type-checking options. */,
++    "skipLibCheck": true /* Skip type checking all .d.ts files. */
+   },
+   // ts编译时忽略的文件
+-  "exclude": [
+-    "node_modules",
+-    "dist"
+-  ]
++  "exclude": ["node_modules", "dist"]
+ }
+```
+</details>
+
+```bash title="提交代码"
+$ git add -A
+$ git commit -m 'chore: 添加代码自动格式化'
+```
+
+## 9 小结
+一个好的软件工程需要好的开发体验，本文从开发者角度出发，解决，自动化编译,自动化重启，自动化检查，自动化代码格式化，这
+些方面来保证代码的稳定性和开发的统一性。
+
+## 10 项目源码
+
+[Source code]( https://github.com/wuchuheng/howToInitTSProject)
+
+## 11 参考资料
+
+* [eslint](https://eslint.org/)
+* [prettierrc](https://prettier.io/)
 
