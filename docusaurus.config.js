@@ -140,6 +140,7 @@ const config = {
         'java',
         'groovy',
         'vim',
+        'git',
         'dart',
         'applescript',
         'makefile',

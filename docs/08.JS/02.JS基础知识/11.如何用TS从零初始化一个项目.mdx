@@ -1,0 +1,99 @@
+---
+title: 11 如何用TS从零初始化一个项目
+tags:
+- TS
+- Typescript
+- Async
+categories:
+- JS
+date: 2022-11-22 00:26
+---
+
+## 1 本文的目标是什么?
+
+有时候我就是想从零开始去做写个项目，就是那种创建一个空目录然后一步一步来的那种，而这个项目主要用的就是`TS`. 
+
+## 2 相关准备
+
+| 名称     | 必要 | 示例           | 说明                      |
+|--------| --- |--------------|-------------------------|
+| `node` | ✅ | v16          | 用来执行`js`或`ts`的运行时引擎     |
+| `pnpm` | ✅ |6.32.4 | 包管理工具,同`npm`或`yarn`是一样的 |
+| `git`  | ✅ | | 代码版本控制工具                |
+
+
+## 3 初始化项目
+
+### 3.1 初始化软件工程
+
+``` bash  title="初始化项目"
+
+$ mkdir dynamicDNS # 创建一个名为 dynamicDNS目录
+$ cd dynamicDNS    # 进入目录
+$ pnpm init        # 初始化软件工程
+pnpm init
+This utility will walk you through creating a package.json file.
+It only covers the most common items, and tries to guess sensible defaults.
+
+See `npm help init` for definitive documentation on these fields
+and exactly what they do.
+
+Use `npm install <pkg>` afterwards to install a package and
+save it as a dependency in the package.json file.
+
+Press ^C at any time to quit.
+package name: (dynamicdns)
+version: (1.0.0)
+description:
+// highlight-start
+entry point: (index.js) dist/index.js # 填写 dist/indexjs
+// highlight-end
+test command:
+git repository:
+keywords:
+author:
+license: (ISC)
+About to write to /Users/wuchuheng/tmp/dynamicDNS/package.json:
+
+{
+  "name": "dynamicdns",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
+
+
+Is this OK? (yes)
+```
+
+### 3.2 配置代码版本控制git
+
+
+> 配置git忽略文件
+``` bash title=".gitignore"
+dist # 用于存放编译后的代码
+node_modules
+.pnpm-debug.log
+
+```
+
+``` bash title="初始化git"
+$ git init
+$ git add -A 
+$ git commit -m init
+```
+
+## 4 添加typescript到项目中
+
+### 4.1 安装`typescript`并初始化配置
+
+```bash title="安装typescript并初始化配置"
+$ pnpm i -D typescript # 安装typescript到项目中
+$ pnpx tsc --init      # 为项目根目录生成ts的配置文件 tsconfig.json
+```
+
