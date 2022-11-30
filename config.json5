@@ -20,7 +20,7 @@
     // article > div.theme-doc-markdown.markdown > div > div > div > span 标签
     lvl4: "article h5, article > div.theme-doc-markdown.markdown > div > div > div > span",
     lvl5: "article h6",
-    content: "article p, article li",
+    content: "article li",
   },
   "strip_chars": " .,;:#",
   "custom_settings": {
