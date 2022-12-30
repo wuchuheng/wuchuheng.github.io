@@ -8,24 +8,35 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: [ 16 ]
-    name: Node ${{ matrix.node }} sample
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup node
+      - name: Checkout
+        uses: actions/checkout@v3
+      # 👇 Build steps
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node }}
-      - run: node -v
-      - run: ls -ahl
-      - run: yarn
-      - run: yarn build
-      - name: SFTP uploader
-        uses: wangyucode/sftp-upload-action@v1.4.6
-        with:
-          host: 'wuchuheng.com'
-          password: ${{ secrets.password }}
-          localDir: 'build'
-          remoteDir: '/home/admin/web/wuchuheng.com/public_html'
+          node-version: 16.x
+      - name: Install dependencies
+        run: npm install -g pnpm
+      - run: pnpm install
+      - name: Build
+        run: pnpm run build
+      - name: deploy files
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
+      - run: mkdir -p ~/.ssh
+      - run: echo 'wuchuheng.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINA60zE+n49NGkrLL0CiyUYqidfvX9AQpYvMJRkktiDA' >> ~/.ssh/known_hosts
+      - run: echo 'wuchuheng.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDM27dExayA3jCVbi1ks4ZypPWO56qWyXhr8oDb4atKjyPVZssLAfnVTh6MJuVFOQc9swwGrLn2xmeEksgwB2FoqTBidntKhIDfaGO6GeZzQYXM/BbFrCmhhY9jcZBMKAWM9ZzADHzaowVZdqt0BeGCpI7ADqgysaGjeGM2edUmPFscLDNbopT0XBaASetmmePEHEsJ41E7o0hu0zdHMHcEHvdMitS377T712F/5AQOe91+/N4AjNFKIGaj3a2fRKMIo/WuB5WKWgL2blB/LR3ZJrFAGyn5tpGxDpwjLDgFnnC8w3fym4Yx6aP6G2EMfKMsJExHwOXIXSXuPfOJtR47' >> ~/.ssh/known_hosts
+      - run: echo 'wuchuheng.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBN9mwp4NkkJ3we3yTuiNzI3wiSqjpWgZpxfTSXH3EGGlV4DMjw4sANN2CFyHR2nRRJGAqL7MftbIPu+UnrsSA+A=' >> ~/.ssh/known_hosts
+      - name: Some task that fetches dependencies
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+            sftp admin@wuchuheng.com <<EOF
+                cd /home/admin/web/wuchuheng.com/public_html
+                lcd build 
+                put -r * ./ 
+            EOF
