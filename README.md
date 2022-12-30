@@ -1,3 +1,13 @@
+
+<a href="https://wuchuheng.com">
+    <h1 align="center">Wuchuheng'notes</h1>
+</a>
+<p align="center">
+    <a href="https://github.com/wuchuheng/wuchuheng.github.io/actions/workflows/deploy.yml">
+        <img src="https://github.com/wuchuheng/wuchuheng.github.io/actions/workflows/deploy.yml/badge.svg" alt="Website Deployment" />
+    </a>
+</p>
+
 # Website
 
 This website is built using [Docusaurus 2](https://docusaurus.io/), a modern static website generator.
