@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import Layout from "@theme/Layout";
-import SVG from "../../components/icons/UnderConstruction"
+import UnderConstruction from "../../components/icons/UnderConstruction/UnderConstruction"
 import styles from "./styles.module.scss"
 
 const Books = (): React.ReactElement => {
@@ -15,7 +15,7 @@ const Books = (): React.ReactElement => {
 
     return <Layout>
         <div className={styles.mainWrapper}>
-            <SVG width={200} />
+            <UnderConstruction width={200} />
             <p>Under developing
                 {Array.from(Array(pointNumber), (e, i) => <span key={`pointRenderNode${i}`}>.</span> )}
                 {Array.from(Array(4 - pointNumber), (e, i) => <span className={styles.fillPointRender} key={`pointFillNode${i}`}>.</span> )}

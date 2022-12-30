@@ -1,8 +1,8 @@
 import React, {useCallback, useState} from "react";
 import LoadingSpinner from "../LoadingSpinner";
-import DogContainer  from "./VoxelDog";
+import VoxelDog  from "./VoxelDog/VoxelDog";
 
-const Index = (): React.ReactElement => {
+const DogContainer = (): React.ReactElement => {
     const [loading, setLoading] = useState<boolean>(true)
     const handleLoad = useCallback(() => {
         setLoading(false)
@@ -11,10 +11,10 @@ const Index = (): React.ReactElement => {
         <>
             {loading && <LoadingSpinner /> }
             <div style={{display: loading ? 'none' : 'block'}}>
-                <DogContainer onLoad={handleLoad} />
+                <VoxelDog onLoad={handleLoad} />
             </div>
         </>
     )
 }
 
-export default Index;
+export default DogContainer;

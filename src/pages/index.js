@@ -4,7 +4,7 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import HomeContainer from '../components/HomeContainer'
 import AuthorInfo from "../components/AuthorInfo";
 import HomeFooterRender from "../components/HomeFooterRender";
-import DogContainer from '../components/DogContainer'
+import DogContainer from '../components/DogContainer/DogContainer'
 
 export default function Home() {
     const {siteConfig} = useDocusaurusContext();

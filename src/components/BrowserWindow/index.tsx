@@ -5,13 +5,13 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React, {memo, ReactNode, useCallback} from 'react';
-import {MdContentCopy} from 'react-icons/Md'
-import {FiCodesandbox} from 'react-icons/Fi'
+import React, { ReactNode, useCallback} from 'react';
+import {MdContentCopy} from 'react-icons/md'
+import {FiCodesandbox} from 'react-icons/fi'
 import styles from './styles.module.scss';
 import MessageRender from "../MessageRender";
 import {copyStringToClipboard} from "@wuchuhengtools/helper"
-import {AiOutlineArrowRight} from 'react-icons/Ai'
+import {AiOutlineArrowRight} from 'react-icons/ai'
 
 interface Props {
     children: ReactNode;
