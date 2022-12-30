@@ -18,25 +18,37 @@ jobs:
           node-version: 16.x
       - name: Install dependencies
         run: npm install -g pnpm
-      - run: pnpm install
-      - name: Build
-        run: pnpm run build
-      - name: deploy files
+#      - run: pnpm install
+#      - name: Build
+#        run: pnpm run build
+#      - name: deploy files
+#        env:
+#          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+#        run: |
+#          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+#          ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
+#      - run: mkdir -p ~/.ssh
+#      - run: echo 'wuchuheng.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINA60zE+n49NGkrLL0CiyUYqidfvX9AQpYvMJRkktiDA' >> ~/.ssh/known_hosts
+#      - run: echo 'wuchuheng.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDM27dExayA3jCVbi1ks4ZypPWO56qWyXhr8oDb4atKjyPVZssLAfnVTh6MJuVFOQc9swwGrLn2xmeEksgwB2FoqTBidntKhIDfaGO6GeZzQYXM/BbFrCmhhY9jcZBMKAWM9ZzADHzaowVZdqt0BeGCpI7ADqgysaGjeGM2edUmPFscLDNbopT0XBaASetmmePEHEsJ41E7o0hu0zdHMHcEHvdMitS377T712F/5AQOe91+/N4AjNFKIGaj3a2fRKMIo/WuB5WKWgL2blB/LR3ZJrFAGyn5tpGxDpwjLDgFnnC8w3fym4Yx6aP6G2EMfKMsJExHwOXIXSXuPfOJtR47' >> ~/.ssh/known_hosts
+#      - run: echo 'wuchuheng.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBN9mwp4NkkJ3we3yTuiNzI3wiSqjpWgZpxfTSXH3EGGlV4DMjw4sANN2CFyHR2nRRJGAqL7MftbIPu+UnrsSA+A=' >> ~/.ssh/known_hosts
+#      - name: Upload files to the online
+#        env:
+#          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+#        run: |
+#            sftp admin@wuchuheng.com <<EOF
+#                cd /home/admin/web/wuchuheng.com/public_html
+#                lcd build
+#                put -r * ./
+
+      - name: Install json5
+        run: npm install -g json5
+      - run: json5 ./config.json5
+      - name: Get the content of algolia.json as config
+        id: algolia_config
+        run: echo "::set-output name=config::$(json5 ./config.json5 | jq -r tostring)"
+      - name: Push indices to Algolia
+        uses: signcl/docsearch-scraper-action@master
         env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: |
-          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
-      - run: mkdir -p ~/.ssh
-      - run: echo 'wuchuheng.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINA60zE+n49NGkrLL0CiyUYqidfvX9AQpYvMJRkktiDA' >> ~/.ssh/known_hosts
-      - run: echo 'wuchuheng.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDM27dExayA3jCVbi1ks4ZypPWO56qWyXhr8oDb4atKjyPVZssLAfnVTh6MJuVFOQc9swwGrLn2xmeEksgwB2FoqTBidntKhIDfaGO6GeZzQYXM/BbFrCmhhY9jcZBMKAWM9ZzADHzaowVZdqt0BeGCpI7ADqgysaGjeGM2edUmPFscLDNbopT0XBaASetmmePEHEsJ41E7o0hu0zdHMHcEHvdMitS377T712F/5AQOe91+/N4AjNFKIGaj3a2fRKMIo/WuB5WKWgL2blB/LR3ZJrFAGyn5tpGxDpwjLDgFnnC8w3fym4Yx6aP6G2EMfKMsJExHwOXIXSXuPfOJtR47' >> ~/.ssh/known_hosts
-      - run: echo 'wuchuheng.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBN9mwp4NkkJ3we3yTuiNzI3wiSqjpWgZpxfTSXH3EGGlV4DMjw4sANN2CFyHR2nRRJGAqL7MftbIPu+UnrsSA+A=' >> ~/.ssh/known_hosts
-      - name: Some task that fetches dependencies
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: |
-            sftp admin@wuchuheng.com <<EOF
-                cd /home/admin/web/wuchuheng.com/public_html
-                lcd build 
-                put -r * ./ 
-            EOF
+          APPLICATION_ID: ${{ secrets.ALGOLIA_APPLICATION_ID }}
+          API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
+          CONFIG: ${{ steps.algolia_config.outputs.config }}
