@@ -26,9 +26,11 @@ specifiers:
   framer-motion: 4.1.17
   graphql: ^16.2.0
   graphql-subscriptions-client: ^0.16.2
+  graphql-ws: ^5.11.2
   mdx-mermaid: ^1.1.1
   mermaid: ^8.13.3
   next: 11.1.2
+  prettier: 2.8.1
   pretty-print-json: ^1.1.1
   prism-react-renderer: ^1.2.1
   qrcode.react: ^3.1.0
@@ -48,7 +50,7 @@ specifiers:
   workbox-strategies: ^6.5.3
 
 dependencies:
-  '@apollo/client': registry.npmmirror.com/@apollo/client/3.6.6_mkaofwwunmxuuv5z2mahoi5lb4
+  '@apollo/client': registry.npmmirror.com/@apollo/client/3.6.6_px4wzwrrwieffq7erm6s5kmh5y
   '@chakra-ui/icons': registry.npmmirror.com/@chakra-ui/icons/1.0.15_react@17.0.2
   '@chakra-ui/react': registry.npmmirror.com/@chakra-ui/react/1.6.9_j7dy535eqgyufnzrothkykrhue
   '@docusaurus/core': registry.npmmirror.com/@docusaurus/core/2.0.0-beta.21_3j5kiqpkwml5zzfuaom7hdylau
@@ -70,6 +72,7 @@ dependencies:
   framer-motion: registry.npmmirror.com/framer-motion/4.1.17_sfoxds7t5ydpegc3knd667wn6m
   graphql: registry.npmmirror.com/graphql/16.5.0
   graphql-subscriptions-client: registry.npmmirror.com/graphql-subscriptions-client/0.16.4
+  graphql-ws: registry.npmmirror.com/graphql-ws/5.11.2_graphql@16.5.0
   mdx-mermaid: registry.npmmirror.com/mdx-mermaid/1.2.3_c22t5semscxhgv3n3sjop6jcyy
   mermaid: registry.npmmirror.com/mermaid/8.14.0
   next: registry.npmmirror.com/next/11.1.2_zcumscxxuebyqfnbcqlig5b3ny
@@ -91,6 +94,7 @@ devDependencies:
   '@docusaurus/module-type-aliases': registry.npmmirror.com/@docusaurus/module-type-aliases/2.0.0-beta.21_sfoxds7t5ydpegc3knd667wn6m
   '@tsconfig/docusaurus': registry.npmmirror.com/@tsconfig/docusaurus/1.0.5
   babel-loader: registry.npmmirror.com/babel-loader/8.2.5
+  prettier: registry.npmmirror.com/prettier/2.8.1
   sass-loader: registry.npmmirror.com/sass-loader/10.1.1_sass@1.52.2
   typescript: registry.npmmirror.com/typescript/4.7.3
   workbox-routing: registry.npmmirror.com/workbox-routing/6.5.3
@@ -162,7 +166,7 @@ packages:
       react-dom: ^0.14.0 || ^15.0.0 || ^16 || ^17 || ^18
     dependencies:
       exenv: 1.2.2
-      prop-types: 15.8.1
+      prop-types: registry.npmmirror.com/prop-types/15.8.1
       react: registry.npmmirror.com/react/17.0.2
       react-dom: registry.npmmirror.com/react-dom/17.0.2_react@17.0.2
       react-lifecycles-compat: 3.0.4
@@ -338,7 +342,7 @@ packages:
       leven: registry.npmmirror.com/leven/3.1.0
     dev: false
 
-  registry.npmmirror.com/@apollo/client/3.6.6_mkaofwwunmxuuv5z2mahoi5lb4:
+  registry.npmmirror.com/@apollo/client/3.6.6_px4wzwrrwieffq7erm6s5kmh5y:
     resolution: {integrity: sha512-AzNLN043wy0bDTTR9wzKYSu+I1IT2Ox3+vWckxgIt88Jfw5jHBvumf3lXE1JlgvbFCTiKS/Sa66AadQXWMVBRQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@apollo/client/-/client-3.6.6.tgz}
     id: registry.npmmirror.com/@apollo/client/3.6.6
     name: '@apollo/client'
@@ -362,6 +366,7 @@ packages:
       '@wry/trie': registry.npmmirror.com/@wry/trie/0.3.1
       graphql: registry.npmmirror.com/graphql/16.5.0
       graphql-tag: registry.npmmirror.com/graphql-tag/2.12.6_graphql@16.5.0
+      graphql-ws: registry.npmmirror.com/graphql-ws/5.11.2_graphql@16.5.0
       hoist-non-react-statics: registry.npmmirror.com/hoist-non-react-statics/3.3.2
       optimism: registry.npmmirror.com/optimism/0.16.1
       prop-types: registry.npmmirror.com/prop-types/15.8.1
@@ -9357,6 +9362,18 @@ packages:
       tslib: registry.npmmirror.com/tslib/2.4.0
     dev: false
 
+  registry.npmmirror.com/graphql-ws/5.11.2_graphql@16.5.0:
+    resolution: {integrity: sha512-4EiZ3/UXYcjm+xFGP544/yW1+DVI8ZpKASFbzrV5EDTFWJp0ZvLl4Dy2fSZAzz9imKp5pZMIcjB0x/H69Pv/6w==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/graphql-ws/-/graphql-ws-5.11.2.tgz}
+    id: registry.npmmirror.com/graphql-ws/5.11.2
+    name: graphql-ws
+    version: 5.11.2
+    engines: {node: '>=10'}
+    peerDependencies:
+      graphql: '>=0.11 <=16'
+    dependencies:
+      graphql: registry.npmmirror.com/graphql/16.5.0
+    dev: false
+
   registry.npmmirror.com/graphql/16.5.0:
     resolution: {integrity: sha512-qbHgh8Ix+j/qY+a/ZcJnFQ+j8ezakqPiHwPiZhV/3PgGlgf96QMBB5/f2rkiC9sgLoy/xvT6TSiaf2nTHJh5iA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/graphql/-/graphql-16.5.0.tgz}
     name: graphql
@@ -12416,6 +12433,14 @@ packages:
     version: 2.0.0
     engines: {node: '>=4'}
     dev: false
+
+  registry.npmmirror.com/prettier/2.8.1:
+    resolution: {integrity: sha512-lqGoSJBQNJidqCHE80vqZJHWHRFoNYsSpP9AjFhlhi9ODCJA541svILes/+/1GM3VaL/abZi7cpFzOpdR9UPKg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/prettier/-/prettier-2.8.1.tgz}
+    name: prettier
+    version: 2.8.1
+    engines: {node: '>=10.13.0'}
+    hasBin: true
+    dev: true
 
   registry.npmmirror.com/pretty-bytes/5.6.0:
     resolution: {integrity: sha512-FFw039TmrBqFK8ma/7OL3sDz/VytdtJr044/QUJtH0wK9lb9jLq9tJyIxUwtQJHwar2BqtiA4iCWSwo9JLkzFg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/pretty-bytes/-/pretty-bytes-5.6.0.tgz}
