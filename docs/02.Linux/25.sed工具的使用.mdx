@@ -1,0 +1,40 @@
+---
+title: 25 sed工具的使用
+date: 2023-01-01 10:34
+---
+
+```mdx-code-block
+import BrowserWindow from '@site/src/components/BrowserWindow';
+import IframeContainer from '@site/src/components/IframeContainer/IframeContainer';
+```
+
+## 1 什么是`sed`？
+`sed`是一个基于正则规则的文本替换的命令行工具。用于处理各种文本的替换操作。常与`grep`和`awk`等等文本处理工具搭配使用。
+
+
+## 2 `sed`在线测试工具
+
+```mdx-code-block
+
+<BrowserWindow url="https://sed.js.org/" isJump>
+    <IframeContainer src='https://sed.js.org/' style={{width: '100%', height: '80vh'}} />
+</BrowserWindow>
+```
+
+## 3 前置文本添加操作
+
+``` bash
+$ ls -ahl dist # <-- 查看一个
+total 45632
+drwxr-xr-x   6 wuchuheng  staff   192B Jan  1 09:53 .
+drwxr-xr-x  15 wuchuheng  staff   480B Jan  1 10:01 ..
+-rw-r--r--   1 wuchuheng  staff     0B Jan  1 09:53 .gitkeep
+-rwxr-xr-x   1 wuchuheng  staff   7.8M Jan  1 09:50 executable_notion_server_0.0.1_darwin_amd64
+-rwxr-xr-x   1 wuchuheng  staff   7.2M Jan  1 09:50 executable_notion_server_0.0.1_linux_amd64
+-rwxr-xr-x   1 wuchuheng  staff   7.3M Jan  1 09:50 executable_notion_server_0.0.1_windows_amd64.exe
+$ ls -l dist  | awk 'NR > 1 {print $NF}' | sed 's/^/dist\//' | tr '\n' ' '
+# 注: 第1条命令是列出所有文件， 第2条命令是排除第一行， 第3条命令是进行行前内容添加， 第4条命令是行与行之间的\n用空格替换
+executable_notion_server_0.0.1_darwin_amd64 executable_notion_server_0.0.1_linux_amd64 executable_notion_server_0.0.1_windows_amd64.exe
+```
+
+
