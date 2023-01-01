@@ -156,11 +156,12 @@ src/windows/mainWindow/events/windowMaximizeToggleEvent.ts
 src/windows/mainWindow/preload.ts
 yarn.lock
 ```
-## 6 指定行号
+## 6 内置变量
 
-``` bash title="指定从第二行开始, 输出第一列"
- awk 'NR > 1 {print $1}'
-```
+| 变量 | 说明 | 示例 |
+| --- | --- | --- |
+| `NF` | 最后一列 | 如： 打印最后一列, `$ awk '{print $(NF)}' ` |
+| `NR` | 当前行号 |  如:选择等号大于1的数据, `awk 'NR > 1 {print $1}', 注意: 默认行号是从1开始的` |
 
 ## 7 正则匹配
 
@@ -199,4 +200,6 @@ $ echo $demoTxt | awk '$0 !~ "coc-extensions|init.lua" {print $0}'
  vim/cocvim/config/lua/plugins.lua
  vim/cocvim/config/plugin/packer_compiled.lua
 ```
+
+
 
