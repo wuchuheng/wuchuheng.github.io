@@ -1,0 +1,86 @@
+---
+title: 01 IOS自动化流程(一)-fastlane入门篇
+date: 2023-01-03 09:25
+---
+
+## 1 软件工程为什么要自动化流程?
+> 为什么IOS软件工程要引入自动化流程?  
+
+&emsp;软件开发工程后是要交付出去给客户使用的，所以软件的迭代更新后一定有交付过程。而为了保障软件工程的功能正常，需要为软件工程引入测试流程。而不
+管是交付流程、测试流程等等这种很频繁重复且又很花时间但又很必要的流程完全可以交给自动化流程来解决，从而节省开发者大量的宝贵时间。  
+
+> fastlane是什么？在IOS软件工程的自动化流程中又起了什么作用?  
+
+&emsp;而`fastlane`就是一个自动化流程的管理工具，它把`IOS`的软件工程中的很频繁重复的处理流程如: 打包、测试或发布等等进行自动化处理。从而节省开发者的时间和
+心智负担。  
+&emsp;总结就是：节省不必要浪费的时间,就是对生命中的意义负责。  
+
+## 2 准备工作
+
+### 2.1 系统参数
+| 名称 | 是否必要 | 说明 | 示例 |
+| --- | --- | --- | --- |
+| MacOS | ✅ | 开发时的操作系统 | MacOS 12.4 |
+| xcode | ✅ | IOS软件工程ide | xcode 12.0 |
+
+### 2.2 创建IOS软件工程
+:::tip 提示
+如果您还不是`IOS`的注册开发者，那您需要去[官网](https://developer.apple.com/)进行注册并缴费$99/年.
+只有成为`IOS`开发者才能发布应用。
+:::
+
+在开发者开台上，创建一个项目有需要先创建这个项目的标识，然后再创建项目。
+
+<details>
+    <summary>开发者平台创建新"wuchuheng"</summary>
+    
+    
+
+> 创建项目的标识: [Identifiers](https://developer.apple.com/account/resources/identifiers/list)
+<img src='https://qiniu.wuchuheng.com/WX20230103-164852%402x.png' />
+<img src='https://qiniu.wuchuheng.com/WX20230103-165058%402x.png' />
+<img src='https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-03%20at%2016.55.50.png' />
+<img src='https://qiniu.wuchuheng.com/images/WX20230103-165827%402x.png' />
+<img src='https://qiniu.wuchuheng.com/images/WX20230103-170130%402x.png' />
+    
+</details>
+
+<details>
+    <summary>本地创建新项目"wuchuheng"</summary>
+    <img src="https://qiniu.wuchuheng.com/images/WX20230103-104553%402x.png" />
+    <img src="https://qiniu.wuchuheng.com/images/WX20230103-104850%402x.png" />
+    <img src="https://qiniu.wuchuheng.com/images/WX20230103-105051%402x.png" />
+    <img src="https://qiniu.wuchuheng.com/images/WX20230103-105256%402x.png" />
+</details>
+
+
+### 2.2 创建开发者证书和发布证书
+
+IOS的开发和发布证书是基于非对称密钥原理，由IOS开发平台进行签发,证书的内容上就有开发者自己的公钥了。有了这个证书，就相当于苹果认可了证书上相对u
+应的保存在开发者的本地的密钥了，然后呢2个证书就相当于说明了2个事，开发证书就说明了苹果认可了证书上公钥对应的私钥(保存在开发者本地)，用有这个私钥
+的开发者结合开发证书就有权在本地对应用进行开发和调试了。而另一个发布证书，同样的也只认可对应的私钥，只有对应的私钥才能对本地应用进行签名并上传。  
+而想要进行证书的申请，就需要在本地创建自己的公钥和私钥，然后生成CSR（Certificate signing request）即证书请求文件, 其实里面主要就写着自己的公钥。
+然后上传CSR文件到苹果开发者的证书申请平台上，然后开发者平台就会解析上面的信息，并进行签名，而证明的证书主要的内容就是开发者自己公钥了。而这个被认可的公钥
+也就说明了，开发者本地的私钥也被认可了，然后根据证书不同的作用，本地私钥就有权限进行不同的操作了，如：开发或发布等等。
+
+<details>
+    <summary>Step 1: 本地生成CSR(Certificate signing request)文件</summary>
+在申请开发证书和发布证书前，需要自己在本地生成CSR文件。其实苹果签发的证书上的主要内容就是自己的公钥，相当于为自己公钥盖个章。所以我们这边需要有自己的
+私钥和公钥，然后把自己公钥写进CSR中，送给苹果去签名，这一来，有了证书就说明了自己的公钥被认可了，而公钥被认可了，那就说明了自己的私钥也被认可了。所以
+原理就这么个原理。而在`macOS`中有`keychain`能在生成CSR文件前就会自己生成对应的公钥和私钥并保存在本地了。 
+    
+<img src='https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-03%20at%2016.30.30.png' />
+<img src='https://qiniu.wuchuheng.com/images/WX20230103-163556%402x.png' />
+<img src='https://qiniu.wuchuheng.com/images/WX20230103-163755%402x.png' />
+</details>
+
+### 2.2 安装fastlane
+``` bash
+$ brew install fastlane
+```
+:::tip 提示
+[`fastlane`](https://docs.fastlane.tools/getting-started/ios/setup/)共有3种安装方式，如果以上的方式不好用，还可以参考下[官方文档](https://docs.fastlane.tools/getting-started/ios/setup/)的说明
+:::
+
+### 
+

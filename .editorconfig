@@ -1,0 +1,4 @@
+root = true
+
+[*.mdx]
+trim_trailing_whitespace=false
