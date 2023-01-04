@@ -31,6 +31,8 @@ date: 2023-01-03 09:25
 
 在开发者开台上，创建一个项目有需要先创建这个项目的标识，然后再创建项目。
 
+### 2.3 在开发者平台上创建应用标识
+
 <details>
     <summary>在开发者平台上创建应用标识</summary>
 > 创建项目的标识: [Identifiers](https://developer.apple.com/account/resources/identifiers/list)
@@ -39,9 +41,11 @@ date: 2023-01-03 09:25
 <img src='https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-03%20at%2016.55.50.png' />
 <img src='https://qiniu.wuchuheng.com/images/WX20230103-165827%402x.png' />
 <img src='https://qiniu.wuchuheng.com/images/WX20230103-170130%402x.png' />
-    <img src='https://qiniu.wuchuheng.com/images/WX20230103-170130%402x.png' />
+<img src='https://qiniu.wuchuheng.com/images/WX20230103-170130%402x.png' />
     
 </details>
+
+### 2.4 开发者平台创建新应用"wuchuheng"
 
 <details>
     <summary>开发者平台创建新应用"wuchuheng"</summary>
@@ -50,15 +54,31 @@ date: 2023-01-03 09:25
 </details>
 
 
+### 2.5 本地创建新项目"wuchuheng"
+
 <details>
     <summary>本地创建新项目"wuchuheng"</summary>
     <img src="https://qiniu.wuchuheng.com/images/WX20230103-104553%402x.png" />
-    <img src="https://qiniu.wuchuheng.com/images/WX20230103-104850%402x.png" />
-    <img src="https://qiniu.wuchuheng.com/images/WX20230103-105051%402x.png" />
+    <img src="https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-04%20at%2009.26.02.png" />
     <img src="https://qiniu.wuchuheng.com/images/WX20230103-105256%402x.png" />
+    
 </details>
 
-### 2.3 创建开发者证书和发布证书
+> 最后本地的项目文件结构为： 
+``` bash
+.
+├── Gemfile
+├── Shared
+├── Tests iOS
+├── Tests macOS
+├── fastlane
+├── macOS
+└── wuchuheng.xcodeproj
+```
+
+
+
+### 2.6 创建开发者证书和发布证书
 
 IOS的开发和发布证书是基于非对称密钥原理，由IOS开发平台进行签发,证书的内容上就有开发者自己的公钥了。有了这个证书，就相当于苹果认可了证书上相对u
 应的保存在开发者的本地的密钥了，然后呢2个证书就相当于说明了2个事，开发证书就说明了苹果认可了证书上公钥对应的私钥(保存在开发者本地)，用有这个私钥
@@ -113,9 +133,14 @@ IOS的开发和发布证书是基于非对称密钥原理，由IOS开发平台�
     <img src='https://qiniu.wuchuheng.com/images/WX20230103-221553.png' />
 </details>
 
+> Step 2: 在苹果开发者平台上创建发布用的profile
+
+步骤和上面一样，不过要选择 Distribution > App store。 因为是要用于本地应用的发布使用的。然后在xcode中打开。
+
 <details>
-    <summary>Step 2: 在苹果开发者平台上创建发布用的profile</summary>
-    步骤和上面一样，不过要选择 Distribution > App store。 因为是要用于本地应用的发布使用的。
+    <summary>step 3: 打开本地项目，并为项目指定profile</summary>
+
+    <ima src="https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-04%20at%2009.11.02.png" />
 </details>
 
 ### 2.5 安装fastlane
@@ -126,5 +151,26 @@ $ brew install fastlane
 [`fastlane`](https://docs.fastlane.tools/getting-started/ios/setup/)共有3种安装方式，如果以上的方式不好用，还可以参考下[官方文档](https://docs.fastlane.tools/getting-started/ios/setup/)的说明
 :::
 
-### 
+## 3 初始化fastlane
+
+```bash
+fastlane init
+
+[✔] 🚀
+[✔] Looking for iOS and Android projects in current directory...
+[09:32:25]: Detected an iOS/macOS project in the current directory: 'wuchuheng.xcodeproj'
+[09:32:25]: -----------------------------
+[09:32:25]: --- Welcome to fastlane 🚀 ---
+[09:32:25]: -----------------------------
+[09:32:25]: fastlane can help you with all kinds of automation for your mobile app
+[09:32:25]: We recommend automating one task first, and then gradually automating more over time
+[09:32:25]: What would you like to use fastlane for?
+1. 📸  Automate screenshots
+2. 👩‍✈️  Automate beta distribution to TestFlight
+3. 🚀  Automate App Store distribution
+4. 🛠  Manual setup - manually setup your project to automate your tasks
+?  2
+```
+
+
 
