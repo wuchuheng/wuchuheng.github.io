@@ -112,7 +112,8 @@ IOS的开发和发布证书是基于非对称密钥原理，由IOS开发平台�
 
 <details>
 <summary>Step 3: 在苹果开发者平台上申请发布证书</summary>
-重上面的步骤，不过要签发的是发布证书类型的。然后也是一样下载并安装
+重上面的步骤，不过要签发的是发布证书类型为: `App Store`。然后命名为: `com.wuchueheng_airRelaese`也是一样下载并用xcode打开。后面应用发布时，
+要用到。
 </details>
 
 ### 2.4 证书配置Profiles文件下载并安装
@@ -178,8 +179,8 @@ fastlane init
 ├── Gemfile            # <-- 生成Gemfile, 用于安装各种依赖
 ├── Gemfile.lock       # <-- 生成Gemfile.lock file, 依赖锁定文件
 ├── fastlane
-│   ├── Appfile
-│  └── Fastfile
+│   ├── Appfile        # <-- 应用配置文件
+│   └── Fastfile       # <-- fastlane 流程配置文件
 ├── wuchuheng
 │  ├── Assets.xcassets
 │  ├── ContentView.swift
@@ -196,3 +197,1320 @@ fastlane init
     └── wuchuhengUITestsLaunchTests.swift
 ```
 
+## 4 建构流程并推送到testflight
+初始化生成的流程配置文件`fastlane/Fastfile`中已经有默认的`beta`流程了.如: 
+``` bash title="fastlane/Fastfile"
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    increment_build_number(xcodeproj: "wuchuheng.xcodeproj")
+    build_app(scheme: "wuchuheng")
+    upload_to_testflight
+  end
+end
+```
+`beta`流程就做了3个事:
+
+1. 自增版本号
+2. 本地构建
+3. 发布到`testflight`
+
+所以我们可以执行`fastlane beta`, 来执行`beta`流程:
+
+
+<details>
+    <summary>执行的结果是错误的</summary>
+
+```bash    
+
+$ fastlane beta
+
+[✔] 🚀
+[07:52:25]: fastlane detected a Gemfile in the current directory
+[07:52:25]: However, it seems like you didn't use `bundle exec`
+[07:52:25]: To launch fastlane faster, please use
+[07:52:25]:
+[07:52:25]: $ bundle exec fastlane beta
+[07:52:25]:
+[07:52:25]: Get started using a Gemfile for fastlane https://docs.fastlane.tools/getting-started/ios/setup/#use-a-gemfile
+[07:52:27]: ------------------------------
+[07:52:27]: --- Step: default_platform ---
+[07:52:27]: ------------------------------
+[07:52:27]: Driving the lane 'ios beta' 🚀
+[07:52:27]: ------------------------------------
+[07:52:27]: --- Step: increment_build_number ---
+[07:52:27]: ------------------------------------
+Current version of project wuchuheng is:
+5
+
+/Users/wuchuheng/Desktop/myProjects/wuchuheng/ios/wuchuheng
+[07:52:27]: $ cd /Users/wuchuheng/myProjects/wuchuheng/ios/wuchuheng && agvtool next-version -all && cd -
+[07:52:27]: ▸ Setting version of project wuchuheng to:
+[07:52:27]: ▸ 6.
+[07:52:27]: ▸ Also setting CFBundleVersion key (assuming it exists)
+[07:52:27]: ▸ Updating CFBundleVersion in Info.plist(s)...
+[07:52:27]: ▸ Cannot find "wuchuheng.xcodeproj/../YES"
+[07:52:27]: ▸ /Users/wuchuheng/Desktop/myProjects/wuchuheng/ios/wuchuheng
+[07:52:28]: -----------------------
+[07:52:28]: --- Step: build_app ---
+[07:52:28]: -----------------------
+[07:52:28]: Resolving Swift Package Manager dependencies...
+[07:52:28]: $ xcodebuild -resolvePackageDependencies -scheme wuchuheng -project ./wuchuheng.xcodeproj
+[07:52:28]: ▸ 2023-01-05 07:52:28.630 xcodebuild[60344:3263146] Requested but did not find extension point with identifier Xcode.IDEKit.ExtensionSentinelHostApplications for extension Xcode.DebuggerFoundation.AppExtensionHosts.watchOS of plug-in com.apple.dt.IDEWatchSupportCore
+[07:52:28]: ▸ 2023-01-05 07:52:28.631 xcodebuild[60344:3263146] Requested but did not find extension point with identifier Xcode.IDEKit.ExtensionPointIdentifierToBundleIdentifier for extension Xcode.DebuggerFoundation.AppExtensionToBundleIdentifierMap.watchOS of plug-in com.apple.dt.IDEWatchSupportCore
+[07:52:29]: ▸ Command line invocation:
+[07:52:29]: ▸     /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -resolvePackageDependencies -scheme wuchuheng -project ./wuchuheng.xcodeproj
+[07:52:29]: ▸ User defaults from command line:
+[07:52:29]: ▸     IDEPackageSupportUseBuiltinSCM = YES
+[07:52:29]: ▸ --- xcodebuild: WARNING: Using the first of multiple matching destinations:
+[07:52:29]: ▸ { platform:macOS, arch:arm64, variant:Designed for [iPad,iPhone], id:00008103-0002782814F2001E }
+[07:52:29]: ▸ { platform:iOS, id:dvtdevice-DVTiPhonePlaceholder-iphoneos:placeholder, name:Any iOS Device }
+[07:52:29]: ▸ { platform:iOS Simulator, id:dvtdevice-DVTiOSDeviceSimulatorPlaceholder-iphonesimulator:placeholder, name:Any iOS Simulator Device }
+[07:52:29]: ▸ { platform:iOS Simulator, id:8BDFAFAD-95C4-4495-8A83-3A5641B21503, OS:15.5, name:iPad (9th generation) }
+[07:52:29]: ▸ { platform:iOS Simulator, id:09A52A1C-78C7-4B96-947F-D7A5538BFAF3, OS:15.5, name:iPad Air (5th generation) }
+[07:52:29]: ▸ { platform:iOS Simulator, id:B3C89639-BF1C-4015-9062-1418748E625B, OS:15.5, name:iPad Pro (9.7-inch) }
+[07:52:29]: ▸ { platform:iOS Simulator, id:132771C6-F919-4BF6-BFF2-4A742B03DC62, OS:15.5, name:iPad Pro (11-inch) (3rd generation) }
+[07:52:29]: ▸ { platform:iOS Simulator, id:C0358E31-BD20-4183-A6AD-D7AB39DD6E3B, OS:15.5, name:iPad Pro (12.9-inch) (5th generation) }
+[07:52:29]: ▸ { platform:iOS Simulator, id:59C32514-4DE2-41C4-A819-3E980358ABEE, OS:15.5, name:iPad mini (6th generation) }
+[07:52:29]: ▸ { platform:iOS Simulator, id:D5B99038-B743-4CEB-8DF7-90E64FA82059, OS:15.5, name:iPhone 8 }
+[07:52:29]: ▸ { platform:iOS Simulator, id:A620CE9A-8C6A-4885-AC9B-389FCC5E7EE0, OS:15.5, name:iPhone 8 Plus }
+[07:52:29]: ▸ { platform:iOS Simulator, id:B1B53B67-CDBE-4B17-89FE-70298F57C20A, OS:15.5, name:iPhone 11 }
+[07:52:29]: ▸ { platform:iOS Simulator, id:F4FC596D-C9F0-4E8E-ADE0-AF3D9E53FB0F, OS:15.5, name:iPhone 11 Pro }
+[07:52:29]: ▸ { platform:iOS Simulator, id:9BF45AD8-7FCD-4112-A812-528E1B5C7299, OS:15.5, name:iPhone 11 Pro Max }
+[07:52:29]: ▸ { platform:iOS Simulator, id:6822D51B-1BF8-46FC-8428-853C6F559F6E, OS:15.5, name:iPhone 12 }
+[07:52:29]: ▸ { platform:iOS Simulator, id:F2869CE0-AFD9-4907-BB12-952971E6A46F, OS:15.5, name:iPhone 12 Pro }
+[07:52:29]: ▸ { platform:iOS Simulator, id:0614CF19-299B-4FA5-8B44-210BC32F07C8, OS:15.5, name:iPhone 12 Pro Max }
+[07:52:29]: ▸ { platform:iOS Simulator, id:E3526C1C-4F96-4F2C-853D-D49CADF26181, OS:15.5, name:iPhone 12 mini }
+[07:52:29]: ▸ { platform:iOS Simulator, id:3BEEB57C-8777-4B33-ADBF-785E7AE2D26D, OS:15.5, name:iPhone 13 }
+[07:52:29]: ▸ { platform:iOS Simulator, id:C9D1439E-C05F-465F-BC72-18D1091B46A0, OS:15.5, name:iPhone 13 Pro }
+[07:52:29]: ▸ { platform:iOS Simulator, id:79D45B38-4643-47B8-843F-890692CB38AF, OS:15.5, name:iPhone 13 Pro Max }
+[07:52:29]: ▸ { platform:iOS Simulator, id:45ED5D8C-E74E-4E14-BE39-25791F21F637, OS:15.5, name:iPhone 13 mini }
+[07:52:29]: ▸ { platform:iOS Simulator, id:22A8F1BB-44EB-43A9-B2B0-1B13EC92EA47, OS:15.5, name:iPhone SE (1st generation) }
+[07:52:29]: ▸ { platform:iOS Simulator, id:DBE8A5F3-8161-488B-AF05-6CB894130C83, OS:15.5, name:iPhone SE (3rd generation) }
+[07:52:29]: ▸ { platform:iOS Simulator, id:5026F08E-B794-4C29-8ED8-5B7BDC1F4942, OS:15.5, name:iPod touch (7th generation) }
+[07:52:29]: ▸ resolved source packages:
+[07:52:29]: $ xcodebuild -showBuildSettings -scheme wuchuheng -project ./wuchuheng.xcodeproj
+2023-01-05 07:52:30.136 xcodebuild[60348:3263233] Requested but did not find extension point with identifier Xcode.IDEKit.ExtensionSentinelHostApplications for extension Xcode.DebuggerFoundation.AppExtensionHosts.watchOS of plug-in com.apple.dt.IDEWatchSupportCore
+2023-01-05 07:52:30.137 xcodebuild[60348:3263233] Requested but did not find extension point with identifier Xcode.IDEKit.ExtensionPointIdentifierToBundleIdentifier for extension Xcode.DebuggerFoundation.AppExtensionToBundleIdentifierMap.watchOS of plug-in com.apple.dt.IDEWatchSupportCore
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:macOS, arch:arm64, variant:Designed for [iPad,iPhone], id:00008103-0002782814F2001E }
+{ platform:iOS, id:dvtdevice-DVTiPhonePlaceholder-iphoneos:placeholder, name:Any iOS Device }
+{ platform:iOS Simulator, id:dvtdevice-DVTiOSDeviceSimulatorPlaceholder-iphonesimulator:placeholder, name:Any iOS Simulator Device }
+{ platform:iOS Simulator, id:8BDFAFAD-95C4-4495-8A83-3A5641B21503, OS:15.5, name:iPad (9th generation) }
+{ platform:iOS Simulator, id:09A52A1C-78C7-4B96-947F-D7A5538BFAF3, OS:15.5, name:iPad Air (5th generation) }
+{ platform:iOS Simulator, id:B3C89639-BF1C-4015-9062-1418748E625B, OS:15.5, name:iPad Pro (9.7-inch) }
+{ platform:iOS Simulator, id:132771C6-F919-4BF6-BFF2-4A742B03DC62, OS:15.5, name:iPad Pro (11-inch) (3rd generation) }
+{ platform:iOS Simulator, id:C0358E31-BD20-4183-A6AD-D7AB39DD6E3B, OS:15.5, name:iPad Pro (12.9-inch) (5th generation) }
+{ platform:iOS Simulator, id:59C32514-4DE2-41C4-A819-3E980358ABEE, OS:15.5, name:iPad mini (6th generation) }
+{ platform:iOS Simulator, id:D5B99038-B743-4CEB-8DF7-90E64FA82059, OS:15.5, name:iPhone 8 }
+{ platform:iOS Simulator, id:A620CE9A-8C6A-4885-AC9B-389FCC5E7EE0, OS:15.5, name:iPhone 8 Plus }
+{ platform:iOS Simulator, id:B1B53B67-CDBE-4B17-89FE-70298F57C20A, OS:15.5, name:iPhone 11 }
+{ platform:iOS Simulator, id:F4FC596D-C9F0-4E8E-ADE0-AF3D9E53FB0F, OS:15.5, name:iPhone 11 Pro }
+{ platform:iOS Simulator, id:9BF45AD8-7FCD-4112-A812-528E1B5C7299, OS:15.5, name:iPhone 11 Pro Max }
+{ platform:iOS Simulator, id:6822D51B-1BF8-46FC-8428-853C6F559F6E, OS:15.5, name:iPhone 12 }
+{ platform:iOS Simulator, id:F2869CE0-AFD9-4907-BB12-952971E6A46F, OS:15.5, name:iPhone 12 Pro }
+{ platform:iOS Simulator, id:0614CF19-299B-4FA5-8B44-210BC32F07C8, OS:15.5, name:iPhone 12 Pro Max }
+{ platform:iOS Simulator, id:E3526C1C-4F96-4F2C-853D-D49CADF26181, OS:15.5, name:iPhone 12 mini }
+{ platform:iOS Simulator, id:3BEEB57C-8777-4B33-ADBF-785E7AE2D26D, OS:15.5, name:iPhone 13 }
+{ platform:iOS Simulator, id:C9D1439E-C05F-465F-BC72-18D1091B46A0, OS:15.5, name:iPhone 13 Pro }
+{ platform:iOS Simulator, id:79D45B38-4643-47B8-843F-890692CB38AF, OS:15.5, name:iPhone 13 Pro Max }
+{ platform:iOS Simulator, id:45ED5D8C-E74E-4E14-BE39-25791F21F637, OS:15.5, name:iPhone 13 mini }
+{ platform:iOS Simulator, id:22A8F1BB-44EB-43A9-B2B0-1B13EC92EA47, OS:15.5, name:iPhone SE (1st generation) }
+{ platform:iOS Simulator, id:DBE8A5F3-8161-488B-AF05-6CB894130C83, OS:15.5, name:iPhone SE (3rd generation) }
+{ platform:iOS Simulator, id:5026F08E-B794-4C29-8ED8-5B7BDC1F4942, OS:15.5, name:iPod touch (7th generation) }
+[07:52:32]: Detected provisioning profile mapping: {:"com.wuchuheng"=>"com.wuchuheng_developer"}
+
++---------------------------------------------------+--------------------------------------------------------------+
+|                                             Summary for gym 2.211.0                                              |
++---------------------------------------------------+--------------------------------------------------------------+
+| scheme                                            | wuchuheng                                                    |
+| project                                           | ./wuchuheng.xcodeproj                                        |
+| clean                                             | false                                                        |
+| output_directory                                  | .                                                            |
+| output_name                                       | wuchuheng                                                    |
+| silent                                            | false                                                        |
+| skip_package_ipa                                  | false                                                        |
+| skip_package_pkg                                  | false                                                        |
+| export_options.provisioningProfiles.com.wuchuheng | com.wuchuheng_developer                                      |
+| build_path                                        | /Users/wuchuheng/Library/Developer/Xcode/Archives/2023-01-05 |
+| result_bundle                                     | false                                                        |
+| buildlog_path                                     | ~/Library/Logs/gym                                           |
+| destination                                       | generic/platform=iOS                                         |
+| xcodebuild_formatter                              | xcpretty                                                     |
+| skip_profile_detection                            | false                                                        |
+| xcodebuild_command                                | xcodebuild                                                   |
+| skip_package_dependencies_resolution              | false                                                        |
+| disable_package_automatic_updates                 | false                                                        |
+| use_system_scm                                    | false                                                        |
+| xcode_path                                        | /Applications/Xcode.app                                      |
++---------------------------------------------------+--------------------------------------------------------------+
+
+[07:52:32]: $ set -o pipefail && xcodebuild -scheme wuchuheng -project ./wuchuheng.xcodeproj -destination 'generic/platform=iOS' -archivePath /Users/wuchuheng/Library/Developer/Xcode/Archives/2023-01-05/wuchuheng\ 2023-01-05\ 07.52.32.xcarchive archive | tee /Users/wuchuheng/Library/Logs/gym/wuchuheng-wuchuheng.log | xcpretty
+[07:52:33]: ▸ 2023-01-05 07:52:33.489 xcodebuild[60370:3263535] Requested but did not find extension point with identifier Xcode.IDEKit.ExtensionSentinelHostApplications for extension Xcode.DebuggerFoundation.AppExtensionHosts.watchOS of plug-in com.apple.dt.IDEWatchSupportCore
+[07:52:33]: ▸ 2023-01-05 07:52:33.489 xcodebuild[60370:3263535] Requested but did not find extension point with identifier Xcode.IDEKit.ExtensionPointIdentifierToBundleIdentifier for extension Xcode.DebuggerFoundation.AppExtensionToBundleIdentifierMap.watchOS of plug-in com.apple.dt.IDEWatchSupportCore
+[07:52:35]: ▸ Linking wuchuheng
+[07:52:35]: ▸ Processing empty-wuchuheng.plist
+[07:52:36]: ▸ Generating 'wuchuheng.app.dSYM'
+[07:52:36]: ▸ Touching wuchuheng.app (in target 'wuchuheng' from project 'wuchuheng')
+[07:52:36]: ▸ Archive Succeeded
+[07:52:36]: Generated plist file with the following values:
+[07:52:36]: ▸ -----------------------------------------
+[07:52:36]: ▸ {
+[07:52:36]: ▸   "provisioningProfiles": {
+[07:52:36]: ▸     "com.wuchuheng": "com.wuchuheng_developer"
+[07:52:36]: ▸   },
+[07:52:36]: ▸   "method": "app-store",
+[07:52:36]: ▸   "signingStyle": "manual"
+[07:52:36]: ▸ }
+[07:52:36]: ▸ -----------------------------------------
+[07:52:36]: $ /usr/bin/xcrun /opt/homebrew/Cellar/fastlane/2.211.0/libexec/gems/fastlane-2.211.0/gym/lib/assets/wrap_xcodebuild/xcbuild-safe.sh -exportArchive -exportOptionsPlist '/var/folders/87/3ys_m27d2t18nr14jd5x48kc0000gn/T/gym_config20230105-60239-s9la0y.plist' -archivePath /Users/wuchuheng/Library/Developer/Xcode/Archives/2023-01-05/wuchuheng\ 2023-01-05\ 07.52.32.xcarchive -exportPath '/var/folders/87/3ys_m27d2t18nr14jd5x48kc0000gn/T/gym_output20230105-60239-hcmhta'
++ xcodebuild -exportArchive -exportOptionsPlist /var/folders/87/3ys_m27d2t18nr14jd5x48kc0000gn/T/gym_config20230105-60239-s9la0y.plist -archivePath '/Users/wuchuheng/Library/Developer/Xcode/Archives/2023-01-05/wuchuheng 2023-01-05 07.52.32.xcarchive' -exportPath /var/folders/87/3ys_m27d2t18nr14jd5x48kc0000gn/T/gym_output20230105-60239-hcmhta
+2023-01-05 07:52:36.764 xcodebuild[60402:3263717] Requested but did not find extension point with identifier Xcode.IDEKit.ExtensionSentinelHostApplications for extension Xcode.DebuggerFoundation.AppExtensionHosts.watchOS of plug-in com.apple.dt.IDEWatchSupportCore
+2023-01-05 07:52:36.765 xcodebuild[60402:3263717] Requested but did not find extension point with identifier Xcode.IDEKit.ExtensionPointIdentifierToBundleIdentifier for extension Xcode.DebuggerFoundation.AppExtensionToBundleIdentifierMap.watchOS of plug-in com.apple.dt.IDEWatchSupportCore
+2023-01-05 07:52:36.894 xcodebuild[60402:3263717] [MT] IDEDistribution: -[IDEDistributionLogging _createLoggingBundleAtPath:]: Created bundle at path "/var/folders/87/3ys_m27d2t18nr14jd5x48kc0000gn/T/wuchuheng_2023-01-05_07-52-36.894.xcdistributionlogs".
+error: exportArchive: Provisioning profile "com.wuchuheng_developer" doesn't include signing certificate "Apple Distribution: chuheng wu (5D6L6979M7)".
+
+Error Domain=IDEProfileQualificationErrorDomain Code=5 "Provisioning profile "com.wuchuheng_developer" doesn't include signing certificate "Apple Distribution: chuheng wu (5D6L6979M7)"." UserInfo={NSLocalizedDescription=Provisioning profile "com.wuchuheng_developer" doesn't include signing certificate "Apple Distribution: chuheng wu (5D6L6979M7)"., IDEDistributionIssueSeverity=3, IDEProfileQualificationError_MissingCerts={(
+<DVTSigningCertificate: 0x600000158dc0; name='Apple Distribution: chuheng wu (5D6L6979M7)', hash='14176EB8CDC8BB4B7BA47308584D7E1E3523BC3E', serialNumber='51EEEFD7D1D5B93B52B6BF0DFB632693', certificateKinds='(
+"1.2.840.113635.100.6.1.7",
+"1.2.840.113635.100.6.1.4"
+), issueDate='2023-01-02 12:47:25 +0000''>
+)}, IDEProfileQualificationError_Profile=<DVTEmbeddedProvisioningProfile 0x600000357f00: name: com.wuchuheng_developer, UUID: 7ea78dc1-f560-463b-a5e2-4d80fe40f36c, teamName: chuheng wu, teamIdentifierPrefixes: (
+5D6L6979M7
+), entitlements: {
+"application-identifier" = "5D6L6979M7.com.wuchuheng";
+"com.apple.developer.team-identifier" = 5D6L6979M7;
+"get-task-allow" = 1;
+"keychain-access-groups" =     (
+"5D6L6979M7.*",
+"com.apple.token"
+);
+ppIdentifierName: Development and testing, applicationIdentifierPrefixes: (
+5D6L6979M7
+), dateCreated: 2023-01-03 14:15:13 +0000, dateExpired: 2024-01-03 14:15:13 +0000, certificateKinds: {(
+"1.2.840.113635.100.6.1.12",
+    "1.2.840.113635.100.6.1.2"
+certificateSHA1Hashes: {(
+0EEDB128631DE7AFBAB70C9B7266B7B0CEE7E04E,
+C867BB38655C93A6BE647370F942A3B52EF7B41D,
+21C89E60D43C2561131319607CE8E33CDA3E71A3
+)}, supportedUDIDs: {(
+d9881d30e75263faf8b4f467be3a8bfdcdddfd70
+isUniversal: 0, isXcodeManaged: 0, platforms: {(
+<DVTPlatform:0x60000185e900:'com.apple.platform.watchos':<DVTFilePath:0x60000185e880:'/Applications/Xcode.app/Contents/Developer/Platforms/WatchOS.platform'>>,
+<DVTPlatform:0x60000185e600:'com.apple.platform.iphoneos':<DVTFilePath:0x60000185e580:'/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform'>>
+)}, filePath: <DVTFilePath:0x60000070c5a0:'/Users/wuchuheng/Library/MobileDevice/Provisioning Profiles/7ea78dc1-f560-463b-a5e2-4d80fe40f36c.mobileprovision'>>}
+
+error: exportArchive: Provisioning profile "com.wuchuheng_developer" is not an "iOS App Store" profile.
+
+Error Domain=IDEProfileQualificationErrorDomain Code=3 "Provisioning profile "com.wuchuheng_developer" is not an "iOS App Store" profile." UserInfo={IDEProfileQualificationError_Profile=<DVTEmbeddedProvisioningProfile 0x600000357f00: name: com.wuchuheng_developer, UUID: 7ea78dc1-f560-463b-a5e2-4d80fe40f36c, teamName: chuheng wu, teamIdentifierPrefixes: (
+5D6L6979M7
+), entitlements: {
+"application-identifier" = "5D6L6979M7.com.wuchuheng";
+"com.apple.developer.team-identifier" = 5D6L6979M7;
+"get-task-allow" = 1;
+"keychain-access-groups" =     (
+"5D6L6979M7.*",
+"com.apple.token"
+);
+ppIdentifierName: Development and testing, applicationIdentifierPrefixes: (
+5D6L6979M7
+), dateCreated: 2023-01-03 14:15:13 +0000, dateExpired: 2024-01-03 14:15:13 +0000, certificateKinds: {(
+"1.2.840.113635.100.6.1.12",
+"1.2.840.113635.100.6.1.2"
+)}, certificateSHA1Hashes: {(
+0EEDB128631DE7AFBAB70C9B7266B7B0CEE7E04E,
+C867BB38655C93A6BE647370F942A3B52EF7B41D,
+21C89E60D43C2561131319607CE8E33CDA3E71A3
+)}, supportedUDIDs: {(
+d9881d30e75263faf8b4f467be3a8bfdcdddfd70
+)}, isUniversal: 0, isXcodeManaged: 0, platforms: {(
+<DVTPlatform:0x60000185e900:'com.apple.platform.watchos':<DVTFilePath:0x60000185e880:'/Applications/Xcode.app/Contents/Developer/Platforms/WatchOS.platform'>>,
+<DVTPlatform:0x60000185e600:'com.apple.platform.iphoneos':<DVTFilePath:0x60000185e580:'/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform'>>
+)}, filePath: <DVTFilePath:0x60000070c5a0:'/Users/wuchuheng/Library/MobileDevice/Provisioning Profiles/7ea78dc1-f560-463b-a5e2-4d80fe40f36c.mobileprovision'>>, NSLocalizedDescription=Provisioning profile "com.wuchuheng_developer" is not an "iOS App Store" profile., IDEDistributionIssueSeverity=3}
+
+** EXPORT FAILED **
+[07:52:43]: Exit status: 70
+
++---------------+-------------------------+
+|            Build environment            |
++---------------+-------------------------+
+| xcode_path    | /Applications/Xcode.app |
+| gym_version   | 2.211.0                 |
+| export_method | app-store               |
+| sdk           | iPhoneOS15.5.sdk        |
++---------------+-------------------------+
+
+[07:52:43]: ▸ Touch /Users/wuchuheng/Library/Developer/Xcode/DerivedData/wuchuheng-gvqrassuxojudzajwrmgckzsktfw/Build/Intermediates.noindex/ArchiveIntermediates/wuchuheng/InstallationBuildProductsLocation/Applications/wuchuheng.app (in target 'wuchuheng' from project 'wuchuheng')
+[07:52:43]: ▸     cd /Users/wuchuheng/myProjects/wuchuheng/ios/wuchuheng
+[07:52:43]: ▸     /usr/bin/touch -c /Users/wuchuheng/Library/Developer/Xcode/DerivedData/wuchuheng-gvqrassuxojudzajwrmgckzsktfw/Build/Intermediates.noindex/ArchiveIntermediates/wuchuheng/InstallationBuildProductsLocation/Applications/wuchuheng.app
+[07:52:43]: ▸ ** ARCHIVE SUCCEEDED **
+[07:52:43]:
+[07:52:43]: ⬆️  Check out the few lines of raw `xcodebuild` output above for potential hints on how to solve this error
+[07:52:43]: 📋  For the complete and more detailed error log, check the full log at:
+[07:52:43]: 📋  /Users/wuchuheng/Library/Logs/gym/wuchuheng-wuchuheng.log
+[07:52:43]:
+[07:52:43]: Looks like fastlane ran into a build/archive error with your project
+[07:52:43]: It's hard to tell what's causing the error, so we wrote some guides on how
+[07:52:43]: to troubleshoot build and signing issues: https://docs.fastlane.tools/codesigning/getting-started/
+[07:52:43]: Before submitting an issue on GitHub, please follow the guide above and make
+[07:52:43]: sure your project is set up correctly.
+[07:52:43]: fastlane uses `xcodebuild` commands to generate your binary, you can see the
+[07:52:43]: the full commands printed out in yellow in the above log.
+[07:52:43]: Make sure to inspect the output above, as usually you'll find more error information there
+[07:52:43]:
++------------------+----------+
+|        Lane Context         |
++------------------+----------+
+| DEFAULT_PLATFORM | ios      |
+| PLATFORM_NAME    | ios      |
+| LANE_NAME        | ios beta |
+| BUILD_NUMBER     | 6        |
++------------------+----------+
+[07:52:43]: Error packaging up the application
+
++------+------------------------+-------------+
+|              fastlane summary               |
++------+------------------------+-------------+
+| Step | Action                 | Time (in s) |
++------+------------------------+-------------+
+| 1    | default_platform       | 0           |
+| 2    | increment_build_number | 0           |
+| 💥   | build_app              | 15          |
++------+------------------------+-------------+
+
+[07:52:43]: fastlane finished with errors
+
+[!] Error packaging up the application
+`
+
+```
+    
+</details>
+    
+那我们就在xcode占手动先跑一下构建和发布流程,来看看有什么问题:
+
+<details>
+    <summary>step 1: 在xcode项目中选择任何设备 </summary>
+
+<img src="https://qiniu.wuchuheng.com/images/WX20230105-080308%402x.png" />
+</details>
+
+    
+<details>
+    <summary>step 2: 在xcode项目中选择product > archive </summary>
+    
+    <img src="https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-05%20at%2008.06.22.png" />
+</details>
+    
+<details>
+    <summary>step 3: 在xcode项目中选择发布</summary>
+    
+    <img src="https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-05%20at%2008.08.09.png" />
+</details>
+        
+<details>
+    <summary>step 4: 在xcode项目中选择下一步</summary>
+    
+    <img src="https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-05%20at%2008.09.18.png" />
+</details>
+        
+       
+<details>
+    <summary>step 5: 在xcode项目中选择上传</summary>
+    
+    <img src="https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-05%20at%2008.10.13.png" />
+</details>
+
+<details>
+    <summary>step 6: 在xcode项目中选择上次下载回来用于发布使用的profile</summary>
+    
+    注意: 是发布用的`profile`文件，而不是开发用的。申请流程跟申请开发用的`profile`一样的，只不过在申请时选择的类型为`App Store`。
+    <img src="https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-05%20at%2008.12.03.png" />
+</details>
+
+<details>
+<summary>step 7: 在xcode项目中选择确定上传</summary>
+
+<img src="https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-05%20at%2008.15.12.png" />
+</details>
+
+<details> 
+<summary>step 8: 上传失败了，报错了</summary>
+<img src="https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-05%20at%2008.21.02.png" />
+</details>
+
+```bash title="报错内容如下:"
+Missing Info.plist value. A value for the Info.plist key 'CFBundleIconName' is missing in the bundle 'com.wuchuheng'. Apps built with iOS 11 or later SDK must supply app icons in an asset catalog and must also provide a value for this Info.plist key. For more information see http://help.apple.com/xcode/mac/current/#/dev10510b1f7
+
+```
+    
+错误的原因只有一个: 初始化的项目没有应用图标。解决的办法就是把`app`图标加上去就可以了。
+:::tip 提示
+如果没有对应的图标文件格式，可去[www.appicon.co](https://www.appicon.co/)中进行转换生成
+:::
+
+<details>
+<summary>step 9: 添加应用图标</summary>
+<img src="https://qiniu.wuchuheng.com/images/WX20230105-094116%402x.png" />
+</details>
+
+<details>
+<summary>step 10: 然后再把上面的步骤再来一次, 重新上传应用</summary>
+<img src="https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-05%20at%2009.53.32.png" />
+</details>
+    
+好到了这一步，就说明了手动在xcode进行应用打包和上传已经没有问题了。在`testFlight`也已经能看看我们上传的应用了。
+
+![](https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-05%20at%2009.56.17.png)
+
+<details>
+<summary>step 11: 然后再试试fastlane的beta流程能不能跑通</summary>
+
+```bash title="操作日志"
+    fastlane beta ; n ok
+
+    [✔] 🚀
+    [10:13:35]: fastlane detected a Gemfile in the current directory
+    [10:13:35]: However, it seems like you didn't use `bundle exec`
+    [10:13:35]: To launch fastlane faster, please use
+    [10:13:35]:
+    [10:13:35]: $ bundle exec fastlane beta
+    [10:13:35]:
+    [10:13:35]: Get started using a Gemfile for fastlane https://docs.fastlane.tools/getting-started/ios/setup/#use-a-gemfile
+    [10:13:35]: ------------------------------
+    [10:13:35]: --- Step: default_platform ---
+    [10:13:35]: ------------------------------
+    [10:13:35]: Driving the lane 'ios beta' 🚀
+    [10:13:35]: ------------------------------------
+    [10:13:35]: --- Step: increment_build_number ---
+    [10:13:35]: ------------------------------------
+    Current version of project wuchuheng is:
+    11
+
+    /Users/wuchuheng/Desktop/myProjects/wuchuheng/ios/wuchuheng
+    [10:13:36]: $ cd /Users/wuchuheng/myProjects/wuchuheng/ios/wuchuheng && agvtool next-version -all && cd -
+    [10:13:36]: ▸ Setting version of project wuchuheng to:
+    [10:13:36]: ▸ 12.
+    [10:13:36]: ▸ Also setting CFBundleVersion key (assuming it exists)
+    [10:13:36]: ▸ Updating CFBundleVersion in Info.plist(s)...
+    [10:13:36]: ▸ Cannot find "wuchuheng.xcodeproj/../YES"
+    [10:13:36]: ▸ /Users/wuchuheng/Desktop/myProjects/wuchuheng/ios/wuchuheng
+    [10:13:36]: -----------------------
+    [10:13:36]: --- Step: build_app ---
+    [10:13:36]: -----------------------
+    [10:13:36]: Resolving Swift Package Manager dependencies...
+    [10:13:36]: $ xcodebuild -resolvePackageDependencies -scheme wuchuheng -project ./wuchuheng.xcodeproj
+    [10:13:36]: ▸ 2023-01-05 10:13:36.806 xcodebuild[70964:3392693] Requested but did not find extension point with identifier Xcode.IDEKit.ExtensionSentinelHostApplications for extension Xcode.DebuggerFoundation.AppExtensionHosts.watchOS of plug-in com.apple.dt.IDEWatchSupportCore
+    [10:13:36]: ▸ 2023-01-05 10:13:36.807 xcodebuild[70964:3392693] Requested but did not find extension point with identifier Xcode.IDEKit.ExtensionPointIdentifierToBundleIdentifier for extension Xcode.DebuggerFoundation.AppExtensionToBundleIdentifierMap.watchOS of plug-in com.apple.dt.IDEWatchSupportCore
+    [10:13:36]: ▸ Command line invocation:
+    [10:13:36]: ▸     /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -resolvePackageDependencies -scheme wuchuheng -project ./wuchuheng.xcodeproj
+    [10:13:36]: ▸ User defaults from command line:
+    [10:13:36]: ▸     IDEPackageSupportUseBuiltinSCM = YES
+    [10:13:37]: ▸ --- xcodebuild: WARNING: Using the first of multiple matching destinations:
+    [10:13:37]: ▸ { platform:macOS, arch:arm64, variant:Designed for [iPad,iPhone], id:00008103-0002782814F2001E }
+    [10:13:37]: ▸ { platform:iOS, id:dvtdevice-DVTiPhonePlaceholder-iphoneos:placeholder, name:Any iOS Device }
+    [10:13:37]: ▸ { platform:iOS Simulator, id:dvtdevice-DVTiOSDeviceSimulatorPlaceholder-iphonesimulator:placeholder, name:Any iOS Simulator Device }
+    [10:13:37]: ▸ { platform:iOS Simulator, id:8BDFAFAD-95C4-4495-8A83-3A5641B21503, OS:15.5, name:iPad (9th generation) }
+    [10:13:37]: ▸ { platform:iOS Simulator, id:09A52A1C-78C7-4B96-947F-D7A5538BFAF3, OS:15.5, name:iPad Air (5th generation) }
+    [10:13:37]: ▸ { platform:iOS Simulator, id:B3C89639-BF1C-4015-9062-1418748E625B, OS:15.5, name:iPad Pro (9.7-inch) }
+    [10:13:37]: ▸ { platform:iOS Simulator, id:132771C6-F919-4BF6-BFF2-4A742B03DC62, OS:15.5, name:iPad Pro (11-inch) (3rd generation) }
+    [10:13:37]: ▸ { platform:iOS Simulator, id:C0358E31-BD20-4183-A6AD-D7AB39DD6E3B, OS:15.5, name:iPad Pro (12.9-inch) (5th generation) }
+    [10:13:37]: ▸ { platform:iOS Simulator, id:59C32514-4DE2-41C4-A819-3E980358ABEE, OS:15.5, name:iPad mini (6th generation) }
+    [10:13:37]: ▸ { platform:iOS Simulator, id:D5B99038-B743-4CEB-8DF7-90E64FA82059, OS:15.5, name:iPhone 8 }
+    [10:13:37]: ▸ { platform:iOS Simulator, id:A620CE9A-8C6A-4885-AC9B-389FCC5E7EE0, OS:15.5, name:iPhone 8 Plus }
+    [10:13:37]: ▸ { platform:iOS Simulator, id:B1B53B67-CDBE-4B17-89FE-70298F57C20A, OS:15.5, name:iPhone 11 }
+    [10:13:37]: ▸ { platform:iOS Simulator, id:F4FC596D-C9F0-4E8E-ADE0-AF3D9E53FB0F, OS:15.5, name:iPhone 11 Pro }
+    [10:13:37]: ▸ { platform:iOS Simulator, id:9BF45AD8-7FCD-4112-A812-528E1B5C7299, OS:15.5, name:iPhone 11 Pro Max }
+    [10:13:37]: ▸ { platform:iOS Simulator, id:6822D51B-1BF8-46FC-8428-853C6F559F6E, OS:15.5, name:iPhone 12 }
+    [10:13:37]: ▸ { platform:iOS Simulator, id:F2869CE0-AFD9-4907-BB12-952971E6A46F, OS:15.5, name:iPhone 12 Pro }
+    [10:13:37]: ▸ { platform:iOS Simulator, id:0614CF19-299B-4FA5-8B44-210BC32F07C8, OS:15.5, name:iPhone 12 Pro Max }
+    [10:13:37]: ▸ { platform:iOS Simulator, id:E3526C1C-4F96-4F2C-853D-D49CADF26181, OS:15.5, name:iPhone 12 mini }
+    [10:13:37]: ▸ { platform:iOS Simulator, id:3BEEB57C-8777-4B33-ADBF-785E7AE2D26D, OS:15.5, name:iPhone 13 }
+    [10:13:37]: ▸ { platform:iOS Simulator, id:C9D1439E-C05F-465F-BC72-18D1091B46A0, OS:15.5, name:iPhone 13 Pro }
+    [10:13:37]: ▸ { platform:iOS Simulator, id:79D45B38-4643-47B8-843F-890692CB38AF, OS:15.5, name:iPhone 13 Pro Max }
+    [10:13:37]: ▸ { platform:iOS Simulator, id:45ED5D8C-E74E-4E14-BE39-25791F21F637, OS:15.5, name:iPhone 13 mini }
+    [10:13:37]: ▸ { platform:iOS Simulator, id:22A8F1BB-44EB-43A9-B2B0-1B13EC92EA47, OS:15.5, name:iPhone SE (1st generation) }
+    [10:13:37]: ▸ { platform:iOS Simulator, id:DBE8A5F3-8161-488B-AF05-6CB894130C83, OS:15.5, name:iPhone SE (3rd generation) }
+    [10:13:37]: ▸ { platform:iOS Simulator, id:5026F08E-B794-4C29-8ED8-5B7BDC1F4942, OS:15.5, name:iPod touch (7th generation) }
+    [10:13:37]: ▸ resolved source packages:
+    [10:13:37]: $ xcodebuild -showBuildSettings -scheme wuchuheng -project ./wuchuheng.xcodeproj
+    2023-01-05 10:13:37.694 xcodebuild[70973:3392819] Requested but did not find extension point with identifier Xcode.IDEKit.ExtensionSentinelHostApplications for extension Xcode.DebuggerFoundation.AppExtensionHosts.watchOS of plug-in com.apple.dt.IDEWatchSupportCore
+    2023-01-05 10:13:37.694 xcodebuild[70973:3392819] Requested but did not find extension point with identifier Xcode.IDEKit.ExtensionPointIdentifierToBundleIdentifier for extension Xcode.DebuggerFoundation.AppExtensionToBundleIdentifierMap.watchOS of plug-in com.apple.dt.IDEWatchSupportCore
+    --- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:macOS, arch:arm64, variant:Designed for [iPad,iPhone], id:00008103-0002782814F2001E }
+{ platform:iOS, id:dvtdevice-DVTiPhonePlaceholder-iphoneos:placeholder, name:Any iOS Device }
+{ platform:iOS Simulator, id:dvtdevice-DVTiOSDeviceSimulatorPlaceholder-iphonesimulator:placeholder, name:Any iOS Simulator Device }
+{ platform:iOS Simulator, id:8BDFAFAD-95C4-4495-8A83-3A5641B21503, OS:15.5, name:iPad (9th generation) }
+{ platform:iOS Simulator, id:09A52A1C-78C7-4B96-947F-D7A5538BFAF3, OS:15.5, name:iPad Air (5th generation) }
+{ platform:iOS Simulator, id:B3C89639-BF1C-4015-9062-1418748E625B, OS:15.5, name:iPad Pro (9.7-inch) }
+{ platform:iOS Simulator, id:132771C6-F919-4BF6-BFF2-4A742B03DC62, OS:15.5, name:iPad Pro (11-inch) (3rd generation) }
+{ platform:iOS Simulator, id:C0358E31-BD20-4183-A6AD-D7AB39DD6E3B, OS:15.5, name:iPad Pro (12.9-inch) (5th generation) }
+{ platform:iOS Simulator, id:59C32514-4DE2-41C4-A819-3E980358ABEE, OS:15.5, name:iPad mini (6th generation) }
+{ platform:iOS Simulator, id:D5B99038-B743-4CEB-8DF7-90E64FA82059, OS:15.5, name:iPhone 8 }
+{ platform:iOS Simulator, id:A620CE9A-8C6A-4885-AC9B-389FCC5E7EE0, OS:15.5, name:iPhone 8 Plus }
+{ platform:iOS Simulator, id:B1B53B67-CDBE-4B17-89FE-70298F57C20A, OS:15.5, name:iPhone 11 }
+{ platform:iOS Simulator, id:F4FC596D-C9F0-4E8E-ADE0-AF3D9E53FB0F, OS:15.5, name:iPhone 11 Pro }
+{ platform:iOS Simulator, id:9BF45AD8-7FCD-4112-A812-528E1B5C7299, OS:15.5, name:iPhone 11 Pro Max }
+{ platform:iOS Simulator, id:6822D51B-1BF8-46FC-8428-853C6F559F6E, OS:15.5, name:iPhone 12 }
+{ platform:iOS Simulator, id:F2869CE0-AFD9-4907-BB12-952971E6A46F, OS:15.5, name:iPhone 12 Pro }
+{ platform:iOS Simulator, id:0614CF19-299B-4FA5-8B44-210BC32F07C8, OS:15.5, name:iPhone 12 Pro Max }
+{ platform:iOS Simulator, id:E3526C1C-4F96-4F2C-853D-D49CADF26181, OS:15.5, name:iPhone 12 mini }
+{ platform:iOS Simulator, id:3BEEB57C-8777-4B33-ADBF-785E7AE2D26D, OS:15.5, name:iPhone 13 }
+{ platform:iOS Simulator, id:C9D1439E-C05F-465F-BC72-18D1091B46A0, OS:15.5, name:iPhone 13 Pro }
+{ platform:iOS Simulator, id:79D45B38-4643-47B8-843F-890692CB38AF, OS:15.5, name:iPhone 13 Pro Max }
+{ platform:iOS Simulator, id:45ED5D8C-E74E-4E14-BE39-25791F21F637, OS:15.5, name:iPhone 13 mini }
+{ platform:iOS Simulator, id:22A8F1BB-44EB-43A9-B2B0-1B13EC92EA47, OS:15.5, name:iPhone SE (1st generation) }
+{ platform:iOS Simulator, id:DBE8A5F3-8161-488B-AF05-6CB894130C83, OS:15.5, name:iPhone SE (3rd generation) }
+{ platform:iOS Simulator, id:5026F08E-B794-4C29-8ED8-5B7BDC1F4942, OS:15.5, name:iPod touch (7th generation) }
+
+    +--------------------------------------+--------------------------------------------------------------+
+    |                                       Summary for gym 2.211.0                                       |
+    +--------------------------------------+--------------------------------------------------------------+
+    | scheme                               | wuchuheng                                                    |
+    | project                              | ./wuchuheng.xcodeproj                                        |
+    | clean                                | false                                                        |
+    | output_directory                     | .                                                            |
+    | output_name                          | wuchuheng                                                    |
+    | silent                               | false                                                        |
+    | skip_package_ipa                     | false                                                        |
+    | skip_package_pkg                     | false                                                        |
+    | build_path                           | /Users/wuchuheng/Library/Developer/Xcode/Archives/2023-01-05 |
+    | result_bundle                        | false                                                        |
+    | buildlog_path                        | ~/Library/Logs/gym                                           |
+    | destination                          | generic/platform=iOS                                         |
+    | xcodebuild_formatter                 | xcpretty                                                     |
+    | skip_profile_detection               | false                                                        |
+    | xcodebuild_command                   | xcodebuild                                                   |
+    | skip_package_dependencies_resolution | false                                                        |
+    | disable_package_automatic_updates    | false                                                        |
+    | use_system_scm                       | false                                                        |
+    | xcode_path                           | /Applications/Xcode.app                                      |
+    +--------------------------------------+--------------------------------------------------------------+
+
+    [10:13:38]: $ set -o pipefail && xcodebuild -scheme wuchuheng -project ./wuchuheng.xcodeproj -destination 'generic/platform=iOS' -archivePath /Users/wuchuheng/Library/Developer/Xcode/Archives/2023-01-05/wuchuheng\ 2023-01-05\ 10.13.38.xcarchive archive | tee /Users/wuchuheng/Library/Logs/gym/wuchuheng-wuchuheng.log | xcpretty
+    [10:13:39]: ▸ 2023-01-05 10:13:39.173 xcodebuild[70992:3392959] Requested but did not find extension point with identifier Xcode.IDEKit.ExtensionSentinelHostApplications for extension Xcode.DebuggerFoundation.AppExtensionHosts.watchOS of plug-in com.apple.dt.IDEWatchSupportCore
+    [10:13:39]: ▸ 2023-01-05 10:13:39.175 xcodebuild[70992:3392959] Requested but did not find extension point with identifier Xcode.IDEKit.ExtensionPointIdentifierToBundleIdentifier for extension Xcode.DebuggerFoundation.AppExtensionToBundleIdentifierMap.watchOS of plug-in com.apple.dt.IDEWatchSupportCore
+    [10:13:40]: ▸ Linking wuchuheng
+    [10:13:41]: ▸ Processing empty-wuchuheng.plist
+    [10:13:42]: ▸ Generating 'wuchuheng.app.dSYM'
+    [10:13:42]: ▸ Touching wuchuheng.app (in target 'wuchuheng' from project 'wuchuheng')
+    [10:13:42]: ▸ Archive Succeeded
+    [10:13:42]: Generated plist file with the following values:
+    [10:13:42]: ▸ -----------------------------------------
+    [10:13:42]: ▸ {
+    [10:13:42]: ▸   "method": "app-store"
+    [10:13:42]: ▸ }
+    [10:13:42]: ▸ -----------------------------------------
+    [10:13:42]: $ /usr/bin/xcrun /opt/homebrew/Cellar/fastlane/2.211.0/libexec/gems/fastlane-2.211.0/gym/lib/assets/wrap_xcodebuild/xcbuild-safe.sh -exportArchive -exportOptionsPlist '/var/folders/87/3ys_m27d2t18nr14jd5x48kc0000gn/T/gym_config20230105-70860-vx28jl.plist' -archivePath /Users/wuchuheng/Library/Developer/Xcode/Archives/2023-01-05/wuchuheng\ 2023-01-05\ 10.13.38.xcarchive -exportPath '/var/folders/87/3ys_m27d2t18nr14jd5x48kc0000gn/T/gym_output20230105-70860-nxsyan'
+    + xcodebuild -exportArchive -exportOptionsPlist /var/folders/87/3ys_m27d2t18nr14jd5x48kc0000gn/T/gym_config20230105-70860-vx28jl.plist -archivePath '/Users/wuchuheng/Library/Developer/Xcode/Archives/2023-01-05/wuchuheng 2023-01-05 10.13.38.xcarchive' -exportPath /var/folders/87/3ys_m27d2t18nr14jd5x48kc0000gn/T/gym_output20230105-70860-nxsyan
+    2023-01-05 10:13:42.719 xcodebuild[71036:3393236] Requested but did not find extension point with identifier Xcode.IDEKit.ExtensionSentinelHostApplications for extension Xcode.DebuggerFoundation.AppExtensionHosts.watchOS of plug-in com.apple.dt.IDEWatchSupportCore
+    2023-01-05 10:13:42.719 xcodebuild[71036:3393236] Requested but did not find extension point with identifier Xcode.IDEKit.ExtensionPointIdentifierToBundleIdentifier for extension Xcode.DebuggerFoundation.AppExtensionToBundleIdentifierMap.watchOS of plug-in com.apple.dt.IDEWatchSupportCore
+    2023-01-05 10:13:42.842 xcodebuild[71036:3393236] [MT] IDEDistribution: -[IDEDistributionLogging _createLoggingBundleAtPath:]: Created bundle at path "/var/folders/87/3ys_m27d2t18nr14jd5x48kc0000gn/T/wuchuheng_2023-01-05_10-13-42.842.xcdistributionlogs".
+    error: exportArchive: No profiles for 'com.wuchuheng' were found
+
+    Error Domain=IDEProfileLocatorErrorDomain Code=1 "No profiles for 'com.wuchuheng' were found" UserInfo={IDEDistributionIssueSeverity=3, NSLocalizedDescription=No profiles for 'com.wuchuheng' were found, NSLocalizedRecoverySuggestion=Xcode couldn't find any iOS App Store provisioning profiles matching 'com.wuchuheng'. Automatic signing is disabled and unable to generate a profile. To enable automatic signing, pass -allowProvisioningUpdates to xcodebuild.}
+
+    ** EXPORT FAILED **
+    [10:13:48]: Exit status: 70
+
+    +---------------+-------------------------+
+    |            Build environment            |
+    +---------------+-------------------------+
+    | xcode_path    | /Applications/Xcode.app |
+    | gym_version   | 2.211.0                 |
+    | export_method | app-store               |
+    | sdk           | iPhoneOS15.5.sdk        |
+    +---------------+-------------------------+
+
+    [10:13:48]: ▸ Touch /Users/wuchuheng/Library/Developer/Xcode/DerivedData/wuchuheng-gvqrassuxojudzajwrmgckzsktfw/Build/Intermediates.noindex/ArchiveIntermediates/wuchuheng/InstallationBuildProductsLocation/Applications/wuchuheng.app (in target 'wuchuheng' from project 'wuchuheng')
+    [10:13:48]: ▸     cd /Users/wuchuheng/myProjects/wuchuheng/ios/wuchuheng
+    [10:13:48]: ▸     /usr/bin/touch -c /Users/wuchuheng/Library/Developer/Xcode/DerivedData/wuchuheng-gvqrassuxojudzajwrmgckzsktfw/Build/Intermediates.noindex/ArchiveIntermediates/wuchuheng/InstallationBuildProductsLocation/Applications/wuchuheng.app
+    # This file contains the fastlane.tools configuration
+    [10:13:48]: ▸ ** ARCHIVE SUCCEEDED **
+    [10:13:48]:
+    [10:13:48]: ⬆️  Check out the few lines of raw `xcodebuild` output above for potential hints on how to solve this error
+    [10:13:48]: 📋  For the complete and more detailed error log, check the full log at:
+    [10:13:48]: 📋  /Users/wuchuheng/Library/Logs/gym/wuchuheng-wuchuheng.log
+    [10:13:48]:
+    [10:13:48]: Looks like fastlane ran into a build/archive error with your project
+    [10:13:48]: It's hard to tell what's causing the error, so we wrote some guides on how
+    [10:13:48]: to troubleshoot build and signing issues: https://docs.fastlane.tools/codesigning/getting-started/
+    [10:13:48]: Before submitting an issue on GitHub, please follow the guide above and make
+    [10:13:48]: sure your project is set up correctly.
+    [10:13:48]: fastlane uses `xcodebuild` commands to generate your binary, you can see the
+    [10:13:48]: the full commands printed out in yellow in the above log.
+    [10:13:48]: Make sure to inspect the output above, as usually you'll find more error information there
+    [10:13:48]:
+    [10:13:48]: Looks like no provisioning profile mapping was provided
+    [10:13:48]: Please check the complete output, in particular the very top
+    [10:13:48]: and see if you can find more information. You can also run fastlane
+    [10:13:48]: with the `--verbose` flag.
+    [10:13:48]: Alternatively you can provide the provisioning profile mapping manually
+    [10:13:48]: https://docs.fastlane.tools/codesigning/xcode-project/#xcode-9-and-up
+    +------------------+----------+
+    |        Lane Context         |
+    +------------------+----------+
+    | DEFAULT_PLATFORM | ios      |
+    | PLATFORM_NAME    | ios      |
+    | LANE_NAME        | ios beta |
+    | BUILD_NUMBER     | 12       |
+    +------------------+----------+
+    [10:13:48]: Error packaging up the application
+
+    +------+------------------------+-------------+
+    |              fastlane summary               |
+    +------+------------------------+-------------+
+    | Step | Action                 | Time (in s) |
+    +------+------------------------+-------------+
+    | 1    | default_platform       | 0           |
+    | 2    | increment_build_number | 0           |
+    | 💥   | build_app              | 12          |
+    +------+------------------------+-------------+
+
+    [10:13:48]: fastlane finished with errors
+
+    [!] Error packaging up the application
+
+```
+    
+</details>
+
+:::danger 警告
+> 结果还是出错了， 提示还是跟之前的一样: 
+    
+```bash
+    [10:13:48]: Looks like fastlane ran into a build/archive error with your project
+    [10:13:48]: It's hard to tell what's causing the error, so we wrote some guides on how
+    [10:13:48]: to troubleshoot build and signing issues: https://docs.fastlane.tools/codesigning/getting-started/
+    [10:13:48]: Before submitting an issue on GitHub, please follow the guide above and make
+    [10:13:48]: sure your project is set up correctly.
+    [10:13:48]: fastlane uses `xcodebuild` commands to generate your binary, you can see the
+    [10:13:48]: the full commands printed out in yellow in the above log.
+    [10:13:48]: Make sure to inspect the output above, as usually you'll find more error information there
+
+    [10:13:48]: Looks like no provisioning profile mapping was provided
+    [10:13:48]: Please check the complete output, in particular the very top
+    [10:13:48]: and see if you can find more information. You can also run fastlane
+    [10:13:48]: with the `--verbose` flag.
+    [10:13:48]: Alternatively you can provide the provisioning profile mapping manually
+    [10:13:48]: https://docs.fastlane.tools/codesigning/xcode-project/#xcode-9-and-up
+
+```
+    
+:::
+    
+    
+    
+看来是`profile`在`fastlane`的`beta`流程中没有找到相关的`profile`文件，才导致构建app失败。不过没关系，`fastlane`的流程中可以加入自动从线上
+下载`profile`下来。然后进行使用。 只要在`beta`流程的构建之前加入获取 `profile`的代码，就可以了: 
+
+    
+```bash title="fastlane/Fastfile"
+
+    default_platform(:ios)
+    
+    platform :ios do
+      desc "Push a new beta build to TestFlight"
+      lane :beta do
+        get_certificates           # 获取证书
+        get_provisioning_profile   # 获取profile
+        increment_build_number(xcodeproj: "wuchuheng.xcodeproj")
+        build_app(scheme: "wuchuheng")
+        upload_to_testflight
+      end
+    end    
+    
+```
+
+<details>
+
+<summary>step 12: 然后再试试fastlane的beta流程还能不能跑通</summary>
+
+```bash title="操作日志"
+$ fastlane beta
+
+[✔] 🚀
+[10:31:38]: fastlane detected a Gemfile in the current directory
+[10:31:38]: However, it seems like you didn't use `bundle exec`
+[10:31:38]: To launch fastlane faster, please use
+[10:31:38]:
+[10:31:38]: $ bundle exec fastlane beta
+[10:31:38]:
+[10:31:38]: Get started using a Gemfile for fastlane https://docs.fastlane.tools/getting-started/ios/setup/#use-a-gemfile
+[10:31:39]: ------------------------------
+[10:31:39]: --- Step: default_platform ---
+[10:31:39]: ------------------------------
+[10:31:39]: Driving the lane 'ios beta' 🚀
+[10:31:39]: ------------------------------
+[10:31:39]: --- Step: get_certificates ---
+[10:31:39]: ------------------------------
+
++-------------------------+------------------------------------------------------+
+|                            Summary for cert 2.211.0                            |
++-------------------------+------------------------------------------------------+
+| development             | false                                                |
+| force                   | false                                                |
+| generate_apple_certs    | true                                                 |
+| username                | root@wuchuheng.com                                   |
+| team_id                 | 5D6L6979M7                                           |
+| keychain_path           | /Users/wuchuheng/Library/Keychains/login.keychain-db |
+| skip_set_partition_list | false                                                |
+| platform                | ios                                                  |
++-------------------------+------------------------------------------------------+
+
+[10:31:39]: Starting login with user 'root@wuchuheng.com'
+[10:31:45]: Successfully logged in
+[10:31:45]: $ security find-certificate -a -c 'Apple Worldwide Developer Relations' -p /Users/wuchuheng/Library/Keychains/login.keychain-db
+[10:31:45]: ▸ -----BEGIN CERTIFICATE-----
+[10:31:45]: ▸ MIIEIjCCAwqgAwIBAgIIAd68xDltoBAwDQYJKoZIhvcNAQEFBQAwYjELMAkGA1UE
+[10:31:45]: ▸ BhMCVVMxEzARBgNVBAoTCkFwcGxlIEluYy4xJjAkBgNVBAsTHUFwcGxlIENlcnRp
+[10:31:45]: ▸ ZmljYXRpb24gQXV0aG9yaXR5MRYwFAYDVQQDEw1BcHBsZSBSb290IENBMB4XDTEz
+[10:31:45]: ▸ MDIwNzIxNDg0N1oXDTIzMDIwNzIxNDg0N1owgZYxCzAJBgNVBAYTAlVTMRMwEQYD
+[10:31:45]: ▸ VQQKDApBcHBsZSBJbmMuMSwwKgYDVQQLDCNBcHBsZSBXb3JsZHdpZGUgRGV2ZWxv
+[10:31:45]: ▸ cGVyIFJlbGF0aW9uczFEMEIGA1UEAww7QXBwbGUgV29ybGR3aWRlIERldmVsb3Bl
+[10:31:45]: ▸ ciBSZWxhdGlvbnMgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEiMA0GCSqGSIb3
+[10:31:45]: ▸ DQEBAQUAA4IBDwAwggEKAoIBAQDKOFSmy1aqyCQ5SOmM7uxfuH8mkbw0U3rOfGOA
+[10:31:45]: ▸ YXdkXqUHI7Y5/lAtFVZYcC1+xG7BSoU+L/DehBqhV8mvexj/avoVEkkVCBmsqtsq
+[10:31:45]: ▸ Mu2WY2hSFT2Miuy/axiV4AOsAX2XBWfODoWVN2rtCbauZ81RZJ/GXNG8V25nNYB2
+[10:31:45]: ▸ NqSHgW44j9grFU57Jdhav06DwY3Sk9UacbVgnJ0zTlX5ElgMhrgWDcHld0WNUEi6
+[10:31:45]: ▸ Ky3klIXh6MSdxmilsKP8Z35wugJZS3dCkTm59c3hTO/AO0iMpuUhXf1qarunFjVg
+[10:31:45]: ▸ HQYDVR0OBBYEFIgnFwmpthhgi+zruvZHWcVSVKO3MA8GA1UdEwEB/wQFMAMBAf8w
+[10:31:45]: ▸ HwYDVR0jBBgwFoAUK9BpR5R2Cf70a40uQKb3R01/CF4wLgYDVR0fBCcwJTAjoCGg
+[10:31:45]: ▸ H4YdaHR0cDovL2NybC5hcHBsZS5jb20vcm9vdC5jcmwwDgYDVR0PAQH/BAQDAgGG
+[10:31:45]: ▸ MBAGCiqGSIb3Y2QGAgEEAgUAMA0GCSqGSIb3DQEBBQUAA4IBAQBPz+9Zviz1smwv
+[10:31:45]: ▸ j+4ThzLoBTWobot9yWkMudkXvHcs1Gfi/ZptOllc34MBvbKuKmFysa/Nw0Uwj6OD
+[10:31:45]: ▸ Dc4dR7Txk4qjdJukw5hyhzs+r0ULklS5MruQGFNrCk4QttkdUGwhgAqJTleMa1s8
+[10:31:45]: ▸ Pab93vcNIx0LSiaHP7qRkkykGRIZbVf1eliHe2iK5IaMSuviSRSqpd1VAKmuu0sw
+[10:31:45]: ▸ ruGgsbwpgOYJd+W+NKIByn/c4grmO7i77LpilfMFY0GCzQ87HUyVpNur+cmV6U/k
+[10:31:45]: ▸ TecmmYHpvPm0KdIBembhLoz2IYrF+Hjhga6/05Cdqa3zr/04GpZnMBxRpVzscYqC
+[10:31:45]: ▸ tGwPDBUf
+[10:31:45]: ▸ -----END CERTIFICATE-----
+[10:31:45]: ▸ -----BEGIN CERTIFICATE-----
+[10:31:45]: ▸ MIIEUTCCAzmgAwIBAgIQfK9pCiW3Of57m0R6wXjF7jANBgkqhkiG9w0BAQsFADBi
+[10:31:45]: ▸ MQswCQYDVQQGEwJVUzETMBEGA1UEChMKQXBwbGUgSW5jLjEmMCQGA1UECxMdQXBw
+[10:31:45]: ▸ bGUgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkxFjAUBgNVBAMTDUFwcGxlIFJvb3Qg
+[10:31:45]: ▸ Q0EwHhcNMjAwMjE5MTgxMzQ3WhcNMzAwMjIwMDAwMDAwWjB1MUQwQgYDVQQDDDtB
+[10:31:45]: ▸ cHBsZSBXb3JsZHdpZGUgRGV2ZWxvcGVyIFJlbGF0aW9ucyBDZXJ0aWZpY2F0aW9u
+[10:31:45]: ▸ IEF1dGhvcml0eTELMAkGA1UECwwCRzMxEzARBgNVBAoMCkFwcGxlIEluYy4xCzAJ
+[10:31:45]: ▸ BgNVBAYTAlVTMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2PWJ/KhZ
+[10:31:45]: ▸ C4fHTJEuLVaQ03gdpDDppUjvC0O/LYT7JF1FG+XrWTYSXFRknmxiLbTGl8rMPPbW
+[10:31:45]: ▸ BpH85QKmHGq0edVny6zpPwcR4YS8Rx1mjjmi6LRJ7TrS4RBgeo6TjMrA2gzAg9Dj
+[10:31:45]: ▸ +ZHWp4zIwXPirkbRYp2SqJBgN31ols2N4Pyb+ni743uvLRfdW/6AWSN1F7gSwe0b
+[10:31:45]: ▸ 5TTO/iK1nkmw5VW/j4SiPKi6xYaVFuQAyZ8D0MyzOhZ71gVcnetHrg21LYwOaU1A
+[10:31:45]: ▸ 0EtMOwSejSGxrC5DVDDOwYqGlJhL32oNP/77HK6XF8J4CjDgXx9UO0m3JQAaN4LS
+[10:31:45]: ▸ VpelUkl8YDib7wIDAQABo4HvMIHsMBIGA1UdEwEB/wQIMAYBAf8CAQAwHwYDVR0j
+[10:31:45]: ▸ BBgwFoAUK9BpR5R2Cf70a40uQKb3R01/CF4wRAYIKwYBBQUHAQEEODA2MDQGCCsG
+[10:31:45]: ▸ AQUFBzABhihodHRwOi8vb2NzcC5hcHBsZS5jb20vb2NzcDAzLWFwcGxlcm9vdGNh
+[10:31:45]: ▸ MC4GA1UdHwQnMCUwI6AhoB+GHWh0dHA6Ly9jcmwuYXBwbGUuY29tL3Jvb3QuY3Js
+[10:31:45]: ▸ MB0GA1UdDgQWBBQJ/sAVkPmvZAqSErkmKGMMl+ynsjAOBgNVHQ8BAf8EBAMCAQYw
+[10:31:45]: ▸ Qr5fpTkg6mKp/cWQyXMT1Z6b0KoPjY3L7QHPbChAW8dVJEH4/M/BtSPp3Ozxb8qA
+[10:31:45]: ▸ HXfCxGFJJWevD8o5Ja3T43rMMygNDi6hV0Bz+uZcrgZRKe3jhQxPYdwyFot30ETK
+[10:31:45]: ▸ XXIDMUacrptAGvr04NM++i+MZp+XxFRZ79JI9AeZSWBZGcfdlNHAwWx/eCHvDOs7
+[10:31:45]: ▸ bJmCS1JgOLU5gm3sUjFTvg+RTElJdI+mUcuER04ddSduvfnSXPN/wmwLCTbiZOTC
+[10:31:45]: ▸ NwMUGdXqapSqqdv+9poIZ4vvK7iqF0mDr8/LvOnP6pVxsLRFoszlh6oKw0E6eVza
+[10:31:45]: ▸ UDSdlTs=
+[10:31:45]: ▸ -----END CERTIFICATE-----
+[10:31:45]: ▸ -----BEGIN CERTIFICATE-----
+[10:31:45]: ▸ MIIC9zCCAnygAwIBAgIIb+/Y9emjp+4wCgYIKoZIzj0EAwIwZzEbMBkGA1UEAwwS
+[10:31:45]: ▸ QXBwbGUgUm9vdCBDQSAtIEczMSYwJAYDVQQLDB1BcHBsZSBDZXJ0aWZpY2F0aW9u
+[10:31:45]: ▸ IEF1dGhvcml0eTETMBEGA1UECgwKQXBwbGUgSW5jLjELMAkGA1UEBhMCVVMwHhcN
+[10:31:45]: ▸ MTQwNTA2MjM0MzI0WhcNMjkwNTA2MjM0MzI0WjCBgDE0MDIGA1UEAwwrQXBwbGUg
+[10:31:45]: ▸ V29ybGR3aWRlIERldmVsb3BlciBSZWxhdGlvbnMgQ0EgLSBHMjEmMCQGA1UECwwd
+[10:31:45]: ▸ QXBwbGUgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkxEzARBgNVBAoMCkFwcGxlIElu
+[10:31:45]: ▸ Yy4xCzAJBgNVBAYTAlVTMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE3fC3BkvP
+[10:31:45]: ▸ 3XMEE8RDiQOTgPte9nStQmFSWAImUxnIYyIHCVJhysTZV+9tJmiLdJGMxPmAaCj8
+[10:31:45]: ▸ CWjwENrp0C7JGqOB9zCB9DBGBggrBgEFBQcBAQQ6MDgwNgYIKwYBBQUHMAGGKmh0
+[10:31:45]: ▸ dHA6Ly9vY3NwLmFwcGxlLmNvbS9vY3NwMDQtYXBwbGVyb290Y2FnMzAdBgNVHQ4E
+[10:31:45]: ▸ FgQUhLaEzDqGYnIWWZToGqO9SN863wswDwYDVR0TAQH/BAUwAwEB/zAfBgNVHSME
+[10:31:45]: ▸ Oi8vY3JsLmFwcGxlLmNvbS9hcHBsZXJvb3RjYWczLmNybDAOBgNVHQ8BAf8EBAMC
+[10:31:45]: ▸ AQYwEAYKKoZIhvdjZAYCDwQCBQAwCgYIKoZIzj0EAwIDaQAwZgIxANmxxzHGI/ZP
+[10:31:45]: ▸ TdDZR8V9GGkRh3En02it4Jtlmr5s3z9GppAJvm6hOyywUYlBPIfSvwIxAPxkUolL
+[10:31:45]: ▸ PF2/axzCiZgvcq61m6oaCyNUd1ToFUOixRLal1BzfF7QbrJcYlDXUfE6Wg==
+[10:31:45]: ▸ -----END CERTIFICATE-----
+[10:31:45]: ▸ -----BEGIN CERTIFICATE-----
+[10:31:45]: ▸ MIIEVTCCAz2gAwIBAgIUE9x3lVJx5T3GMujM/+Uh88zFztIwDQYJKoZIhvcNAQEL
+[10:31:45]: ▸ BQAwYjELMAkGA1UEBhMCVVMxEzARBgNVBAoTCkFwcGxlIEluYy4xJjAkBgNVBAsT
+[10:31:45]: ▸ HUFwcGxlIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MRYwFAYDVQQDEw1BcHBsZSBS
+[10:31:45]: ▸ b290IENBMB4XDTIwMTIxNjE5MzYwNFoXDTMwMTIxMDAwMDAwMFowdTFEMEIGA1UE
+[10:31:45]: ▸ Aww7QXBwbGUgV29ybGR3aWRlIERldmVsb3BlciBSZWxhdGlvbnMgQ2VydGlmaWNh
+[10:31:45]: ▸ dGlvbiBBdXRob3JpdHkxCzAJBgNVBAsMAkc0MRMwEQYDVQQKDApBcHBsZSBJbmMu
+[10:31:45]: ▸ MQswCQYDVQQGEwJVUzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANAf
+[10:31:45]: ▸ eKp6JzKwRl/nF3bYoJ0OKY6tPTKlxGs3yeRBkWq3eXFdDDQEYHX3rkOPR8SGHgjo
+[10:31:45]: ▸ v9Y5Ui8eZ/xx8YJtPH4GUnadLLzVQ+mxtLxAOnhRXVGhJeG+bJGdayFZGEHVD41t
+[10:31:45]: ▸ QSo5SiHgkJ9OE0/QjJoyuNdqkh4laqQyziIZhQVg3AJK8lrrd3kCfcCXVGySjnYB
+[10:31:45]: ▸ 5kaP5eYq+6KwrRitbTOFOCOL6oqW7Z+uZk+jDEAnbZXQYojZQykn/e2kv1MukBVl
+[10:31:45]: ▸ PNkuYmQzHWxq3Y4hqqRfFcYw7V/mjDaSlLfcOQIA+2SM1AyB8j/VNJeHdSbCb64D
+[10:31:45]: ▸ YyEMe9QbsWLFApy9/a8CAwEAAaOB7zCB7DASBgNVHRMBAf8ECDAGAQH/AgEAMB8G
+[10:31:45]: ▸ BggrBgEFBQcwAYYoaHR0cDovL29jc3AuYXBwbGUuY29tL29jc3AwMy1hcHBsZXJv
+[10:31:45]: ▸ b3RjYTAuBgNVHR8EJzAlMCOgIaAfhh1odHRwOi8vY3JsLmFwcGxlLmNvbS9yb290
+[10:31:45]: ▸ LmNybDAdBgNVHQ4EFgQUW9n6HeeaGgujmXYiUIY+kchbd6gwDgYDVR0PAQH/BAQD
+[10:31:45]: ▸ AgEGMBAGCiqGSIb3Y2QGAgEEAgUAMA0GCSqGSIb3DQEBCwUAA4IBAQA/Vj2e5bbD
+[10:31:45]: ▸ eeZFIGi9v3OLLBKeAuOugCKMBB7DUshwgKj7zqew1UJEggOCTwb8O0kU+9h0UoWv
+[10:31:45]: ▸ p50h5wESA5/NQFjQAde/MoMrU1goPO6cn1R2PWQnxn6NHThNLa6B5rmluJyJlPef
+[10:31:45]: ▸ x4elUWY0GzlxOSTjh2fvpbFoe4zuPfeutnvi0v/fYcZqdUmVIkSoBPyUuAsuORFJ
+[10:31:45]: ▸ EtHlgepZAE9bPFo22noicwkJac3AfOriJP6YRLj477JxPxpd1F1+M02cHSS+APCQ
+[10:31:45]: ▸ A1iZQT0xWmJArzmoUUOSqwSonMJNsUvSq3xKX+udO7xPiEAGE/+QF4oIRynoYpgp
+[10:31:45]: ▸ pU8RBWk6z/Kf
+[10:31:45]: ▸ -----END CERTIFICATE-----
+[10:31:45]: ▸ -----BEGIN CERTIFICATE-----
+[10:31:45]: ▸ MIIEVTCCAz2gAwIBAgIUO36ACu7TAqHm7NuX2cqsKJzxaZQwDQYJKoZIhvcNAQEL
+[10:31:45]: ▸ BQAwYjELMAkGA1UEBhMCVVMxEzARBgNVBAoTCkFwcGxlIEluYy4xJjAkBgNVBAsT
+[10:31:45]: ▸ HUFwcGxlIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MRYwFAYDVQQDEw1BcHBsZSBS
+[10:31:45]: ▸ b290IENBMB4XDTIwMTIxNjE5Mzg1NloXDTMwMTIxMDAwMDAwMFowdTFEMEIGA1UE
+[10:31:45]: ▸ Aww7QXBwbGUgV29ybGR3aWRlIERldmVsb3BlciBSZWxhdGlvbnMgQ2VydGlmaWNh
+[10:31:45]: ▸ dGlvbiBBdXRob3JpdHkxCzAJBgNVBAsMAkc1MRMwEQYDVQQKDApBcHBsZSBJbmMu
+[10:31:45]: ▸ MQswCQYDVQQGEwJVUzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJ9d
+[10:31:45]: ▸ 2h/7+rzQSyI8x9Ym+hf39J8ePmQRZprvXr6rNL2qLCFu1h6UIYUsdMEOEGGqPGNK
+[10:31:45]: ▸ fkrjyHXWz8KcCEh7arkpsclm/ciKFtGyBDyCuoBs4v8Kcuus/jtvSL6eixFNlX2y
+[10:31:45]: ▸ e5AvAhxO/Em+12+1T754xtress3J2WYRO1rpCUVziVDUTuJoBX7adZxLAa7a489t
+[10:31:45]: ▸ dE3eU9DVGjiCOtCd410pe7GB6iknC/tgfIYS+/BiTwbnTNEf2W2e7XPaeCENnXDZ
+[10:31:45]: ▸ RleQX2eEwXN3CqhiYraucIa7dSOJrXn25qTU/YMmMgo7JJJbIKGc0S+AGJvdPAvn
+[10:31:45]: ▸ tf3sgFcPF54/K4cnu/cCAwEAAaOB7zCB7DASBgNVHRMBAf8ECDAGAQH/AgEAMB8G
+[10:31:45]: ▸ A1UdIwQYMBaAFCvQaUeUdgn+9GuNLkCm90dNfwheMEQGCCsGAQUFBwEBBDgwNjA0
+[10:31:45]: ▸ BggrBgEFBQcwAYYoaHR0cDovL29jc3AuYXBwbGUuY29tL29jc3AwMy1hcHBsZXJv
+[10:31:45]: ▸ b3RjYTAuBgNVHR8EJzAlMCOgIaAfhh1odHRwOi8vY3JsLmFwcGxlLmNvbS9yb290
+[10:31:45]: ▸ LmNybDAdBgNVHQ4EFgQUGYuXjUpbYXhX9KVcNRKKOQjjsHUwDgYDVR0PAQH/BAQD
+[10:31:45]: ▸ nlKiAIIid81yL5D5Iq8UJcyqCkJgksK9dR3rTMoV5X5rQBBe+1tFdA3wen2Ikc7e
+[10:31:45]: ▸ Y4tCidIY30GzWJ4GCIdI3UCvI9Xt6yxg5eukfxzpnIPWlF9MYjmKTq4TjX1DuNxe
+[10:31:45]: ▸ rL4YQPLmDyxdE5Pxe2WowmhI3v+0lpsM+zI2np4NlV84CouW0hJst4sLjtc+7G8B
+[10:31:45]: ▸ qs5NRWDbhHFmYuUZZTDNiv9FU/tu+4h3Q8NIY/n3UbNyXnniVs+8u4S5OFp4rhFI
+[10:31:45]: ▸ UrsNNYuU3sx0mmj1SWCUrPKosxWGkNDMMEOG0+VwAlG0gcCol9Tq6rCMCUDvOJOy
+[10:31:45]: ▸ zSID62dDZchF
+[10:31:45]: ▸ -----END CERTIFICATE-----
+[10:31:45]: ▸ -----BEGIN CERTIFICATE-----
+[10:31:45]: ▸ MIIDFjCCApygAwIBAgIUIsGhRwp0c2nvU4YSycafPTjzbNcwCgYIKoZIzj0EAwMw
+[10:31:45]: ▸ ZzEbMBkGA1UEAwwSQXBwbGUgUm9vdCBDQSAtIEczMSYwJAYDVQQLDB1BcHBsZSBD
+[10:31:45]: ▸ ZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTETMBEGA1UECgwKQXBwbGUgSW5jLjELMAkG
+[10:31:45]: ▸ A1UEBhMCVVMwHhcNMjEwMzE3MjAzNzEwWhcNMzYwMzE5MDAwMDAwWjB1MUQwQgYD
+[10:31:45]: ▸ VQQDDDtBcHBsZSBXb3JsZHdpZGUgRGV2ZWxvcGVyIFJlbGF0aW9ucyBDZXJ0aWZp
+[10:31:45]: ▸ Y2F0aW9uIEF1dGhvcml0eTELMAkGA1UECwwCRzYxEzARBgNVBAoMCkFwcGxlIElu
+[10:31:45]: ▸ Yy4xCzAJBgNVBAYTAlVTMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEbsQKC94PrlWm
+[10:31:45]: ▸ ZXnXgtxzdVJL8T0SGYngDRGpngn3N6PT8JMEb7FDi4bBmPhCnZ3/sq6PF/cGcKXW
+[10:31:45]: ▸ sL5vOteRhyJ45x3ASP7cOB+aao90fcpxSv/EZFbniAbNgZGhIhpIo4H6MIH3MBIG
+[10:31:45]: ▸ A1UdEwEB/wQIMAYBAf8CAQAwHwYDVR0jBBgwFoAUu7DeoVgziJqkipnevr3rr9rL
+[10:31:45]: ▸ JKswRgYIKwYBBQUHAQEEOjA4MDYGCCsGAQUFBzABhipodHRwOi8vb2NzcC5hcHBs
+[10:31:45]: ▸ cDovL2NybC5hcHBsZS5jb20vYXBwbGVyb290Y2FnMy5jcmwwHQYDVR0OBBYEFD8v
+[10:31:45]: ▸ lCNR01DJmig97bB85c+lkGKZMA4GA1UdDwEB/wQEAwIBBjAQBgoqhkiG92NkBgIB
+[10:31:45]: ▸ BAIFADAKBggqhkjOPQQDAwNoADBlAjBAXhSq5IyKogMCPtw490BaB677CaEGJXuf
+[10:31:45]: ▸ QB/EqZGd6CSjiCtOnuMTbXVXmxxcxfkCMQDTSPxarZXvNrkxU3TkUMI33yzvFVVR
+[10:31:45]: ▸ T4wxWJC994OsdcZ4+RGNsYDyR5gmdr0nDGg=
+[10:31:45]: ▸ -----END CERTIFICATE-----
+[10:31:46]: Found the certificate CHYMCJ8GX7 (chuheng wu) which is installed on the local machine. Using this one.
+[10:31:46]: $ security find-certificate -a -c 'Apple Worldwide Developer Relations' -p /Users/wuchuheng/Library/Keychains/login.keychain-db
+[10:31:46]: ▸ -----BEGIN CERTIFICATE-----
+[10:31:46]: ▸ MIIEIjCCAwqgAwIBAgIIAd68xDltoBAwDQYJKoZIhvcNAQEFBQAwYjELMAkGA1UE
+[10:31:46]: ▸ BhMCVVMxEzARBgNVBAoTCkFwcGxlIEluYy4xJjAkBgNVBAsTHUFwcGxlIENlcnRp
+[10:31:46]: ▸ ZmljYXRpb24gQXV0aG9yaXR5MRYwFAYDVQQDEw1BcHBsZSBSb290IENBMB4XDTEz
+[10:31:46]: ▸ MDIwNzIxNDg0N1oXDTIzMDIwNzIxNDg0N1owgZYxCzAJBgNVBAYTAlVTMRMwEQYD
+[10:31:46]: ▸ VQQKDApBcHBsZSBJbmMuMSwwKgYDVQQLDCNBcHBsZSBXb3JsZHdpZGUgRGV2ZWxv
+[10:31:46]: ▸ cGVyIFJlbGF0aW9uczFEMEIGA1UEAww7QXBwbGUgV29ybGR3aWRlIERldmVsb3Bl
+[10:31:46]: ▸ ciBSZWxhdGlvbnMgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEiMA0GCSqGSIb3
+[10:31:46]: ▸ DQEBAQUAA4IBDwAwggEKAoIBAQDKOFSmy1aqyCQ5SOmM7uxfuH8mkbw0U3rOfGOA
+[10:31:46]: ▸ YXdkXqUHI7Y5/lAtFVZYcC1+xG7BSoU+L/DehBqhV8mvexj/avoVEkkVCBmsqtsq
+[10:31:46]: ▸ Mu2WY2hSFT2Miuy/axiV4AOsAX2XBWfODoWVN2rtCbauZ81RZJ/GXNG8V25nNYB2
+[10:31:46]: ▸ NqSHgW44j9grFU57Jdhav06DwY3Sk9UacbVgnJ0zTlX5ElgMhrgWDcHld0WNUEi6
+[10:31:46]: ▸ Ky3klIXh6MSdxmilsKP8Z35wugJZS3dCkTm59c3hTO/AO0iMpuUhXf1qarunFjVg
+[10:31:46]: ▸ 0uat80YpyejDi+l5wGphZxWy8P3laLxiX27Pmd3vG2P+kmWrAgMBAAGjgaYwgaMw
+[10:31:46]: ▸ HQYDVR0OBBYEFIgnFwmpthhgi+zruvZHWcVSVKO3MA8GA1UdEwEB/wQFMAMBAf8w
+[10:31:46]: ▸ HwYDVR0jBBgwFoAUK9BpR5R2Cf70a40uQKb3R01/CF4wLgYDVR0fBCcwJTAjoCGg
+[10:31:46]: ▸ H4YdaHR0cDovL2NybC5hcHBsZS5jb20vcm9vdC5jcmwwDgYDVR0PAQH/BAQDAgGG
+[10:31:46]: ▸ MBAGCiqGSIb3Y2QGAgEEAgUAMA0GCSqGSIb3DQEBBQUAA4IBAQBPz+9Zviz1smwv
+[10:31:46]: ▸ j+4ThzLoBTWobot9yWkMudkXvHcs1Gfi/ZptOllc34MBvbKuKmFysa/Nw0Uwj6OD
+[10:31:46]: ▸ Dc4dR7Txk4qjdJukw5hyhzs+r0ULklS5MruQGFNrCk4QttkdUGwhgAqJTleMa1s8
+[10:31:46]: ▸ Pab93vcNIx0LSiaHP7qRkkykGRIZbVf1eliHe2iK5IaMSuviSRSqpd1VAKmuu0sw
+[10:31:46]: ▸ TecmmYHpvPm0KdIBembhLoz2IYrF+Hjhga6/05Cdqa3zr/04GpZnMBxRpVzscYqC
+[10:31:46]: ▸ tGwPDBUf
+[10:31:46]: ▸ -----END CERTIFICATE-----
+[10:31:46]: ▸ -----BEGIN CERTIFICATE-----
+[10:31:46]: ▸ MIIEUTCCAzmgAwIBAgIQfK9pCiW3Of57m0R6wXjF7jANBgkqhkiG9w0BAQsFADBi
+[10:31:46]: ▸ MQswCQYDVQQGEwJVUzETMBEGA1UEChMKQXBwbGUgSW5jLjEmMCQGA1UECxMdQXBw
+[10:31:46]: ▸ bGUgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkxFjAUBgNVBAMTDUFwcGxlIFJvb3Qg
+[10:31:46]: ▸ Q0EwHhcNMjAwMjE5MTgxMzQ3WhcNMzAwMjIwMDAwMDAwWjB1MUQwQgYDVQQDDDtB
+[10:31:46]: ▸ cHBsZSBXb3JsZHdpZGUgRGV2ZWxvcGVyIFJlbGF0aW9ucyBDZXJ0aWZpY2F0aW9u
+[10:31:46]: ▸ IEF1dGhvcml0eTELMAkGA1UECwwCRzMxEzARBgNVBAoMCkFwcGxlIEluYy4xCzAJ
+[10:31:46]: ▸ BgNVBAYTAlVTMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2PWJ/KhZ
+[10:31:46]: ▸ C4fHTJEuLVaQ03gdpDDppUjvC0O/LYT7JF1FG+XrWTYSXFRknmxiLbTGl8rMPPbW
+[10:31:46]: ▸ BpH85QKmHGq0edVny6zpPwcR4YS8Rx1mjjmi6LRJ7TrS4RBgeo6TjMrA2gzAg9Dj
+[10:31:46]: ▸ +ZHWp4zIwXPirkbRYp2SqJBgN31ols2N4Pyb+ni743uvLRfdW/6AWSN1F7gSwe0b
+[10:31:46]: ▸ 5TTO/iK1nkmw5VW/j4SiPKi6xYaVFuQAyZ8D0MyzOhZ71gVcnetHrg21LYwOaU1A
+[10:31:46]: ▸ 0EtMOwSejSGxrC5DVDDOwYqGlJhL32oNP/77HK6XF8J4CjDgXx9UO0m3JQAaN4LS
+[10:31:46]: ▸ VpelUkl8YDib7wIDAQABo4HvMIHsMBIGA1UdEwEB/wQIMAYBAf8CAQAwHwYDVR0j
+[10:31:46]: ▸ BBgwFoAUK9BpR5R2Cf70a40uQKb3R01/CF4wRAYIKwYBBQUHAQEEODA2MDQGCCsG
+[10:31:46]: ▸ AQUFBzABhihodHRwOi8vb2NzcC5hcHBsZS5jb20vb2NzcDAzLWFwcGxlcm9vdGNh
+[10:31:46]: ▸ MC4GA1UdHwQnMCUwI6AhoB+GHWh0dHA6Ly9jcmwuYXBwbGUuY29tL3Jvb3QuY3Js
+[10:31:46]: ▸ MB0GA1UdDgQWBBQJ/sAVkPmvZAqSErkmKGMMl+ynsjAOBgNVHQ8BAf8EBAMCAQYw
+[10:31:46]: ▸ Qr5fpTkg6mKp/cWQyXMT1Z6b0KoPjY3L7QHPbChAW8dVJEH4/M/BtSPp3Ozxb8qA
+[10:31:46]: ▸ HXfCxGFJJWevD8o5Ja3T43rMMygNDi6hV0Bz+uZcrgZRKe3jhQxPYdwyFot30ETK
+[10:31:46]: ▸ XXIDMUacrptAGvr04NM++i+MZp+XxFRZ79JI9AeZSWBZGcfdlNHAwWx/eCHvDOs7
+[10:31:46]: ▸ bJmCS1JgOLU5gm3sUjFTvg+RTElJdI+mUcuER04ddSduvfnSXPN/wmwLCTbiZOTC
+[10:31:46]: ▸ NwMUGdXqapSqqdv+9poIZ4vvK7iqF0mDr8/LvOnP6pVxsLRFoszlh6oKw0E6eVza
+[10:31:46]: ▸ UDSdlTs=
+[10:31:46]: ▸ -----END CERTIFICATE-----
+[10:31:46]: ▸ -----BEGIN CERTIFICATE-----
+[10:31:46]: ▸ MIIC9zCCAnygAwIBAgIIb+/Y9emjp+4wCgYIKoZIzj0EAwIwZzEbMBkGA1UEAwwS
+[10:31:46]: ▸ QXBwbGUgUm9vdCBDQSAtIEczMSYwJAYDVQQLDB1BcHBsZSBDZXJ0aWZpY2F0aW9u
+[10:31:46]: ▸ IEF1dGhvcml0eTETMBEGA1UECgwKQXBwbGUgSW5jLjELMAkGA1UEBhMCVVMwHhcN
+[10:31:46]: ▸ MTQwNTA2MjM0MzI0WhcNMjkwNTA2MjM0MzI0WjCBgDE0MDIGA1UEAwwrQXBwbGUg
+[10:31:46]: ▸ V29ybGR3aWRlIERldmVsb3BlciBSZWxhdGlvbnMgQ0EgLSBHMjEmMCQGA1UECwwd
+[10:31:46]: ▸ QXBwbGUgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkxEzARBgNVBAoMCkFwcGxlIElu
+[10:31:46]: ▸ Yy4xCzAJBgNVBAYTAlVTMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE3fC3BkvP
+[10:31:46]: ▸ 3XMEE8RDiQOTgPte9nStQmFSWAImUxnIYyIHCVJhysTZV+9tJmiLdJGMxPmAaCj8
+[10:31:46]: ▸ CWjwENrp0C7JGqOB9zCB9DBGBggrBgEFBQcBAQQ6MDgwNgYIKwYBBQUHMAGGKmh0
+[10:31:46]: ▸ dHA6Ly9vY3NwLmFwcGxlLmNvbS9vY3NwMDQtYXBwbGVyb290Y2FnMzAdBgNVHQ4E
+[10:31:46]: ▸ FgQUhLaEzDqGYnIWWZToGqO9SN863wswDwYDVR0TAQH/BAUwAwEB/zAfBgNVHSME
+[10:31:46]: ▸ Oi8vY3JsLmFwcGxlLmNvbS9hcHBsZXJvb3RjYWczLmNybDAOBgNVHQ8BAf8EBAMC
+[10:31:46]: ▸ AQYwEAYKKoZIhvdjZAYCDwQCBQAwCgYIKoZIzj0EAwIDaQAwZgIxANmxxzHGI/ZP
+[10:31:46]: ▸ TdDZR8V9GGkRh3En02it4Jtlmr5s3z9GppAJvm6hOyywUYlBPIfSvwIxAPxkUolL
+[10:31:46]: ▸ PF2/axzCiZgvcq61m6oaCyNUd1ToFUOixRLal1BzfF7QbrJcYlDXUfE6Wg==
+[10:31:46]: ▸ -----END CERTIFICATE-----
+[10:31:46]: ▸ -----BEGIN CERTIFICATE-----
+[10:31:46]: ▸ MIIEVTCCAz2gAwIBAgIUE9x3lVJx5T3GMujM/+Uh88zFztIwDQYJKoZIhvcNAQEL
+[10:31:46]: ▸ BQAwYjELMAkGA1UEBhMCVVMxEzARBgNVBAoTCkFwcGxlIEluYy4xJjAkBgNVBAsT
+[10:31:46]: ▸ HUFwcGxlIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MRYwFAYDVQQDEw1BcHBsZSBS
+[10:31:46]: ▸ b290IENBMB4XDTIwMTIxNjE5MzYwNFoXDTMwMTIxMDAwMDAwMFowdTFEMEIGA1UE
+[10:31:46]: ▸ Aww7QXBwbGUgV29ybGR3aWRlIERldmVsb3BlciBSZWxhdGlvbnMgQ2VydGlmaWNh
+[10:31:46]: ▸ dGlvbiBBdXRob3JpdHkxCzAJBgNVBAsMAkc0MRMwEQYDVQQKDApBcHBsZSBJbmMu
+[10:31:46]: ▸ MQswCQYDVQQGEwJVUzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANAf
+[10:31:46]: ▸ eKp6JzKwRl/nF3bYoJ0OKY6tPTKlxGs3yeRBkWq3eXFdDDQEYHX3rkOPR8SGHgjo
+[10:31:46]: ▸ v9Y5Ui8eZ/xx8YJtPH4GUnadLLzVQ+mxtLxAOnhRXVGhJeG+bJGdayFZGEHVD41t
+[10:31:46]: ▸ QSo5SiHgkJ9OE0/QjJoyuNdqkh4laqQyziIZhQVg3AJK8lrrd3kCfcCXVGySjnYB
+[10:31:46]: ▸ 5kaP5eYq+6KwrRitbTOFOCOL6oqW7Z+uZk+jDEAnbZXQYojZQykn/e2kv1MukBVl
+[10:31:46]: ▸ PNkuYmQzHWxq3Y4hqqRfFcYw7V/mjDaSlLfcOQIA+2SM1AyB8j/VNJeHdSbCb64D
+[10:31:46]: ▸ YyEMe9QbsWLFApy9/a8CAwEAAaOB7zCB7DASBgNVHRMBAf8ECDAGAQH/AgEAMB8G
+[10:31:46]: ▸ BggrBgEFBQcwAYYoaHR0cDovL29jc3AuYXBwbGUuY29tL29jc3AwMy1hcHBsZXJv
+[10:31:46]: ▸ b3RjYTAuBgNVHR8EJzAlMCOgIaAfhh1odHRwOi8vY3JsLmFwcGxlLmNvbS9yb290
+[10:31:46]: ▸ LmNybDAdBgNVHQ4EFgQUW9n6HeeaGgujmXYiUIY+kchbd6gwDgYDVR0PAQH/BAQD
+[10:31:46]: ▸ AgEGMBAGCiqGSIb3Y2QGAgEEAgUAMA0GCSqGSIb3DQEBCwUAA4IBAQA/Vj2e5bbD
+[10:31:46]: ▸ eeZFIGi9v3OLLBKeAuOugCKMBB7DUshwgKj7zqew1UJEggOCTwb8O0kU+9h0UoWv
+[10:31:46]: ▸ p50h5wESA5/NQFjQAde/MoMrU1goPO6cn1R2PWQnxn6NHThNLa6B5rmluJyJlPef
+[10:31:46]: ▸ x4elUWY0GzlxOSTjh2fvpbFoe4zuPfeutnvi0v/fYcZqdUmVIkSoBPyUuAsuORFJ
+[10:31:46]: ▸ EtHlgepZAE9bPFo22noicwkJac3AfOriJP6YRLj477JxPxpd1F1+M02cHSS+APCQ
+[10:31:46]: ▸ A1iZQT0xWmJArzmoUUOSqwSonMJNsUvSq3xKX+udO7xPiEAGE/+QF4oIRynoYpgp
+[10:31:46]: ▸ pU8RBWk6z/Kf
+[10:31:46]: ▸ -----END CERTIFICATE-----
+[10:31:46]: ▸ -----BEGIN CERTIFICATE-----
+[10:31:46]: ▸ MIIEVTCCAz2gAwIBAgIUO36ACu7TAqHm7NuX2cqsKJzxaZQwDQYJKoZIhvcNAQEL
+[10:31:46]: ▸ BQAwYjELMAkGA1UEBhMCVVMxEzARBgNVBAoTCkFwcGxlIEluYy4xJjAkBgNVBAsT
+[10:31:46]: ▸ HUFwcGxlIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MRYwFAYDVQQDEw1BcHBsZSBS
+[10:31:46]: ▸ b290IENBMB4XDTIwMTIxNjE5Mzg1NloXDTMwMTIxMDAwMDAwMFowdTFEMEIGA1UE
+[10:31:46]: ▸ Aww7QXBwbGUgV29ybGR3aWRlIERldmVsb3BlciBSZWxhdGlvbnMgQ2VydGlmaWNh
+[10:31:46]: ▸ dGlvbiBBdXRob3JpdHkxCzAJBgNVBAsMAkc1MRMwEQYDVQQKDApBcHBsZSBJbmMu
+[10:31:46]: ▸ MQswCQYDVQQGEwJVUzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJ9d
+[10:31:46]: ▸ 2h/7+rzQSyI8x9Ym+hf39J8ePmQRZprvXr6rNL2qLCFu1h6UIYUsdMEOEGGqPGNK
+[10:31:46]: ▸ fkrjyHXWz8KcCEh7arkpsclm/ciKFtGyBDyCuoBs4v8Kcuus/jtvSL6eixFNlX2y
+[10:31:46]: ▸ e5AvAhxO/Em+12+1T754xtress3J2WYRO1rpCUVziVDUTuJoBX7adZxLAa7a489t
+[10:31:46]: ▸ dE3eU9DVGjiCOtCd410pe7GB6iknC/tgfIYS+/BiTwbnTNEf2W2e7XPaeCENnXDZ
+[10:31:46]: ▸ RleQX2eEwXN3CqhiYraucIa7dSOJrXn25qTU/YMmMgo7JJJbIKGc0S+AGJvdPAvn
+[10:31:46]: ▸ tf3sgFcPF54/K4cnu/cCAwEAAaOB7zCB7DASBgNVHRMBAf8ECDAGAQH/AgEAMB8G
+[10:31:46]: ▸ A1UdIwQYMBaAFCvQaUeUdgn+9GuNLkCm90dNfwheMEQGCCsGAQUFBwEBBDgwNjA0
+[10:31:46]: ▸ BggrBgEFBQcwAYYoaHR0cDovL29jc3AuYXBwbGUuY29tL29jc3AwMy1hcHBsZXJv
+[10:31:46]: ▸ b3RjYTAuBgNVHR8EJzAlMCOgIaAfhh1odHRwOi8vY3JsLmFwcGxlLmNvbS9yb290
+[10:31:46]: ▸ LmNybDAdBgNVHQ4EFgQUGYuXjUpbYXhX9KVcNRKKOQjjsHUwDgYDVR0PAQH/BAQD
+[10:31:46]: ▸ nlKiAIIid81yL5D5Iq8UJcyqCkJgksK9dR3rTMoV5X5rQBBe+1tFdA3wen2Ikc7e
+[10:31:46]: ▸ Y4tCidIY30GzWJ4GCIdI3UCvI9Xt6yxg5eukfxzpnIPWlF9MYjmKTq4TjX1DuNxe
+[10:31:46]: ▸ rL4YQPLmDyxdE5Pxe2WowmhI3v+0lpsM+zI2np4NlV84CouW0hJst4sLjtc+7G8B
+[10:31:46]: ▸ qs5NRWDbhHFmYuUZZTDNiv9FU/tu+4h3Q8NIY/n3UbNyXnniVs+8u4S5OFp4rhFI
+[10:31:46]: ▸ UrsNNYuU3sx0mmj1SWCUrPKosxWGkNDMMEOG0+VwAlG0gcCol9Tq6rCMCUDvOJOy
+[10:31:46]: ▸ zSID62dDZchF
+[10:31:46]: ▸ -----END CERTIFICATE-----
+[10:31:46]: ▸ -----BEGIN CERTIFICATE-----
+[10:31:46]: ▸ MIIDFjCCApygAwIBAgIUIsGhRwp0c2nvU4YSycafPTjzbNcwCgYIKoZIzj0EAwMw
+[10:31:46]: ▸ ZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTETMBEGA1UECgwKQXBwbGUgSW5jLjELMAkG
+[10:31:46]: ▸ A1UEBhMCVVMwHhcNMjEwMzE3MjAzNzEwWhcNMzYwMzE5MDAwMDAwWjB1MUQwQgYD
+[10:31:46]: ▸ VQQDDDtBcHBsZSBXb3JsZHdpZGUgRGV2ZWxvcGVyIFJlbGF0aW9ucyBDZXJ0aWZp
+[10:31:46]: ▸ Y2F0aW9uIEF1dGhvcml0eTELMAkGA1UECwwCRzYxEzARBgNVBAoMCkFwcGxlIElu
+[10:31:46]: ▸ Yy4xCzAJBgNVBAYTAlVTMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEbsQKC94PrlWm
+[10:31:46]: ▸ ZXnXgtxzdVJL8T0SGYngDRGpngn3N6PT8JMEb7FDi4bBmPhCnZ3/sq6PF/cGcKXW
+[10:31:46]: ▸ sL5vOteRhyJ45x3ASP7cOB+aao90fcpxSv/EZFbniAbNgZGhIhpIo4H6MIH3MBIG
+[10:31:46]: ▸ A1UdEwEB/wQIMAYBAf8CAQAwHwYDVR0jBBgwFoAUu7DeoVgziJqkipnevr3rr9rL
+[10:31:46]: ▸ JKswRgYIKwYBBQUHAQEEOjA4MDYGCCsGAQUFBzABhipodHRwOi8vb2NzcC5hcHBs
+[10:31:46]: ▸ ZS5jb20vb2NzcDAzLWFwcGxlcm9vdGNhZzMwNwYDVR0fBDAwLjAsoCqgKIYmaHR0
+[10:31:46]: ▸ cDovL2NybC5hcHBsZS5jb20vYXBwbGVyb290Y2FnMy5jcmwwHQYDVR0OBBYEFD8v
+[10:31:46]: ▸ lCNR01DJmig97bB85c+lkGKZMA4GA1UdDwEB/wQEAwIBBjAQBgoqhkiG92NkBgIB
+[10:31:46]: ▸ BAIFADAKBggqhkjOPQQDAwNoADBlAjBAXhSq5IyKogMCPtw490BaB677CaEGJXuf
+[10:31:46]: ▸ QB/EqZGd6CSjiCtOnuMTbXVXmxxcxfkCMQDTSPxarZXvNrkxU3TkUMI33yzvFVVR
+[10:31:46]: ▸ T4wxWJC994OsdcZ4+RGNsYDyR5gmdr0nDGg=
+[10:31:46]: ▸ -----END CERTIFICATE-----
+[10:31:46]: Verifying the certificate is properly installed locally...
+[10:31:46]: Successfully installed certificate CHYMCJ8GX7
+[10:31:46]: Use signing certificate 'CHYMCJ8GX7' from now on!
+[10:31:46]: --------------------------------------
+[10:31:46]: --- Step: get_provisioning_profile ---
+[10:31:46]: --------------------------------------
+
++-------------------------------------+--------------------+
+|                 Summary for sigh 2.211.0                 |
++-------------------------------------+--------------------+
+| adhoc                               | false              |
+| developer_id                        | false              |
+| development                         | false              |
+| skip_install                        | false              |
+| force                               | false              |
+| include_mac_in_profiles             | false              |
+| app_identifier                      | com.wuchuheng      |
+| username                            | root@wuchuheng.com |
+| team_id                             | 5D6L6979M7         |
+| ignore_profiles_with_different_name | false              |
+| cert_id                             | CHYMCJ8GX7         |
+| skip_fetch_profiles                 | false              |
+| include_all_certificates            | false              |
+| skip_certificate_verification       | false              |
+| platform                            | ios                |
+| readonly                            | false              |
+| fail_on_name_taken                  | false              |
++-------------------------------------+--------------------+
+
+[10:31:46]: Starting login with user 'root@wuchuheng.com'
+[10:31:47]: Successfully logged in
+[10:31:47]: Fetching profiles...
+[10:31:47]: Verifying certificates...
+[10:31:47]: $ security find-certificate -a -c 'Apple Worldwide Developer Relations' -p /Users/wuchuheng/Library/Keychains/login.keychain-db
+[10:31:47]: ▸ -----BEGIN CERTIFICATE-----
+[10:31:47]: ▸ MIIEIjCCAwqgAwIBAgIIAd68xDltoBAwDQYJKoZIhvcNAQEFBQAwYjELMAkGA1UE
+[10:31:47]: ▸ BhMCVVMxEzARBgNVBAoTCkFwcGxlIEluYy4xJjAkBgNVBAsTHUFwcGxlIENlcnRp
+[10:31:47]: ▸ ZmljYXRpb24gQXV0aG9yaXR5MRYwFAYDVQQDEw1BcHBsZSBSb290IENBMB4XDTEz
+[10:31:47]: ▸ MDIwNzIxNDg0N1oXDTIzMDIwNzIxNDg0N1owgZYxCzAJBgNVBAYTAlVTMRMwEQYD
+[10:31:47]: ▸ VQQKDApBcHBsZSBJbmMuMSwwKgYDVQQLDCNBcHBsZSBXb3JsZHdpZGUgRGV2ZWxv
+[10:31:47]: ▸ cGVyIFJlbGF0aW9uczFEMEIGA1UEAww7QXBwbGUgV29ybGR3aWRlIERldmVsb3Bl
+[10:31:47]: ▸ ciBSZWxhdGlvbnMgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEiMA0GCSqGSIb3
+[10:31:47]: ▸ DQEBAQUAA4IBDwAwggEKAoIBAQDKOFSmy1aqyCQ5SOmM7uxfuH8mkbw0U3rOfGOA
+[10:31:47]: ▸ YXdkXqUHI7Y5/lAtFVZYcC1+xG7BSoU+L/DehBqhV8mvexj/avoVEkkVCBmsqtsq
+[10:31:47]: ▸ Mu2WY2hSFT2Miuy/axiV4AOsAX2XBWfODoWVN2rtCbauZ81RZJ/GXNG8V25nNYB2
+[10:31:47]: ▸ NqSHgW44j9grFU57Jdhav06DwY3Sk9UacbVgnJ0zTlX5ElgMhrgWDcHld0WNUEi6
+[10:31:47]: ▸ Ky3klIXh6MSdxmilsKP8Z35wugJZS3dCkTm59c3hTO/AO0iMpuUhXf1qarunFjVg
+[10:31:47]: ▸ 0uat80YpyejDi+l5wGphZxWy8P3laLxiX27Pmd3vG2P+kmWrAgMBAAGjgaYwgaMw
+[10:31:47]: ▸ HQYDVR0OBBYEFIgnFwmpthhgi+zruvZHWcVSVKO3MA8GA1UdEwEB/wQFMAMBAf8w
+[10:31:47]: ▸ HwYDVR0jBBgwFoAUK9BpR5R2Cf70a40uQKb3R01/CF4wLgYDVR0fBCcwJTAjoCGg
+[10:31:47]: ▸ H4YdaHR0cDovL2NybC5hcHBsZS5jb20vcm9vdC5jcmwwDgYDVR0PAQH/BAQDAgGG
+[10:31:47]: ▸ j+4ThzLoBTWobot9yWkMudkXvHcs1Gfi/ZptOllc34MBvbKuKmFysa/Nw0Uwj6OD
+[10:31:47]: ▸ Dc4dR7Txk4qjdJukw5hyhzs+r0ULklS5MruQGFNrCk4QttkdUGwhgAqJTleMa1s8
+[10:31:47]: ▸ Pab93vcNIx0LSiaHP7qRkkykGRIZbVf1eliHe2iK5IaMSuviSRSqpd1VAKmuu0sw
+[10:31:47]: ▸ ruGgsbwpgOYJd+W+NKIByn/c4grmO7i77LpilfMFY0GCzQ87HUyVpNur+cmV6U/k
+[10:31:47]: ▸ TecmmYHpvPm0KdIBembhLoz2IYrF+Hjhga6/05Cdqa3zr/04GpZnMBxRpVzscYqC
+[10:31:47]: ▸ tGwPDBUf
+[10:31:47]: ▸ -----END CERTIFICATE-----
+[10:31:47]: ▸ -----BEGIN CERTIFICATE-----
+[10:31:47]: ▸ MIIEUTCCAzmgAwIBAgIQfK9pCiW3Of57m0R6wXjF7jANBgkqhkiG9w0BAQsFADBi
+[10:31:47]: ▸ MQswCQYDVQQGEwJVUzETMBEGA1UEChMKQXBwbGUgSW5jLjEmMCQGA1UECxMdQXBw
+[10:31:47]: ▸ bGUgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkxFjAUBgNVBAMTDUFwcGxlIFJvb3Qg
+[10:31:47]: ▸ Q0EwHhcNMjAwMjE5MTgxMzQ3WhcNMzAwMjIwMDAwMDAwWjB1MUQwQgYDVQQDDDtB
+[10:31:47]: ▸ cHBsZSBXb3JsZHdpZGUgRGV2ZWxvcGVyIFJlbGF0aW9ucyBDZXJ0aWZpY2F0aW9u
+[10:31:47]: ▸ IEF1dGhvcml0eTELMAkGA1UECwwCRzMxEzARBgNVBAoMCkFwcGxlIEluYy4xCzAJ
+[10:31:47]: ▸ BgNVBAYTAlVTMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2PWJ/KhZ
+[10:31:47]: ▸ C4fHTJEuLVaQ03gdpDDppUjvC0O/LYT7JF1FG+XrWTYSXFRknmxiLbTGl8rMPPbW
+[10:31:47]: ▸ BpH85QKmHGq0edVny6zpPwcR4YS8Rx1mjjmi6LRJ7TrS4RBgeo6TjMrA2gzAg9Dj
+[10:31:47]: ▸ +ZHWp4zIwXPirkbRYp2SqJBgN31ols2N4Pyb+ni743uvLRfdW/6AWSN1F7gSwe0b
+[10:31:47]: ▸ 5TTO/iK1nkmw5VW/j4SiPKi6xYaVFuQAyZ8D0MyzOhZ71gVcnetHrg21LYwOaU1A
+[10:31:47]: ▸ VpelUkl8YDib7wIDAQABo4HvMIHsMBIGA1UdEwEB/wQIMAYBAf8CAQAwHwYDVR0j
+[10:31:47]: ▸ BBgwFoAUK9BpR5R2Cf70a40uQKb3R01/CF4wRAYIKwYBBQUHAQEEODA2MDQGCCsG
+[10:31:47]: ▸ AQUFBzABhihodHRwOi8vb2NzcC5hcHBsZS5jb20vb2NzcDAzLWFwcGxlcm9vdGNh
+[10:31:47]: ▸ MC4GA1UdHwQnMCUwI6AhoB+GHWh0dHA6Ly9jcmwuYXBwbGUuY29tL3Jvb3QuY3Js
+[10:31:47]: ▸ MB0GA1UdDgQWBBQJ/sAVkPmvZAqSErkmKGMMl+ynsjAOBgNVHQ8BAf8EBAMCAQYw
+[10:31:47]: ▸ EAYKKoZIhvdjZAYCAQQCBQAwDQYJKoZIhvcNAQELBQADggEBAK1lE+j24IF3RAJH
+[10:31:47]: ▸ Qr5fpTkg6mKp/cWQyXMT1Z6b0KoPjY3L7QHPbChAW8dVJEH4/M/BtSPp3Ozxb8qA
+[10:31:47]: ▸ HXfCxGFJJWevD8o5Ja3T43rMMygNDi6hV0Bz+uZcrgZRKe3jhQxPYdwyFot30ETK
+[10:31:47]: ▸ XXIDMUacrptAGvr04NM++i+MZp+XxFRZ79JI9AeZSWBZGcfdlNHAwWx/eCHvDOs7
+[10:31:47]: ▸ NwMUGdXqapSqqdv+9poIZ4vvK7iqF0mDr8/LvOnP6pVxsLRFoszlh6oKw0E6eVza
+[10:31:47]: ▸ UDSdlTs=
+[10:31:47]: ▸ -----END CERTIFICATE-----
+[10:31:47]: ▸ -----BEGIN CERTIFICATE-----
+[10:31:47]: ▸ MIIC9zCCAnygAwIBAgIIb+/Y9emjp+4wCgYIKoZIzj0EAwIwZzEbMBkGA1UEAwwS
+[10:31:47]: ▸ QXBwbGUgUm9vdCBDQSAtIEczMSYwJAYDVQQLDB1BcHBsZSBDZXJ0aWZpY2F0aW9u
+[10:31:47]: ▸ IEF1dGhvcml0eTETMBEGA1UECgwKQXBwbGUgSW5jLjELMAkGA1UEBhMCVVMwHhcN
+[10:31:47]: ▸ MTQwNTA2MjM0MzI0WhcNMjkwNTA2MjM0MzI0WjCBgDE0MDIGA1UEAwwrQXBwbGUg
+[10:31:47]: ▸ V29ybGR3aWRlIERldmVsb3BlciBSZWxhdGlvbnMgQ0EgLSBHMjEmMCQGA1UECwwd
+[10:31:47]: ▸ QXBwbGUgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkxEzARBgNVBAoMCkFwcGxlIElu
+[10:31:47]: ▸ Yy4xCzAJBgNVBAYTAlVTMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE3fC3BkvP
+[10:31:47]: ▸ 3XMEE8RDiQOTgPte9nStQmFSWAImUxnIYyIHCVJhysTZV+9tJmiLdJGMxPmAaCj8
+[10:31:47]: ▸ dHA6Ly9vY3NwLmFwcGxlLmNvbS9vY3NwMDQtYXBwbGVyb290Y2FnMzAdBgNVHQ4E
+[10:31:47]: ▸ FgQUhLaEzDqGYnIWWZToGqO9SN863wswDwYDVR0TAQH/BAUwAwEB/zAfBgNVHSME
+[10:31:47]: ▸ GDAWgBS7sN6hWDOImqSKmd6+veuv2sskqzA3BgNVHR8EMDAuMCygKqAohiZodHRw
+[10:31:47]: ▸ Oi8vY3JsLmFwcGxlLmNvbS9hcHBsZXJvb3RjYWczLmNybDAOBgNVHQ8BAf8EBAMC
+[10:31:47]: ▸ AQYwEAYKKoZIhvdjZAYCDwQCBQAwCgYIKoZIzj0EAwIDaQAwZgIxANmxxzHGI/ZP
+[10:31:47]: ▸ TdDZR8V9GGkRh3En02it4Jtlmr5s3z9GppAJvm6hOyywUYlBPIfSvwIxAPxkUolL
+[10:31:47]: ▸ PF2/axzCiZgvcq61m6oaCyNUd1ToFUOixRLal1BzfF7QbrJcYlDXUfE6Wg==
+[10:31:47]: ▸ -----END CERTIFICATE-----
+[10:31:47]: ▸ -----BEGIN CERTIFICATE-----
+[10:31:47]: ▸ MIIEVTCCAz2gAwIBAgIUE9x3lVJx5T3GMujM/+Uh88zFztIwDQYJKoZIhvcNAQEL
+[10:31:47]: ▸ BQAwYjELMAkGA1UEBhMCVVMxEzARBgNVBAoTCkFwcGxlIEluYy4xJjAkBgNVBAsT
+[10:31:47]: ▸ HUFwcGxlIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MRYwFAYDVQQDEw1BcHBsZSBS
+[10:31:47]: ▸ b290IENBMB4XDTIwMTIxNjE5MzYwNFoXDTMwMTIxMDAwMDAwMFowdTFEMEIGA1UE
+[10:31:47]: ▸ Aww7QXBwbGUgV29ybGR3aWRlIERldmVsb3BlciBSZWxhdGlvbnMgQ2VydGlmaWNh
+[10:31:47]: ▸ dGlvbiBBdXRob3JpdHkxCzAJBgNVBAsMAkc0MRMwEQYDVQQKDApBcHBsZSBJbmMu
+[10:31:47]: ▸ MQswCQYDVQQGEwJVUzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANAf
+[10:31:47]: ▸ eKp6JzKwRl/nF3bYoJ0OKY6tPTKlxGs3yeRBkWq3eXFdDDQEYHX3rkOPR8SGHgjo
+[10:31:47]: ▸ v9Y5Ui8eZ/xx8YJtPH4GUnadLLzVQ+mxtLxAOnhRXVGhJeG+bJGdayFZGEHVD41t
+[10:31:47]: ▸ QSo5SiHgkJ9OE0/QjJoyuNdqkh4laqQyziIZhQVg3AJK8lrrd3kCfcCXVGySjnYB
+[10:31:47]: ▸ 5kaP5eYq+6KwrRitbTOFOCOL6oqW7Z+uZk+jDEAnbZXQYojZQykn/e2kv1MukBVl
+[10:31:47]: ▸ PNkuYmQzHWxq3Y4hqqRfFcYw7V/mjDaSlLfcOQIA+2SM1AyB8j/VNJeHdSbCb64D
+[10:31:47]: ▸ YyEMe9QbsWLFApy9/a8CAwEAAaOB7zCB7DASBgNVHRMBAf8ECDAGAQH/AgEAMB8G
+[10:31:47]: ▸ A1UdIwQYMBaAFCvQaUeUdgn+9GuNLkCm90dNfwheMEQGCCsGAQUFBwEBBDgwNjA0
+[10:31:47]: ▸ BggrBgEFBQcwAYYoaHR0cDovL29jc3AuYXBwbGUuY29tL29jc3AwMy1hcHBsZXJv
+[10:31:47]: ▸ b3RjYTAuBgNVHR8EJzAlMCOgIaAfhh1odHRwOi8vY3JsLmFwcGxlLmNvbS9yb290
+[10:31:47]: ▸ LmNybDAdBgNVHQ4EFgQUW9n6HeeaGgujmXYiUIY+kchbd6gwDgYDVR0PAQH/BAQD
+[10:31:47]: ▸ AgEGMBAGCiqGSIb3Y2QGAgEEAgUAMA0GCSqGSIb3DQEBCwUAA4IBAQA/Vj2e5bbD
+[10:31:47]: ▸ eeZFIGi9v3OLLBKeAuOugCKMBB7DUshwgKj7zqew1UJEggOCTwb8O0kU+9h0UoWv
+[10:31:47]: ▸ p50h5wESA5/NQFjQAde/MoMrU1goPO6cn1R2PWQnxn6NHThNLa6B5rmluJyJlPef
+[10:31:47]: ▸ EtHlgepZAE9bPFo22noicwkJac3AfOriJP6YRLj477JxPxpd1F1+M02cHSS+APCQ
+[10:31:47]: ▸ A1iZQT0xWmJArzmoUUOSqwSonMJNsUvSq3xKX+udO7xPiEAGE/+QF4oIRynoYpgp
+[10:31:47]: ▸ pU8RBWk6z/Kf
+[10:31:47]: ▸ -----END CERTIFICATE-----
+[10:31:47]: ▸ -----BEGIN CERTIFICATE-----
+[10:31:47]: ▸ MIIEVTCCAz2gAwIBAgIUO36ACu7TAqHm7NuX2cqsKJzxaZQwDQYJKoZIhvcNAQEL
+[10:31:47]: ▸ BQAwYjELMAkGA1UEBhMCVVMxEzARBgNVBAoTCkFwcGxlIEluYy4xJjAkBgNVBAsT
+[10:31:47]: ▸ HUFwcGxlIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MRYwFAYDVQQDEw1BcHBsZSBS
+[10:31:47]: ▸ b290IENBMB4XDTIwMTIxNjE5Mzg1NloXDTMwMTIxMDAwMDAwMFowdTFEMEIGA1UE
+[10:31:47]: ▸ Aww7QXBwbGUgV29ybGR3aWRlIERldmVsb3BlciBSZWxhdGlvbnMgQ2VydGlmaWNh
+[10:31:47]: ▸ dGlvbiBBdXRob3JpdHkxCzAJBgNVBAsMAkc1MRMwEQYDVQQKDApBcHBsZSBJbmMu
+[10:31:47]: ▸ MQswCQYDVQQGEwJVUzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJ9d
+[10:31:47]: ▸ 2h/7+rzQSyI8x9Ym+hf39J8ePmQRZprvXr6rNL2qLCFu1h6UIYUsdMEOEGGqPGNK
+[10:31:47]: ▸ fkrjyHXWz8KcCEh7arkpsclm/ciKFtGyBDyCuoBs4v8Kcuus/jtvSL6eixFNlX2y
+[10:31:47]: ▸ e5AvAhxO/Em+12+1T754xtress3J2WYRO1rpCUVziVDUTuJoBX7adZxLAa7a489t
+[10:31:47]: ▸ dE3eU9DVGjiCOtCd410pe7GB6iknC/tgfIYS+/BiTwbnTNEf2W2e7XPaeCENnXDZ
+[10:31:47]: ▸ A1UdIwQYMBaAFCvQaUeUdgn+9GuNLkCm90dNfwheMEQGCCsGAQUFBwEBBDgwNjA0
+[10:31:47]: ▸ BggrBgEFBQcwAYYoaHR0cDovL29jc3AuYXBwbGUuY29tL29jc3AwMy1hcHBsZXJv
+[10:31:47]: ▸ b3RjYTAuBgNVHR8EJzAlMCOgIaAfhh1odHRwOi8vY3JsLmFwcGxlLmNvbS9yb290
+[10:31:47]: ▸ LmNybDAdBgNVHQ4EFgQUGYuXjUpbYXhX9KVcNRKKOQjjsHUwDgYDVR0PAQH/BAQD
+[10:31:47]: ▸ AgEGMBAGCiqGSIb3Y2QGAgEEAgUAMA0GCSqGSIb3DQEBCwUAA4IBAQBaxDWi2eYK
+[10:31:47]: ▸ nlKiAIIid81yL5D5Iq8UJcyqCkJgksK9dR3rTMoV5X5rQBBe+1tFdA3wen2Ikc7e
+[10:31:47]: ▸ Y4tCidIY30GzWJ4GCIdI3UCvI9Xt6yxg5eukfxzpnIPWlF9MYjmKTq4TjX1DuNxe
+[10:31:47]: ▸ rL4YQPLmDyxdE5Pxe2WowmhI3v+0lpsM+zI2np4NlV84CouW0hJst4sLjtc+7G8B
+[10:31:47]: ▸ qs5NRWDbhHFmYuUZZTDNiv9FU/tu+4h3Q8NIY/n3UbNyXnniVs+8u4S5OFp4rhFI
+[10:31:47]: ▸ UrsNNYuU3sx0mmj1SWCUrPKosxWGkNDMMEOG0+VwAlG0gcCol9Tq6rCMCUDvOJOy
+[10:31:47]: ▸ zSID62dDZchF
+[10:31:47]: ▸ -----END CERTIFICATE-----
+[10:31:47]: ▸ -----BEGIN CERTIFICATE-----
+[10:31:47]: ▸ MIIDFjCCApygAwIBAgIUIsGhRwp0c2nvU4YSycafPTjzbNcwCgYIKoZIzj0EAwMw
+[10:31:47]: ▸ ZzEbMBkGA1UEAwwSQXBwbGUgUm9vdCBDQSAtIEczMSYwJAYDVQQLDB1BcHBsZSBD
+[10:31:47]: ▸ A1UdEwEB/wQIMAYBAf8CAQAwHwYDVR0jBBgwFoAUu7DeoVgziJqkipnevr3rr9rL
+[10:31:47]: ▸ JKswRgYIKwYBBQUHAQEEOjA4MDYGCCsGAQUFBzABhipodHRwOi8vb2NzcC5hcHBs
+[10:31:47]: ▸ ZS5jb20vb2NzcDAzLWFwcGxlcm9vdGNhZzMwNwYDVR0fBDAwLjAsoCqgKIYmaHR0
+[10:31:47]: ▸ cDovL2NybC5hcHBsZS5jb20vYXBwbGVyb290Y2FnMy5jcmwwHQYDVR0OBBYEFD8v
+[10:31:47]: ▸ lCNR01DJmig97bB85c+lkGKZMA4GA1UdDwEB/wQEAwIBBjAQBgoqhkiG92NkBgIB
+[10:31:47]: ▸ BAIFADAKBggqhkjOPQQDAwNoADBlAjBAXhSq5IyKogMCPtw490BaB677CaEGJXuf
+[10:31:47]: ▸ QB/EqZGd6CSjiCtOnuMTbXVXmxxcxfkCMQDTSPxarZXvNrkxU3TkUMI33yzvFVVR
+[10:31:47]: ▸ T4wxWJC994OsdcZ4+RGNsYDyR5gmdr0nDGg=
+[10:31:47]: ▸ -----END CERTIFICATE-----
+[10:31:47]: Found 1 matching profile(s)
+[10:31:47]: Downloading provisioning profile...
+[10:31:47]: Successfully downloaded provisioning profile...
+[10:31:47]: Installing provisioning profile...
+/Users/wuchuheng/myProjects/wuchuheng/ios/wuchuheng/AppStore_com.wuchuheng.mobileprovision
+[10:31:47]: Setting Provisioning Profile type to 'app-store'
+[10:31:47]: ------------------------------------
+[10:31:47]: --- Step: increment_build_number ---
+[10:31:47]: ------------------------------------
+Current version of project wuchuheng is:
+14
+
+/Users/wuchuheng/Desktop/myProjects/wuchuheng/ios/wuchuheng
+[10:31:48]: $ cd /Users/wuchuheng/myProjects/wuchuheng/ios/wuchuheng && agvtool next-version -all && cd -
+[10:31:48]: ▸ Setting version of project wuchuheng to:
+[10:31:48]: ▸ 15.
+[10:31:48]: ▸ Also setting CFBundleVersion key (assuming it exists)
+[10:31:48]: ▸ Updating CFBundleVersion in Info.plist(s)...
+[10:31:48]: ▸ Cannot find "wuchuheng.xcodeproj/../YES"
+[10:31:48]: ▸ /Users/wuchuheng/Desktop/myProjects/wuchuheng/ios/wuchuheng
+[10:31:48]: -----------------------
+[10:31:48]: --- Step: build_app ---
+[10:31:48]: -----------------------
+[10:31:48]: Resolving Swift Package Manager dependencies...
+[10:31:48]: $ xcodebuild -resolvePackageDependencies -scheme wuchuheng -project ./wuchuheng.xcodeproj
+[10:31:49]: ▸ 2023-01-05 10:31:49.118 xcodebuild[73768:3416207] Requested but did not find extension point with identifier Xcode.IDEKit.ExtensionSentinelHostApplications for extension Xcode.DebuggerFoundation.AppExtensionHosts.watchOS of plug-in com.apple.dt.IDEWatchSupportCore
+[10:31:49]: ▸ 2023-01-05 10:31:49.119 xcodebuild[73768:3416207] Requested but did not find extension point with identifier Xcode.IDEKit.ExtensionPointIdentifierToBundleIdentifier for extension Xcode.DebuggerFoundation.AppExtensionToBundleIdentifierMap.watchOS of plug-in com.apple.dt.IDEWatchSupportCore
+[10:31:49]: ▸ Command line invocation:
+[10:31:49]: ▸     /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -resolvePackageDependencies -scheme wuchuheng -project ./wuchuheng.xcodeproj
+[10:31:49]: ▸ User defaults from command line:
+[10:31:49]: ▸     IDEPackageSupportUseBuiltinSCM = YES
+[10:31:50]: ▸ --- xcodebuild: WARNING: Using the first of multiple matching destinations:
+[10:31:50]: ▸ { platform:macOS, arch:arm64, variant:Designed for [iPad,iPhone], id:00008103-0002782814F2001E }
+[10:31:50]: ▸ { platform:iOS, id:dvtdevice-DVTiPhonePlaceholder-iphoneos:placeholder, name:Any iOS Device }
+[10:31:50]: ▸ { platform:iOS Simulator, id:dvtdevice-DVTiOSDeviceSimulatorPlaceholder-iphonesimulator:placeholder, name:Any iOS Simulator Device }
+[10:31:50]: ▸ { platform:iOS Simulator, id:8BDFAFAD-95C4-4495-8A83-3A5641B21503, OS:15.5, name:iPad (9th generation) }
+[10:31:50]: ▸ { platform:iOS Simulator, id:09A52A1C-78C7-4B96-947F-D7A5538BFAF3, OS:15.5, name:iPad Air (5th generation) }
+[10:31:50]: ▸ { platform:iOS Simulator, id:B3C89639-BF1C-4015-9062-1418748E625B, OS:15.5, name:iPad Pro (9.7-inch) }
+[10:31:50]: ▸ { platform:iOS Simulator, id:132771C6-F919-4BF6-BFF2-4A742B03DC62, OS:15.5, name:iPad Pro (11-inch) (3rd generation) }
+[10:31:50]: ▸ { platform:iOS Simulator, id:C0358E31-BD20-4183-A6AD-D7AB39DD6E3B, OS:15.5, name:iPad Pro (12.9-inch) (5th generation) }
+[10:31:50]: ▸ { platform:iOS Simulator, id:59C32514-4DE2-41C4-A819-3E980358ABEE, OS:15.5, name:iPad mini (6th generation) }
+[10:31:50]: ▸ { platform:iOS Simulator, id:D5B99038-B743-4CEB-8DF7-90E64FA82059, OS:15.5, name:iPhone 8 }
+[10:31:50]: ▸ { platform:iOS Simulator, id:A620CE9A-8C6A-4885-AC9B-389FCC5E7EE0, OS:15.5, name:iPhone 8 Plus }
+[10:31:50]: ▸ { platform:iOS Simulator, id:B1B53B67-CDBE-4B17-89FE-70298F57C20A, OS:15.5, name:iPhone 11 }
+[10:31:50]: ▸ { platform:iOS Simulator, id:F4FC596D-C9F0-4E8E-ADE0-AF3D9E53FB0F, OS:15.5, name:iPhone 11 Pro }
+[10:31:50]: ▸ { platform:iOS Simulator, id:9BF45AD8-7FCD-4112-A812-528E1B5C7299, OS:15.5, name:iPhone 11 Pro Max }
+[10:31:50]: ▸ { platform:iOS Simulator, id:6822D51B-1BF8-46FC-8428-853C6F559F6E, OS:15.5, name:iPhone 12 }
+[10:31:50]: ▸ { platform:iOS Simulator, id:F2869CE0-AFD9-4907-BB12-952971E6A46F, OS:15.5, name:iPhone 12 Pro }
+[10:31:50]: ▸ { platform:iOS Simulator, id:0614CF19-299B-4FA5-8B44-210BC32F07C8, OS:15.5, name:iPhone 12 Pro Max }
+[10:31:50]: ▸ { platform:iOS Simulator, id:E3526C1C-4F96-4F2C-853D-D49CADF26181, OS:15.5, name:iPhone 12 mini }
+[10:31:50]: ▸ { platform:iOS Simulator, id:3BEEB57C-8777-4B33-ADBF-785E7AE2D26D, OS:15.5, name:iPhone 13 }
+[10:31:50]: ▸ { platform:iOS Simulator, id:C9D1439E-C05F-465F-BC72-18D1091B46A0, OS:15.5, name:iPhone 13 Pro }
+[10:31:50]: ▸ { platform:iOS Simulator, id:79D45B38-4643-47B8-843F-890692CB38AF, OS:15.5, name:iPhone 13 Pro Max }
+[10:31:50]: ▸ { platform:iOS Simulator, id:45ED5D8C-E74E-4E14-BE39-25791F21F637, OS:15.5, name:iPhone 13 mini }
+[10:31:50]: ▸ { platform:iOS Simulator, id:22A8F1BB-44EB-43A9-B2B0-1B13EC92EA47, OS:15.5, name:iPhone SE (1st generation) }
+[10:31:50]: ▸ { platform:iOS Simulator, id:DBE8A5F3-8161-488B-AF05-6CB894130C83, OS:15.5, name:iPhone SE (3rd generation) }
+[10:31:50]: ▸ { platform:iOS Simulator, id:5026F08E-B794-4C29-8ED8-5B7BDC1F4942, OS:15.5, name:iPod touch (7th generation) }
+[10:31:50]: ▸ resolved source packages:
+[10:31:50]: $ xcodebuild -showBuildSettings -scheme wuchuheng -project ./wuchuheng.xcodeproj
+2023-01-05 10:31:50.913 xcodebuild[73776:3416301] Requested but did not find extension point with identifier Xcode.IDEKit.ExtensionSentinelHostApplications for extension Xcode.DebuggerFoundation.AppExtensionHosts.watchOS of plug-in com.apple.dt.IDEWatchSupportCore
+2023-01-05 10:31:50.913 xcodebuild[73776:3416301] Requested but did not find extension point with identifier Xcode.IDEKit.ExtensionPointIdentifierToBundleIdentifier for extension Xcode.DebuggerFoundation.AppExtensionToBundleIdentifierMap.watchOS of plug-in com.apple.dt.IDEWatchSupportCore
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:macOS, arch:arm64, variant:Designed for [iPad,iPhone], id:00008103-0002782814F2001E }
+{ platform:iOS, id:dvtdevice-DVTiPhonePlaceholder-iphoneos:placeholder, name:Any iOS Device }
+{ platform:iOS Simulator, id:dvtdevice-DVTiOSDeviceSimulatorPlaceholder-iphonesimulator:placeholder, name:Any iOS Simulator Device }
+{ platform:iOS Simulator, id:8BDFAFAD-95C4-4495-8A83-3A5641B21503, OS:15.5, name:iPad (9th generation) }
+{ platform:iOS Simulator, id:09A52A1C-78C7-4B96-947F-D7A5538BFAF3, OS:15.5, name:iPad Air (5th generation) }
+{ platform:iOS Simulator, id:B3C89639-BF1C-4015-9062-1418748E625B, OS:15.5, name:iPad Pro (9.7-inch) }
+{ platform:iOS Simulator, id:132771C6-F919-4BF6-BFF2-4A742B03DC62, OS:15.5, name:iPad Pro (11-inch) (3rd generation) }
+{ platform:iOS Simulator, id:C0358E31-BD20-4183-A6AD-D7AB39DD6E3B, OS:15.5, name:iPad Pro (12.9-inch) (5th generation) }
+{ platform:iOS Simulator, id:59C32514-4DE2-41C4-A819-3E980358ABEE, OS:15.5, name:iPad mini (6th generation) }
+{ platform:iOS Simulator, id:D5B99038-B743-4CEB-8DF7-90E64FA82059, OS:15.5, name:iPhone 8 }
+{ platform:iOS Simulator, id:A620CE9A-8C6A-4885-AC9B-389FCC5E7EE0, OS:15.5, name:iPhone 8 Plus }
+{ platform:iOS Simulator, id:B1B53B67-CDBE-4B17-89FE-70298F57C20A, OS:15.5, name:iPhone 11 }
+{ platform:iOS Simulator, id:F4FC596D-C9F0-4E8E-ADE0-AF3D9E53FB0F, OS:15.5, name:iPhone 11 Pro }
+{ platform:iOS Simulator, id:9BF45AD8-7FCD-4112-A812-528E1B5C7299, OS:15.5, name:iPhone 11 Pro Max }
+{ platform:iOS Simulator, id:6822D51B-1BF8-46FC-8428-853C6F559F6E, OS:15.5, name:iPhone 12 }
+{ platform:iOS Simulator, id:F2869CE0-AFD9-4907-BB12-952971E6A46F, OS:15.5, name:iPhone 12 Pro }
+{ platform:iOS Simulator, id:0614CF19-299B-4FA5-8B44-210BC32F07C8, OS:15.5, name:iPhone 12 Pro Max }
+{ platform:iOS Simulator, id:E3526C1C-4F96-4F2C-853D-D49CADF26181, OS:15.5, name:iPhone 12 mini }
+{ platform:iOS Simulator, id:3BEEB57C-8777-4B33-ADBF-785E7AE2D26D, OS:15.5, name:iPhone 13 }
+{ platform:iOS Simulator, id:C9D1439E-C05F-465F-BC72-18D1091B46A0, OS:15.5, name:iPhone 13 Pro }
+{ platform:iOS Simulator, id:79D45B38-4643-47B8-843F-890692CB38AF, OS:15.5, name:iPhone 13 Pro Max }
+{ platform:iOS Simulator, id:45ED5D8C-E74E-4E14-BE39-25791F21F637, OS:15.5, name:iPhone 13 mini }
+{ platform:iOS Simulator, id:22A8F1BB-44EB-43A9-B2B0-1B13EC92EA47, OS:15.5, name:iPhone SE (1st generation) }
+{ platform:iOS Simulator, id:DBE8A5F3-8161-488B-AF05-6CB894130C83, OS:15.5, name:iPhone SE (3rd generation) }
+{ platform:iOS Simulator, id:5026F08E-B794-4C29-8ED8-5B7BDC1F4942, OS:15.5, name:iPod touch (7th generation) }
+    [10:31:52]: Detected provisioning profile mapping: {:"com.wuchuheng"=>"com.wuchuheng_airRelease"}
+
+    +---------------------------------------------------+--------------------------------------------------------------+
+    |                                             Summary for gym 2.211.0                                              |
+    +---------------------------------------------------+--------------------------------------------------------------+
+    | scheme                                            | wuchuheng                                                    |
+    | export_method                                     | app-store                                                    |
+    | export_options.provisioningProfiles.com.wuchuheng | com.wuchuheng_airRelease                                     |
+    | project                                           | ./wuchuheng.xcodeproj                                        |
+    | clean                                             | false                                                        |
+    | output_directory                                  | .                                                            |
+    | output_name                                       | wuchuheng                                                    |
+    | silent                                            | false                                                        |
+    | skip_package_ipa                                  | false                                                        |
+    | skip_package_pkg                                  | false                                                        |
+    | build_path                                        | /Users/wuchuheng/Library/Developer/Xcode/Archives/2023-01-05 |
+    | result_bundle                                     | false                                                        |
+    | buildlog_path                                     | ~/Library/Logs/gym                                           |
+    | destination                                       | generic/platform=iOS                                         |
+    | xcodebuild_formatter                              | xcpretty                                                     |
+    | skip_profile_detection                            | false                                                        |
+    | xcodebuild_command                                | xcodebuild                                                   |
+    | skip_package_dependencies_resolution              | false                                                        |
+    | disable_package_automatic_updates                 | false                                                        |
+    | use_system_scm                                    | false                                                        |
+    | xcode_path                                        | /Applications/Xcode.app                                      |
+    +---------------------------------------------------+--------------------------------------------------------------+
+
+    [10:31:52]: $ set -o pipefail && xcodebuild -scheme wuchuheng -project ./wuchuheng.xcodeproj -destination 'generic/platform=iOS' -archivePath /Users/wuchuheng/Library/Developer/Xcode/Archives/2023-01-05/wuchuheng\ 2023-01-05\ 10.31.52.xcarchive archive | tee /Users/wuchuheng/Library/Logs/gym/wuchuheng-wuchuheng.log | xcpretty
+    [10:31:53]: ▸ 2023-01-05 10:31:53.249 xcodebuild[73799:3416556] Requested but did not find extension point with identifier Xcode.IDEKit.ExtensionSentinelHostApplications for extension Xcode.DebuggerFoundation.AppExtensionHosts.watchOS of plug-in com.apple.dt.IDEWatchSupportCore
+    [10:31:53]: ▸ 2023-01-05 10:31:53.249 xcodebuild[73799:3416556] Requested but did not find extension point with identifier Xcode.IDEKit.ExtensionPointIdentifierToBundleIdentifier for extension Xcode.DebuggerFoundation.AppExtensionToBundleIdentifierMap.watchOS of plug-in com.apple.dt.IDEWatchSupportCore
+    [10:31:54]: ▸ Linking wuchuheng
+    [10:31:55]: ▸ Processing empty-wuchuheng.plist
+    [10:31:56]: ▸ Generating 'wuchuheng.app.dSYM'
+    [10:31:56]: ▸ Touching wuchuheng.app (in target 'wuchuheng' from project 'wuchuheng')
+    [10:31:56]: ▸ Archive Succeeded
+    [10:31:56]: Generated plist file with the following values:
+    [10:31:56]: ▸ -----------------------------------------
+    [10:31:56]: ▸ {
+    [10:31:56]: ▸   "provisioningProfiles": {
+    [10:31:56]: ▸     "com.wuchuheng": "com.wuchuheng_airRelease"
+    [10:31:56]: ▸   },
+    [10:31:56]: ▸   "method": "app-store",
+    [10:31:56]: ▸   "signingStyle": "manual"
+    [10:31:56]: ▸ }
+    [10:31:56]: ▸ -----------------------------------------
+    [10:31:56]: $ /usr/bin/xcrun /opt/homebrew/Cellar/fastlane/2.211.0/libexec/gems/fastlane-2.211.0/gym/lib/assets/wrap_xcodebuild/xcbuild-safe.sh -exportArchive -exportOptionsPlist '/var/folders/87/3ys_m27d2t18nr14jd5x48kc0000gn/T/gym_config20230105-73611-tgxw6c.plist' -archivePath /Users/wuchuheng/Library/Developer/Xcode/Archives/2023-01-05/wuchuheng\ 2023-01-05\ 10.31.52.xcarchive -exportPath '/var/folders/87/3ys_m27d2t18nr14jd5x48kc0000gn/T/gym_output20230105-73611-dfipfx'
+    [10:32:01]: Mapping dSYM(s) using generated BCSymbolMaps
+    [10:32:01]: $ dsymutil --symbol-map /Users/wuchuheng/Library/Developer/Xcode/Archives/2023-01-05/wuchuheng\ 2023-01-05\ 10.31.52.xcarchive/BCSymbolMaps/BBABFF87-CAEF-37A7-95F3-F9F7B3B42420.bcsymbolmap /Users/wuchuheng/Library/Developer/Xcode/Archives/2023-01-05/wuchuheng\ 2023-01-05\ 10.31.52.xcarchive/dSYMs/wuchuheng.app.dSYM
+    [10:32:01]: Compressing 1 dSYM(s)
+    [10:32:01]: $ cd '/Users/wuchuheng/Library/Developer/Xcode/Archives/2023-01-05/wuchuheng 2023-01-05 10.31.52.xcarchive/dSYMs' && zip -r '/Users/wuchuheng/myProjects/wuchuheng/ios/wuchuheng/wuchuheng.app.dSYM.zip' *.dSYM
+    [10:32:02]: ▸ updating: wuchuheng.app.dSYM/ (stored 0%)
+    [10:32:02]: ▸ updating: wuchuheng.app.dSYM/Contents/ (stored 0%)
+    [10:32:02]: ▸ updating: wuchuheng.app.dSYM/Contents/Resources/ (stored 0%)
+    [10:32:02]: ▸ updating: wuchuheng.app.dSYM/Contents/Resources/DWARF/ (stored 0%)
+    [10:32:02]: ▸ updating: wuchuheng.app.dSYM/Contents/Resources/DWARF/wuchuheng (deflated 60%)
+    [10:32:02]: ▸ updating: wuchuheng.app.dSYM/Contents/Info.plist (deflated 52%)
+
+    [10:32:02]: Successfully exported and compressed dSYM file
+    [10:32:02]: Successfully exported and signed the ipa file:
+    [10:32:02]: /Users/wuchuheng/myProjects/wuchuheng/ios/wuchuheng/wuchuheng.ipa
+    [10:32:02]: ----------------------------------
+    [10:32:02]: --- Step: upload_to_testflight ---
+    [10:32:02]: ----------------------------------
+    [10:32:02]: Login to App Store Connect (root@wuchuheng.com)
+    [10:32:04]: Login successful
+    [10:32:05]: Ready to upload new build to TestFlight (App: 1662521333)...
+    [10:32:20]: iTunes Transporter successfully finished its job
+    [10:32:21]: Going to upload updated app to App Store Connect
+    [10:32:21]: This might take a few minutes. Please don't interrupt the script.
+    [10:33:08]: iTunes Transporter successfully finished its job
+    [10:33:09]: ------------------------------------------------------------------------------------------------------------------
+    [10:33:09]: --- Successfully uploaded package to App Store Connect. It might take a few minutes until it's visible online. ---
+    [10:33:09]: ------------------------------------------------------------------------------------------------------------------
+    [10:33:09]: Successfully uploaded the new binary to App Store Connect
+    [10:33:09]: If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option
+    [10:33:09]: Note that if `skip_waiting_for_build_processing` is used but a `changelog` is supplied, this process will wait for the build to appear on AppStoreConnect, update the changelog and then skip the remaining of the processing steps.
+    [10:33:09]: Waiting for processing on... app_id: 1662521333, app_version: 1.0, build_version: 15, platform: IOS
+    [10:33:10]: Read more information on why this build isn't showing up yet - https://github.com/fastlane/fastlane/issues/14997
+    [10:33:10]: Waiting for the build to show up in the build list - this may take a few minutes (check your email for processing issues if this continues)
+    [10:33:41]: Waiting for the build to show up in the build list - this may take a few minutes (check your email for processing issues if this continues)
+    [10:34:16]: Waiting for the build to show up in the build list - this may take a few minutes (check your email for processing issues if this continues)
+    [10:34:47]: Waiting for the build to show up in the build list - this may take a few minutes (check your email for processing issues if this continues)
+    [10:35:23]: Waiting for App Store Connect to finish processing the new build (1.0 - 15) for IOS
+    [10:35:54]: Waiting for App Store Connect to finish processing the new build (1.0 - 15) for IOS
+    [10:36:30]: Successfully finished processing the build 1.0 - 15 for IOS
+    [10:36:30]: Using App Store Connect's default for notifying external testers (which is true) - set `notify_external_testers` for full control
+    [10:36:30]: Distributing new build to testers: 1.0 - 15
+    [10:36:30]: Export compliance has been set to 'false'. Need to wait for build to finishing processing again...
+    [10:36:30]: Set 'ITSAppUsesNonExemptEncryption' in the 'Info.plist' to skip this step and speed up the submission
+    [10:36:31]: Successfully distributed build to Internal testers 🚀
+
+    +------+--------------------------+-------------+
+    |               fastlane summary                |
+    +------+--------------------------+-------------+
+    | Step | Action                   | Time (in s) |
+    +------+--------------------------+-------------+
+    | 1    | default_platform         | 0           |
+    | 2    | get_certificates         | 6           |
+    | 3    | get_provisioning_profile | 1           |
+    | 4    | increment_build_number   | 0           |
+    | 5    | build_app                | 13          |
+    | 6    | upload_to_testflight     | 269         |
+    +------+--------------------------+-------------+
+
+    [10:36:31]: fastlane.tools finished successfully 🎉
+
+```
+</details>
+
+
+![](https://qiniu.wuchuheng.com/images/WX20230106-061958%402x.png)
+
+    
+## 5 总结
+`fastlane`之所以能实现应用的构建和发布，其本质还是通过调用本地的`xcode`命令行方式去执行这一过程的。而当中遇到的证书和`profile`不匹配的问题，
+也通过配置流程，来下载相关的文件到本地。从而实现了应用的构建和发布。所以本文问题的难点在于本机的证书和`profile`相关的问题。
+    
