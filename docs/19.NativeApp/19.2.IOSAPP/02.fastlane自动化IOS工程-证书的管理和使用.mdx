@@ -323,7 +323,12 @@ $ fastlane beta # 执行构建和发布流程
 ```
 执行的结果也是ok的
 
-## 7 总结
+## 7 文中涉及到的变量
+
+* fastlane match password: 这是fastlane在同步`git`中的证书(**certificates**)到本地或线上时，需要用到的密码
+* specific password: 这是`beta`流程在发布应用时，需要用到的密码，在 [appleid.apple.com](https://appleid.apple.com/account/manage)进行申请。
+
+## 8 总结
 本文主要是解决证书的更新和同步的问题，从一台主机上进行`app`的开发，然后把证书(**certificates**)和相关的配置(**profiles**)同步到**git**, 
 而其它的开发机器就可以执行同步证书(**certificate**)的流程来实现证书的更新。从而节省各种手动导入造成的时间浪费。
 
