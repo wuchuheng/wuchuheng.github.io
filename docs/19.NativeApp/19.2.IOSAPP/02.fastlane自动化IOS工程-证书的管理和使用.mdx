@@ -1,0 +1,337 @@
+---
+title: 02 fastlane自动化IOS工程(二)-证书的管理和使用
+date: 2023-01-06 08:52
+---
+
+```mdx-code-block
+import Img from '@site/src/components/Img/index';
+
+```
+
+## 1 为什么要管理`certificates`和`profiles`?
+
+&emsp;在团队开发或是其它的情况而导致一个项目有多台机器在开发时。这时就需要把同样的`certificates`和`profile`手动更新到不同的机器上。这样才有权限对
+项目进行开发与发布。而项目的`profile`或`certificates`的变动也会导致以上的操作再来一次。这样的操作过于重复与枯燥,浪费大量不必要的时间。所以需要
+有一种统一的方式来管理这些`certificates`或`profiles`的变动，然后又能统一地同步到所以机器上，而不影响其它机器的项目开发。而在`fastlane`中，这
+种方法号`match`。它是通过把`certificates`和`profiles`收集起来在同一个地方，如: `git`等等方式，然后不同的机器就通过这种方法来实现本地的`certificates`
+或`profiles`的变更同步。 
+
+<Img src='https://qiniu.wuchuheng.com/images/cs-git-img.png' align='center' />
+
+
+## 2 准备工作
+
+### 2.1 能基本使用`fastlane`
+&emsp;对`fastlane`有个基本的使用认识。如果不是新手，也可能参考[《01 fastlane自动化IOS工程(一)-本地入门使用篇》](/docs/19.NativeApp/19.2.IOSAPP/01.fastlane自动化IOS工程-本地入门使用篇.mdx)。 
+本文的项目正是基于[《01 fastlane自动化IOS工程(一)-本地入门使用篇》](/docs/19.NativeApp/19.2.IOSAPP/01.fastlane自动化IOS工程-本地入门使用篇.mdx)
+而来的。
+
+### 2.2 创建一个私人`git`仓库用来保存`profiles`和`certificates`
+&emsp; 本文举例用的是git@github.com:wuchuheng/certificates.git 的私人仓库来保存这些文件。
+
+
+## 3 初始化match
+
+```bash  title="项目根目录下执行"
+
+$  fastlane match init
+
+[✔] 🚀
+[11:04:56]: fastlane match supports multiple storage modes, please select the one you want to use:
+1. git
+2. google_cloud
+3. s3
+4. gitlab_secure_files
+?  1    #<-- 这里选择1, 也就是git
+[11:05:21]: Please create a new, private git repository to store the certificates and profiles there
+[11:05:21]: URL of the Git Repo: git@github.com:wuchuheng/certificates.git  #<-- 填写上用于保存的git仓库
+[11:05:31]: Successfully created './Matchfile'. You can open the file using a code editor.
+[11:05:31]: You can now run `fastlane match development`, `fastlane match adhoc`, `fastlane match enterprise` and `fastlane match appstore`
+[11:05:31]: On the first run for each environment it will create the provisioning profiles and
+[11:05:31]: certificates for you. From then on, it will automatically import the existing profiles.
+[11:05:31]: For more information visit https://docs.fastlane.tools/actions/match/
+
+```
+
+> 然后会生成`fastlane/Matchfile`.
+
+``` bash title="fastlane/Matchfile"
+cat Matchfile
+
+git_url("git@github.com:wuchuheng/certificates.git")
+
+storage_mode("git")
+
+type("development") # The default type, can be: appstore, adhoc, enterprise or development
+
+# app_identifier(["tools.fastlane.app", "tools.fastlane.app2"])
+# username("user@fastlane.tools") # Your Apple Developer Portal username
+
+# For all available options run `fastlane match --help`
+# Remove the # in the beginning of the line to enable the other options
+
+# The docs are available on https://docs.fastlane.tools/actions/match
+```
+
+## 4 同步development和app store的certificates和profiles
+
+```bash title="配置development相关的profile和certificates"
+$ fastlane match development
+
+[✔] 🚀
+[11:13:37]: fastlane detected a Gemfile in the current directory
+[11:13:37]: However, it seems like you didn't use `bundle exec`
+[11:13:37]: To launch fastlane faster, please use
+[11:13:37]:
+[11:13:37]: $ bundle exec fastlane match development
+[11:13:37]:
+[11:13:37]: Get started using a Gemfile for fastlane https://docs.fastlane.tools/getting-started/ios/setup/#use-a-gemfile
+[11:13:38]: Successfully loaded '/Users/wuchuheng/Desktop/myprojects/wuchuheng/ios/wuchuheng/fastlane/Matchfile' 📄
+
+```
+
+```bash title="配置appstore相关的profile和certificates"
+fastlane match appstore
+
+[✔] 🚀
+[12:02:13]: fastlane detected a Gemfile in the current directory
+[12:02:13]: However, it seems like you didn't use `bundle exec`
+[12:02:13]: To launch fastlane faster, please use
+[12:02:13]:
+[12:02:13]: $ bundle exec fastlane match appstore
+[12:02:13]:
+[12:02:13]: Get started using a Gemfile for fastlane https://docs.fastlane.tools/getting-started/ios/setup/#use-a-gemfile
+[12:02:15]: Successfully loaded '/Users/wuchuheng/Desktop/myprojects/wuchuheng/ios/wuchuheng/fastlane/Matchfile' 📄
+
+```
+
+> 然后执行过后，会在开发都平台上生成以`match`为前缀的对应的`profiles`
+
+<Img src="https://qiniu.wuchuheng.com/images/WX20230106-121756.png" align={'center'} />
+
+
+> 再然后，也会把对应的`certificates`和`profiles`上传到git上
+
+<Img src="https://qiniu.wuchuheng.com/images/WX20230106-120833.png" align={'center'} />
+
+## 5 测试本地的match能否使用正常
+
+### 5.1 在xcode中使用已经生成的`profiles`
+在xcode中打开项目，然后: 
+
+<Img src="https://qiniu.wuchuheng.com/images/WX20230106-122606.png" align="center" />
+
+### 5.2 去除fastlane/Fastfile中的下载certificates和profiles步骤
+```git
+diff --git a/fastlane/Fastfile b/fastlane/Fastfile
+index b2f1b3c..6bbddb7 100644
+--- a/fastlane/Fastfile
++++ b/fastlane/Fastfile
+@@ -18,8 +18,8 @@ default_platform(:ios)
+ platform :ios do
+   desc "Push a new beta build to TestFlight"
+   lane :beta do
+-    get_certificates           # invokes cert
+-    get_provisioning_profile
+     increment_build_number(xcodeproj: "wuchuheng.xcodeproj")
+     build_app(scheme: "wuchuheng")
+     upload_to_testflight
+
+```
+
+### 5.3 本地执行fastlane流程
+
+```bash
+$ fastlane beta
+fastlane beta
+
+[✔] 🚀
+[12:30:31]: fastlane detected a Gemfile in the current directory
+[12:30:31]: However, it seems like you didn't use `bundle exec`
+[12:30:31]: To launch fastlane faster, please use
+[12:30:31]:
+[12:30:31]: $ bundle exec fastlane beta
+[12:30:31]:
+[12:30:31]: Get started using a Gemfile for fastlane https://docs.fastlane.tools/getting-started/ios/setup/#use-a-gemfile
+[12:30:32]: ------------------------------
+[12:30:32]: --- Step: default_platform ---
+[12:30:32]: ------------------------------
+[12:30:32]: Driving the lane 'ios beta' 🚀
+[12:30:32]: ------------------------------------
+[12:30:32]: --- Step: increment_build_number ---
+[12:30:32]: ------------------------------------
+Current version of project wuchuheng is: 19
+...
+ +------+------------------------+-------------+
+|              fastlane summary               |
++------+------------------------+-------------+
+| Step | Action                 | Time (in s) |
++------+------------------------+-------------+
+| 1    | default_platform       | 0           |
+| 2    | increment_build_number | 1           |
+| 3    | build_app              | 15          |
+| 4    | upload_to_testflight   | 218         |
++------+------------------------+-------------+
+
+[12:34:27]: fastlane.tools finished successfully 🎉
+```
+:::tip 提示
+在发布的过程中会要求一个指定密码: FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD, 这个密码需要到[appleid.apple.com](https://appleid.apple.com/account/manage)
+进行生成
+:::
+
+> 结果流程是能跑通的。
+
+
+### 5.4 提交代码
+> 本次操作要提交的代码
+
+```git
+diff --git a/fastlane/Fastfile b/fastlane/Fastfile
+index b2f1b3c..e9c9a09 100644
+--- a/fastlane/Fastfile
++++ b/fastlane/Fastfile
+@@ -18,8 +18,6 @@ default_platform(:ios)
++
++desc "Download certificates from the git"
++lane :syncCertificates do
++    match(type: "appstore")
++    match(type: "development")
++end
++
+ platform :ios do
+   desc "Push a new beta build to TestFlight"
+   lane :beta do
+-    get_certificates           # invokes cert
+-    get_provisioning_profile
+     increment_build_number(xcodeproj: "wuchuheng.xcodeproj")
+     build_app(scheme: "wuchuheng")
+     upload_to_testflight
+diff --git a/fastlane/report.xml b/fastlane/report.xml
+index f1fb1ac..0fc18d8 100644
+
+diff --git a/wuchuheng.xcodeproj/project.pbxproj b/wuchuheng.xcodeproj/project.pbxproj
+index 79a2ba3..a82bb04 100644
+--- a/wuchuheng.xcodeproj/project.pbxproj
++++ b/wuchuheng.xcodeproj/project.pbxproj
+@@ -417,7 +417,7 @@
+ 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+ 				CODE_SIGN_IDENTITY = "iPhone Developer";
+ 				CODE_SIGN_STYLE = Manual;
+-				CURRENT_PROJECT_VERSION = 17;
++				CURRENT_PROJECT_VERSION = 20;
+ 				DEVELOPMENT_ASSET_PATHS = "\"wuchuheng/Preview Content\"";
+ 				DEVELOPMENT_TEAM = 5D6L6979M7;
+ 				ENABLE_PREVIEWS = YES;
+@@ -434,7 +434,7 @@
+ 				MARKETING_VERSION = 1.0;
+ 				PRODUCT_BUNDLE_IDENTIFIER = com.wuchuheng;
+ 				PRODUCT_NAME = "$(TARGET_NAME)";
+-				PROVISIONING_PROFILE_SPECIFIER = com.wuchuheng_airDeveloper;
++				PROVISIONING_PROFILE_SPECIFIER = "match Development com.wuchuheng 1672977205";
+ 				SWIFT_EMIT_LOC_STRINGS = YES;
+ 				SWIFT_VERSION = 5.0;
+ 				TARGETED_DEVICE_FAMILY = "1,2";
+@@ -449,7 +449,7 @@
+ 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+ 				CODE_SIGN_IDENTITY = "iPhone Distribution";
+ 				CODE_SIGN_STYLE = Manual;
+-				CURRENT_PROJECT_VERSION = 17;
++				CURRENT_PROJECT_VERSION = 20;
+ 				DEVELOPMENT_ASSET_PATHS = "\"wuchuheng/Preview Content\"";
+ 				DEVELOPMENT_TEAM = 5D6L6979M7;
+ 				ENABLE_PREVIEWS = YES;
+@@ -466,7 +466,7 @@
+ 				MARKETING_VERSION = 1.0;
+ 				PRODUCT_BUNDLE_IDENTIFIER = com.wuchuheng;
+ 				PRODUCT_NAME = "$(TARGET_NAME)";
+-				PROVISIONING_PROFILE_SPECIFIER = com.wuchuheng_airRelease;
++				PROVISIONING_PROFILE_SPECIFIER = "match AppStore com.wuchuheng";
+ 				SWIFT_EMIT_LOC_STRINGS = YES;
+ 				SWIFT_VERSION = 5.0;
+ 				TARGETED_DEVICE_FAMILY = "1,2";
+@@ -479,7 +479,7 @@
+ 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+ 				BUNDLE_LOADER = "$(TEST_HOST)";
+ 				CODE_SIGN_STYLE = Automatic;
+-				CURRENT_PROJECT_VERSION = 17;
++				CURRENT_PROJECT_VERSION = 20;
+ 				DEVELOPMENT_TEAM = 5D6L6979M7;
+ 				GENERATE_INFOPLIST_FILE = YES;
+ 				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+@@ -499,7 +499,7 @@
+ 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+ 				BUNDLE_LOADER = "$(TEST_HOST)";
+ 				CODE_SIGN_STYLE = Automatic;
+-				CURRENT_PROJECT_VERSION = 17;
++				CURRENT_PROJECT_VERSION = 20;
+ 				DEVELOPMENT_TEAM = 5D6L6979M7;
+ 				GENERATE_INFOPLIST_FILE = YES;
+ 				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+@@ -518,7 +518,7 @@
+ 			buildSettings = {
+ 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+ 				CODE_SIGN_STYLE = Automatic;
+-				CURRENT_PROJECT_VERSION = 17;
++				CURRENT_PROJECT_VERSION = 20;
+ 				DEVELOPMENT_TEAM = 5D6L6979M7;
+ 				GENERATE_INFOPLIST_FILE = YES;
+ 				MARKETING_VERSION = 1.0;
+@@ -536,7 +536,7 @@
+ 			buildSettings = {
+ 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+ 				CODE_SIGN_STYLE = Automatic;
+-				CURRENT_PROJECT_VERSION = 17;
++				CURRENT_PROJECT_VERSION = 20;
+ 				DEVELOPMENT_TEAM = 5D6L6979M7;
+ 				GENERATE_INFOPLIST_FILE = YES;
+ 				MARKETING_VERSION = 1.0;
+```
+
+``` bash 
+$ git add -A
+$ git status
+
+On branch main
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	new file:   .gitignore
+	modified:   fastlane/Fastfile
+	new file:   fastlane/Matchfile
+	modified:   fastlane/report.xml
+	deleted:    wuchuheng.app.dSYM.zip
+	modified:   wuchuheng.xcodeproj/project.pbxproj
+$ git commit -m 'feat: init match'
+$ git commit -m 'feat: init match'
+
+[main 34d6016] feat: init match
+ 7 files changed, 181 insertions(+), 48 deletions(-)
+ create mode 100644 .gitignore
+ create mode 100644 fastlane/Matchfile
+ rewrite fastlane/report.xml (60%)
+ create mode 100644 tmp
+ delete mode 100644 wuchuheng.app.dSYM.zip
+```
+
+
+## 6 在别的机器通过match进行profiles和certificates的导入与使用
+``` bash
+$ git clone git@github.com:wuchuheng/com.wuchuheng.ios.helloWorld.git # 下载项目
+$ cd com.wuchuheng.ios.helloWorld
+$ fastlane syncCertificates # 同步证书流程
+$ fastlane beta # 执行构建和发布流程
+```
+执行的结果也是ok的
+
+## 7 总结
+本文主要是解决证书的更新和同步的问题，从一台主机上进行`app`的开发，然后把证书(**certificates**)和相关的配置(**profiles**)同步到**git**, 
+而其它的开发机器就可以执行同步证书(**certificate**)的流程来实现证书的更新。从而节省各种手动导入造成的时间浪费。
+
+## 本文源代码
+
+[Source](https://github.com/wuchuheng/com.wuchuheng.ios.helloWorld)
+
+## 参考资料:
+
+* [《Fastlane的match文档》](https://docs.fastlane.tools/actions/match/) 
+* [《Codesigning的概念说明》](https://codesigning.guide/) 
