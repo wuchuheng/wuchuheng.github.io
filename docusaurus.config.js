@@ -149,7 +149,8 @@ const config = {
         'rust',
         'lua',
         'json',
-        'ruby'
+        'ruby',
+        'cmake'
       ],
     },
     algolia: {
