@@ -148,7 +148,8 @@ const config = {
         'tsx',
         'rust',
         'lua',
-        'json'
+        'json',
+        'ruby'
       ],
     },
     algolia: {
