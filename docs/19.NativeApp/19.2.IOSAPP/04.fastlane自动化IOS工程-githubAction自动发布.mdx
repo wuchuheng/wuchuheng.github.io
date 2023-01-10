@@ -1,6 +1,9 @@
 ---
-title: 03 fastlane自动化IOS工程(三)-自动发布
-date: 2023-01-06 08:52
+title: 04 fastlane自动化IOS工程(四)-githubAction自动发布
+date: 2023-01-07 14:40
+tags:
+ - CI/CD
+ - "Github action"
 ---
 
 ```mdx-code-block
@@ -8,179 +11,594 @@ import Img from '@site/src/components/Img/index';
 
 ```
 
-## 1 什么是自动发布? 
 
-&emsp; 前面的章节中的`beta`流程尽管能执行，但是，在同步证书的过程中要求开发都输入验证码后才能进行发布。这样一来就算不上是全自动化了。所以本章节就
-的内容就是来解决这一问题，跳过开发苹果的[2-factor authentication (2FA)](https://support.apple.com/en-us/HT204915), 实现完全自动化。
+## 1 为什么要用**Github Action**来进行自动发布?这么做的意义是什么？ 
 
-<Img src="https://qiniu.wuchuheng.com/images/WX20230107-082950.png" align='center' />
+&emsp; 如果在人的一生当中，如果把一件事做一遍完全可以，但如果一件事要重复做且不知道要做多少数次才能把事件推进。那么，在这种不知道还要重复多少次的事，在未来，
+在可预见的未来，如果这种重复的事不能适可而止，那么在将来它一定会消耗人大量的时间与精力，从而让人本该把精力专注于更重要的事情之前就已经被这种无意的的事缠身消耗精力，
+从而在推进重要的事情之前就已经耗光了精力，从而直接导致事件的失败。    
+&emsp;  总结就是: 重复且无意意义的不能在当下解决，那么它一定会在未来拖住人前进的脚步。这是债务，如果当下不解决，那么在未来光是时间利息的支出，将是一笔
+沉重的代价。  
+&emsp;  所以这种软件打包、构建或发布这种在开发过程中无数次重复的事可以进行一次，但不能永无止境重复下去。现在不解决这样的问题，那么在未来，必然成为阻碍自己
+前进的障碍并让自己疲于奔命。    
+&emsp;  总结就是：人生有限，这种没完没了重复的问题，必须尽早彻底根除才行。    
+&emsp;  而配置好**github action**的自动化流程。 那么开发者就是专注于代码的直接问题，然后然后解决完问题就直接提交代码就可以了，至于， 打包、测试、发布,等等这些重复
+且无聊无意义的事就交给自动化流程来处理，在自动化执行的过程中，自己完全可以去倒杯水，活动活动身子，放松下。 再回来看看自动化流程执行的结果。就可以了。 
 
-## 2 如何才避免**2-factor authentication (2FA)**验证呢?
-苹果开发平台上有[App Store Connect API](https://developer.apple.com/documentation/appstoreconnectapi)这种对外开放的api，可以通过
-借着开发**api**来避免这种问题。所以为了调用这个**API`， 我们需要在开发者平台上生成一个密钥，才能通过这个密钥来调用这个**API**.
+## 2 那么在github Action大概是如何实现ios应用发布的?
 
-## 3 获取App Store Connect API密钥和相关信息
+1. 本地提交代码然后触发构建流先程
+2. github 进行构建而这个构建过程又分为几个小步骤: 
+   - 2.1. 配置好构建环境的环境变量，用于fastlane构建时使用
+   - 2.2  同步**certificates**和**profiles**
+   - 2.3  **fastlane**打包**IOS**
+   - 2.4  **fastlane**发布到**testflight**
+   - 2.5  然后就搞定了
 
-在[App Store Connect API](https://appstoreconnect.apple.com/access/api)， 进行生成. 然后把文件下载下来。
+## 3 配置fastlane环境变量
 
-<Img src="https://qiniu.wuchuheng.com/images/WX20230107-130328.png" align="center" />
+> `fastlane`会默认读取`fastlane/.env`文件中的配置成为环境变量。所以我们下面会收集到所需要的环境变量前写入`fastlane/.env`文件中。
+
+:::tip 提示
+由于`fastlane/.env`的环境变量很私密，所以不能公开出来,建议不要加入到`git`中，如在`.gitignore`进行配置.
+```bash title=".gitignore"
+# ...
+fastlane/.env
+# ...
+```
+:::
 
 
-## 4 修改相关配置
-### 4.1 创建**fastlane/.env**
-`.env`文件是用于保存一些在`fastlane`启动时就默认加载的环境变量。由于密钥等配置在开发过程中不能被泄漏，所以采用`.env`文件形式来保存这些信息，
-且会被`git`所忽略,来保证安全。
+### 3.1 GIT_AUTHORIZATION
+<details>
+    <summary>GIT_AUTHORIZATION (Github的访问token)</summary>
+
+&emsp;为什么需要这个参数是用来访问保存**Certificates**和**Profiles**的地方。在**Github Action**的构建**IOS APP**前需要先同步**Certificates**
+和**Profiles**。 所以我们需要有权限能访问到这个仓库，而**GIT_AUTHORIZATION**正是允许访问这个仓库的**Token*。 那么如何获取到这个**Token`呢?
+&emsp; Github > Your Profile > Settings > Developer Settings > Tokens(classic)。如:
+
+<Img src="/images/WX20230108-093823.png" align="center"/>
+</details>
+
+### 3.2 APP_STORE_CONNECT_API...
+
+<details>
+    <summary> APP_STORE_CONNECT_API_KEY_CONTENT <br/> APP_STORE_CONNECT_API_ISSUER_ID <br/> APP_STORE_CONNECT_API_KEY_ID </summary>
+
+&emsp; 这3个参数是来自 [appstoreconnect.apple.com](https://appstoreconnect.apple.com/access/api)。
+那么这个3个参数解决了什么问题？ 通过这3个参数就能对接到苹果的开发者平台，能做到，如: 下载证书(**certificates**)、**profiles**和上传签名应用等操作。 
+而本文就需要通过这些参数来实现对应用在签名时规避2次验证([Two-factor authentication for Apple ID](https://support.apple.com/en-us/HT204915))和应用的上传。
+    
+> 位置是: Users and Access > Keys > Key Type > App Store Connect API。
+
+<Img src="/images/WX20230107-130328.png" />
+</details>
+
+### 3.3 APP_IDENTIFIER
+
+<details>
+    <summary>APP_IDENTIFIER (应用标识)</summary>
+
+    &emsp; 应用标识identifier是苹果开发者平台的应用标识，如果不知道的话可以去[developer.apple.com](https://developer.apple.com/account/resources/identifiers/list)
+    查看, 在创建开发者平台创建应用之前就需要先创建**identifier**, 它的命名通常是以倒置域名来命名的
+
+    > 位置:  [Certificates,Identifiers&Profiles](https://developer.apple.com/account/resources/identifiers/list) > Identifiers
+
+    <Img src="/images/WX20230110-133927.png" align="center" />
+
+</details>
+
+### 3.4 MATCH_PASSWORD
+
+MATCH_PASSWORD (match 密码), 用于同步**git**上证书(certificates)和**Profiles到本地用的。
+
+### 3.5 TEMP_KEYCHAIN_USER
+用于创建本地`keychain`使用，名称可以自己定义。
+
+### 3.6 TEMP_KEYCHAIN_USER
+用于创建本地`keychain`使用，名称可以自己定义。
+
+### 3.7 FASTLANE_APPLE_ID
+开发者者账号
+
+### 3.8 ITC_TEAM_ID
+这个参数的出处我还没找到，这个参数是初始化**fastlane**工程时，输入账号和密码时, 自动在`fastlane/Fastfile`生成的。 应用于: itc_team_id(***), 
+后面为了安全，把它放了在`fastlane/.env`中, 创建了`ITC_TEAM_ID="<ITC_TEAM_ID>"`这一个环境变量。并用反过替代`itc_team_id(ENV["ITC_TEAM_ID"])`
+
+### 3.9 DEVELOPER_PORTAL_TEAM_ID
+开发者平台的`Team ID`
+> 位置:  [develope acciont](https://developer.apple.com/account) > Membership details > Team ID
+
+### 4.0 GIT_AUTHORIZATION
+**Github Token **用于在使用`match`同步本地证书(certificates)和Profiles时，能有权限访问到这个仓库.
+
+> 位置: [Github](https://github.com) > [Setting](https://github.com/settings/profile) > [Token](https://github.com/settings/tokens) > Generate token
+
+### 4.1 汇总后的**fastlane/.env**配置
 
 ```bash title="fastlane/.env"
-# app store connect api key. https://appstoreconnect.apple.com/access/api
+APP_STORE_CONNECT_API_KEY_CONTENT="-----BEGIN PRIVATE KEY-----
+<APP_STORE_CONNECT_API_KEY_CONTENT>
+-----END PRIVATE KEY-----"
+# Identifies the issuer who created the authentication token. https://appstoreconnect.apple.com/access/api
+APP_STORE_CONNECT_API_ISSUER_ID="<APP_STORE_CONNECT_API_ISSUER_ID>"
+# The key of app store connect api. https://appstoreconnect.apple.com/access/api
+APP_STORE_CONNECT_API_KEY_ID="<APP_STORE_CONNECT_API_KEY_ID>"
+
+# APP IDENTIFIER, https://developer.apple.com/account/resources/identifiers/list
+APP_IDENTIFIER="<APP_IDENTIFIER>"
+
+# Fastlane match password
+MATCH_PASSWORD="<MATCH_PASSWORD>"
+
+# The name from keychain.
+TEMP_KEYCHAIN_USER="<TEMP_KEYCHAIN_USER>"
+
+# The IOS APP ID，
+FASTLANE_APPLE_ID="<FASTLANE_APPLE_ID>"
+
+#App Store Connect Team ID, Used for itc_team_id in Appfile.
+ITC_TEAM_ID="<ITC_TEAM_ID>"
+
+#Developer Portal Team ID, Used for team_id in Appfile.
+DEVELOPER_PORTAL_TEAM_ID="<DEVELOPER_PORTAL_TEAM_ID>"
+
+# Github token to access repository for certificates.
+GIT_AUTHORIZATION="<GIT_AUTHORIZATION>"
+```
+
+## 4 **fastlane/Matchfile**文件配置
+
+```bash title="fastlane/Matchfile"
+git_url("https://github.com/wuchuheng/certificates.git")
+
+storage_mode("git")
+
+type("development") # The default type, can be: appstore, adhoc, enterprise or development
+type("appstore") # The default type, can be: appstore, adhoc, enterprise or development
+```
+
+## 5 **fastlane/Appfile**文件配置
+```bash title="fastlane/Appfile"
+app_identifier(ENV["APP_IDENTIFIER"]) # The bundle identifier of your app
+apple_id(ENV["FASTLANE_APPLE_ID"]) # Your Apple Developer Portal username
+
+itc_team_id(ENV["ITC_TEAM_ID"]) # App Store Connect Team ID
+team_id(ENV["DEVELOPER_PORTAL_TEAM_ID"]) # Developer Portal Team ID
+```
+
+## 6 **fastlane/Fastfile**文件配置
+```bash title="fastlane/Fastfile"
+default_platform(:ios)
+
+api_key = app_store_connect_api_key(
+    key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"],
+    issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"],
+    key_content: ENV["APP_STORE_CONNECT_API_KEY_CONTENT"]
+)
+
+platform :ios do
+    desc "Download certificates from the git"
+    lane :syncCertificates do
+        match(
+            api_key: api_key,
+            type: "appstore",
+            git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION"]),
+            keychain_password: ENV["MATCH_PASSWORD"]
+         )
+        match(
+           api_key: api_key,
+           type: "development",
+           git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION"]),
+           keychain_password: ENV["MATCH_PASSWORD"]
+       )
+    end
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+   if ENV['CI']
+        create_keychain(
+            name: ENV["TEMP_KEYCHAIN_USER"],
+            password: ENV["MATCH_PASSWORD"],
+            default_keychain: true,
+            unlock: true,
+            timeout: 3600,
+            lock_when_sleeps: false
+        )
+
+        match(
+            keychain_name: ENV["TEMP_KEYCHAIN_USER"],
+            api_key: api_key,
+            type: "appstore",
+            git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION"]),
+            keychain_password: ENV["MATCH_PASSWORD"]
+         )
+    end
+    increment_build_number({ build_number: latest_testflight_build_number + 1 })
+    build_app( scheme: "wuchuheng", xcodebuild_formatter: "" )
+    upload_to_testflight(skip_waiting_for_build_processing: true)
+  end
+end
+
+```
+
+
+## 7 本地测试fastlane的发布流程能不能成功?
+```bash title="本地测试能不能发布"
+$ fastlane syncCertificates #从git同步证书下来
+
+[✔] 🚀 
+[15:01:18]: fastlane detected a Gemfile in the current directory
+...
+[15:01:31]: fastlane.tools finished successfully 🎉
+
+$ fastlane beta # 启动发布流程
+
+[✔] 🚀 
+[15:03:29]: fastlane detected a Gemfile in the current directory
+...
+[15:04:38]: fastlane.tools finished successfully 🎉
+
+```
+
+> 以上2步的都执行成功就说明的在本地的证书(certificates) 同步和发布这2个流程是没有问题的
+
+## 8 Github action 自动构建并发布
+
+### 8.1 配置Github action的环境变量
+由于`fastlane/.env`中记录的数据很私密，所以这个文件不能提交到**git**上， 所以我们需要的`fastlane/.env`的变量配置的`github acton`的**secrets**中， 
+让其有构建的过程中，参与进去。 配置方式就是把本地的`fastlane/.env`文件的配置加入到: repo(仓库) > Settings > Secrets > Actions > Repository secrets;
+
+<Img src='/images/WX20230110-151411.png' align="center"/>
+
+### 8.2 配置github action
+
+```bash title=".github/workflows/deployment_ios.yml"
+name: Appstore Deployment
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  deploy_ios:
+    name: Deploy build to TestFlight
+    runs-on: macOS-latest
+    steps:
+      - name: Checkout code from ref
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+      - name: Configure env
+        run: |
+          envFile="fastlane/.env";
+          touch $envFile;
+          cat >> $envFile  <<EOL
+          GIT_AUTHORIZATION="${{ secrets.GIT_AUTHORIZATION }}"
+          EOL
+          cat >> $envFile  <<EOL
+          APP_STORE_CONNECT_API_KEY_CONTENT="${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}"
+          EOL
+          cat >> $envFile  <<EOL
+          APP_STORE_CONNECT_API_ISSUER_ID="${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}"
+          EOL
+          cat >> $envFile  <<EOL
+          APP_STORE_CONNECT_API_KEY_ID="${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}"
+          EOL
+          cat >> $envFile  <<EOL
+          APP_IDENTIFIER="${{ secrets.APP_IDENTIFIER }}"
+          EOL
+          cat >> $envFile  <<EOL
+          MATCH_PASSWORD="${{ secrets.MATCH_PASSWORD }}"
+          EOL
+          cat >> $envFile  <<EOL
+          TEMP_KEYCHAIN_USER="${{ secrets.TEMP_KEYCHAIN_USER }}"
+          EOL
+          cat >> $envFile  <<EOL
+          FASTLANE_APPLE_ID="${{ secrets.FASTLANE_APPLE_ID }}"
+          EOL
+          cat >> $envFile  <<EOL
+          ITC_TEAM_ID="${{ secrets.ITC_TEAM_ID }}"
+          EOL
+          cat >> $envFile  <<EOL
+          DEVELOPER_PORTAL_TEAM_ID="${{ secrets.DEVELOPER_PORTAL_TEAM_ID }}"
+          EOL
+          cat >> $envFile  <<EOL
+          GIT_AUTHORIZATION="${{ secrets.GIT_AUTHORIZATION }}"
+          EOL
+          cat $envFile
+      - name: Sync Certificates.
+        uses: maierj/fastlane-action@v1.4.0
+        with:
+          lane: syncCertificates
+      - name: Deploy iOS Beta to TestFlight via Fastlane
+        uses: maierj/fastlane-action@v1.4.0
+        with:
+          lane: beta
+```
+> 这文件在意思是，当有新的版本提交时，就是触发这一构建流程。
+
+### 8.3 测试Github action的执行效果
+```bash
+$ git add -A
+$ git commit -m "version: 0.0.119"
+$ git tag v0.0.119
+$ git push origin master
+$ git push --tags
+```
+
+<Img src='/images/WX20230110-153018.png' align='center' />
+
+## 9 本次主要的代码变动
+
+<details>
+    <summary>.github/workflows/deployment_ios.yml</summary>
+
+```yaml title=".github/workflows/deployment_ios.yml"
+name: Appstore Deployment
+
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  deploy_ios:
+    name: Deploy build to TestFlight
+    runs-on: macOS-latest
+    steps:
+      - name: Checkout code from ref
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+      - name: Configure env
+        run: |
+          envFile="fastlane/.env";
+          touch $envFile;
+          cat >> $envFile  <<EOL
+          GIT_AUTHORIZATION="${{ secrets.GIT_AUTHORIZATION }}"
+          EOL
+          cat >> $envFile  <<EOL
+          APP_STORE_CONNECT_API_KEY_CONTENT="${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}"
+          EOL
+          cat >> $envFile  <<EOL
+          APP_STORE_CONNECT_API_ISSUER_ID="${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}"
+          EOL
+          cat >> $envFile  <<EOL
+          APP_STORE_CONNECT_API_KEY_ID="${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}"
+          EOL
+          cat >> $envFile  <<EOL
+          APP_IDENTIFIER="${{ secrets.APP_IDENTIFIER }}"
+          EOL
+          cat >> $envFile  <<EOL
+          MATCH_PASSWORD="${{ secrets.MATCH_PASSWORD }}"
+          EOL
+          cat >> $envFile  <<EOL
+          TEMP_KEYCHAIN_USER="${{ secrets.TEMP_KEYCHAIN_USER }}"
+          EOL
+          cat >> $envFile  <<EOL
+          FASTLANE_APPLE_ID="${{ secrets.FASTLANE_APPLE_ID }}"
+          EOL
+          cat >> $envFile  <<EOL
+          ITC_TEAM_ID="${{ secrets.ITC_TEAM_ID }}"
+          EOL
+          cat >> $envFile  <<EOL
+          DEVELOPER_PORTAL_TEAM_ID="${{ secrets.DEVELOPER_PORTAL_TEAM_ID }}"
+          EOL
+          cat >> $envFile  <<EOL
+          GIT_AUTHORIZATION="${{ secrets.GIT_AUTHORIZATION }}"
+          EOL
+          cat $envFile
+      - name: Sync Certificates.
+        uses: maierj/fastlane-action@v1.4.0
+        with:
+          lane: syncCertificates
+      - name: Deploy iOS Beta to TestFlight via Fastlane
+        uses: maierj/fastlane-action@v1.4.0
+        with:
+          lane: beta
+```
+</details>
+
+<details>
+    <summary>fastlane/.env.example</summary>
+
+```bash title="fastlane/.env.example"
 APP_STORE_CONNECT_API_KEY_CONTENT="-----BEGIN PRIVATE KEY-----
 ...
 -----END PRIVATE KEY-----"
-
 # Identifies the issuer who created the authentication token. https://appstoreconnect.apple.com/access/api
-APP_STORE_CONNECT_API_ISSUER_ID="..."
-
+APP_STORE_CONNECT_API_ISSUER_ID="<APP_STORE_CONNECT_API_ISSUER_ID>"
 # The key of app store connect api. https://appstoreconnect.apple.com/access/api
-APP_STORE_CONNECT_API_KEY_ID="..."
-```
+APP_STORE_CONNECT_API_KEY_ID="<APP_STORE_CONNECT_API_KEY_ID>"
 
-### 4.2 修改**fastlane/Fastfile**
+# APP IDENTIFIER, https://developer.apple.com/account/resources/identifiers/list
+APP_IDENTIFIER="<APP_IDENTIFIER>"
 
-```git title="fastlane/fastfile"
-diff --git a/fastlane/Fastfile b/fastlane/Fastfile
-index ab44af6..a9e5aab 100644
---- a/fastlane/Fastfile
-+++ b/fastlane/Fastfile
-@@ -15,11 +15,17 @@
- 
- default_platform(:ios)
- 
-+# Load the App Store Connect API token to use in other fastlane tools and actions. https://docs.fastlane.tools/actions/app_store_connect_api_key/
-+api_key = app_store_connect_api_key(
-+    key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"],
-+    issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"],
-+    key_content: ENV["APP_STORE_CONNECT_API_KEY_CONTENT"]
-+)
- 
- desc "Download certificates from the git"
- lane :syncCertificates do
--    match(type: "appstore")
--    match(type: "development")
-+    match(api_key: api_key, type: "appstore", readonly: true)
-+    match(api_key: api_key, type: "development", readonly: true)
- end
- 
- platform :ios do
-..
+# Fastlane match password
+MATCH_PASSWORD="<MATCH_PASSWORD>"
+
+# The name from keychain.
+TEMP_KEYCHAIN_USER="<TEMP_KEYCHAIN_USER>"
+
+# The IOS APP ID，
+FASTLANE_APPLE_ID="<FASTLANE_APPLE_ID>"
+
+#App Store Connect Team ID, Used for itc_team_id in Appfile.
+ITC_TEAM_ID="<ITC_TEAM_ID>"
+
+#Developer Portal Team ID, Used for team_id in Appfile.
+DEVELOPER_PORTAL_TEAM_ID="<DEVELOPER_PORTAL_TEAM_ID>"
+
+# Github token to access repository for certificates.
+GIT_AUTHORIZATION="<GIT_AUTHORIZATION>"
 
 ```
+</details>
 
-## 5 删除本地证书并执行**bata**流程看看行不行
+<details>
+    <summary>fastlane/Appfile</summary>
 
-### 5.1 如何删除本地证书?
+```git title="fastlane/Appfile"
 
-<Img src="https://qiniu.wuchuheng.com/images/WX20230107-134713.png" align="center" />
+diff --git a/fastlane/Appfile b/fastlane/Appfile
+index 203b64e..f454e10 100644
+--- a/fastlane/Appfile
++++ b/fastlane/Appfile
+@@ -1,8 +1,8 @@
+-app_identifier("com.wuchuheng") # The bundle identifier of your app
+-apple_id("root@wuchuheng.com") # Your Apple Developer Portal username
++app_identifier(ENV["APP_IDENTIFIER"]) # The bundle identifier of your app
++apple_id(ENV["FASTLANE_APPLE_ID"]) # Your Apple Developer Portal username
 
-### 5.1 执行**beta**流程
-```bash
-$ fastlane syncCertificates # 同步下证书
-$ fastlane beta # 执行流程
-[✔] 🚀 
-[13:29:08]: fastlane detected a Gemfile in the current directory
-[13:29:08]: However, it seems like you didn't use `bundle exec`
-[13:29:08]: To launch fastlane faster, please use
-[13:29:08]: 
-[13:29:08]: $ bundle exec fastlane beta
-[13:29:08]: 
-...
-[13:32:00]: fastlane.tools finished successfully 🎉
+-itc_team_id("125598569") # App Store Connect Team ID
+-team_id("5D6L6979M7") # Developer Portal Team ID
++itc_team_id(ENV["ITC_TEAM_ID"]) # App Store Connect Team ID
++team_id(ENV["DEVELOPER_PORTAL_TEAM_ID"]) # Developer Portal Team ID
+
+
+
 ```
-> 结果是成功的，也没有出现要2次验证的情况
+    
+</details>
 
-## 6 本次改动的代码
-```git title="本次修改的文件"
-diff --git a/.gitignore b/.gitignore
-index 55a0685..10ed8c5 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -1,2 +1,5 @@
- *.zip
- *.ipa
-+.idea
-+fastlane/.env
-+tmp
-diff --git a/fastlane/Fastfile b/fastlane/Fastfile
-index ab44af6..a9e5aab 100644
---- a/fastlane/Fastfile
-+++ b/fastlane/Fastfile
-@@ -15,11 +15,17 @@
- 
- default_platform(:ios)
- 
-+# Load the App Store Connect API token to use in other fastlane tools and actions. https://docs.fastlane.tools/actions/app_store_connect_api_key/
-+api_key = app_store_connect_api_key(
-+    key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"],
-+    issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"],
-+    key_content: ENV["APP_STORE_CONNECT_API_KEY_CONTENT"]
-+)
- 
- desc "Download certificates from the git"
- lane :syncCertificates do
--    match(type: "appstore")
--    match(type: "development")
-+    match(api_key: api_key, type: "appstore", readonly: true)
-+    match(api_key: api_key, type: "development", readonly: true)
- end
- 
- platform :ios do
+<details>
+    <summary>fastlane/Matchfile</summary>
+
+```git title="fastlane/Matchfile"
+
 diff --git a/fastlane/Matchfile b/fastlane/Matchfile
-index c454c5d..05986fc 100644
+index 05986fc..c8ccc09 100644
 --- a/fastlane/Matchfile
 +++ b/fastlane/Matchfile
-@@ -4,8 +4,8 @@ storage_mode("git")
- 
- type("development") # The default type, can be: appstore, adhoc, enterprise or development
- 
--# app_identifier(["tools.fastlane.app", "tools.fastlane.app2"])
--# username("user@fastlane.tools") # Your Apple Developer Portal username
-+app_identifier(["com.wuchuheng"])
-+username("root@wuchuheng.com") # Your Apple Developer Portal username
- 
- # For all available options run `fastlane match --help`
- # Remove the # in the beginning of the line to enable the other options
+@@ -1,11 +1,12 @@
+-git_url("git@github.com:wuchuheng/certificates.git")
++git_url("https://github.com/wuchuheng/certificates.git")
+
+storage_mode("git")
+
+type("development") # The default type, can be: appstore, adhoc, enterprise or development
++type("appstore") # The default type, can be: appstore, adhoc, enterprise or development
+
+-app_identifier(["com.wuchuheng"])
+-username("root@wuchuheng.com") # Your Apple Developer Portal username
++# app_identifier(["tools.fastlane.app", "tools.fastlane.app2"])
++# username("user@fastlane.tools") # Your Apple Developer Portal username
+
+# For all available options run `fastlane match --help`
+# Remove the # in the beginning of the line to enable the other options
+    
+    
+
 ```
+    
+</details>
 
-``` bash 
-$ git add -A   
-$ git status 
-On branch master
-Changes to be committed:
-  (use "git restore --staged <file>..." to unstage)
-        modified:   .gitignore
-        new file:   fastlane/.env.example
-        modified:   fastlane/Fastfile
-        modified:   fastlane/Matchfile
-        modified:   fastlane/report.xml
-        modified:   wuchuheng.xcodeproj/project.pbxproj
+<details>
+    <summary>fastlane/Fastfile</summary>
 
-$ git commit -m 'feat: configure app-store-connect-api'
-[master f6c0f8a] feat: configure app-store-connect-api
- 6 files changed, 40 insertions(+), 13 deletions(-)
- create mode 100644 fastlane/.env.example
+```rb title="fastlane/Fastfile"
+default_platform(:ios)
+
+api_key = app_store_connect_api_key(
+    key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"],
+    issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"],
+    key_content: ENV["APP_STORE_CONNECT_API_KEY_CONTENT"]
+)
+
+platform :ios do
+    desc "Download certificates from the git"
+    lane :syncCertificates do
+        match(
+            api_key: api_key,
+            type: "appstore",
+            git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION"]),
+            keychain_password: ENV["MATCH_PASSWORD"]
+         )
+        match(
+           api_key: api_key,
+           type: "development",
+           git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION"]),
+           keychain_password: ENV["MATCH_PASSWORD"]
+       )
+    end
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+   if ENV['CI']
+        create_keychain(
+            name: ENV["TEMP_KEYCHAIN_USER"],
+            password: ENV["MATCH_PASSWORD"],
+            default_keychain: true,
+            unlock: true,
+            timeout: 3600,
+            lock_when_sleeps: false
+        )
+
+        match(
+            keychain_name: ENV["TEMP_KEYCHAIN_USER"],
+            api_key: api_key,
+            type: "appstore",
+            git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION"]),
+            keychain_password: ENV["MATCH_PASSWORD"]
+         )
+    end
+    increment_build_number({ build_number: latest_testflight_build_number + 1 })
+    build_app( scheme: "wuchuheng", xcodebuild_formatter: "" )
+    upload_to_testflight(skip_waiting_for_build_processing: true)
+  end
+end
+    
 ```
+</details>
 
-## 7 总结
+## 10 总结
 
-本文的目标是解决之前在同步证书时遇到的2次验证所导致的不能全自动化实现流程。为此了解决这个问题，通过了**app store connect api**的对外
-接口来解决这个问题。
-&emsp; 那么解决这一问题后，将对后面的`CI/CD`的自动化起到了铺平道路的作用。 
+本文本主要说了2个步骤，一个是**fastlane**的本地流程， 一个是在**github action**上执行已经本地执行成功的**fastlane**流程。 其中想要相对比较复杂的
+**fastlane**的本地流程，想要执行成功需要做好4个方面的工作:   
+1. 环境变量的配置(fastlane/.env)
+2. 配置好 `fastlane/Appfile`
+3. 配置好 `fastlane/Fastfile`
+4. `fastlane/Matchfile`。
+而这其中每一方面的出错都会导致本地的流程失败。  
+&emmsp; 而本文的另一大步骤是**Github action**去执行**fastlane**流程。而想要确保成功需要确保2个小步骤准确： 一个是线上的`evn`配置，一个是本地的`.github/workflows/deployment_ios.yml`的配置。
+主要容易出错的就是这2个地方。 另外还有另一个在本地不会出错但在线上会出错的地方，那就是在线上构建时，需要在流程中加入创建`keychain`的流程。 代码如下: 
+```ruby {4-21} title="fastlane/Fastfile"
 
-## 8 源代码
+...
+lane :beta do
+   if ENV['CI']
+        create_keychain(
+            name: ENV["TEMP_KEYCHAIN_USER"],
+            password: ENV["MATCH_PASSWORD"],
+            default_keychain: true,
+            unlock: true,
+            timeout: 3600,
+            lock_when_sleeps: false
+        )
 
-[Source](https://github.com/wuchuheng/com.wuchuheng.ios.helloWorld)
+        match(
+            keychain_name: ENV["TEMP_KEYCHAIN_USER"],
+            api_key: api_key,
+            type: "appstore",
+            git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION"]),
+            keychain_password: ENV["MATCH_PASSWORD"]
+         )
+    end
+    increment_build_number({ build_number: latest_testflight_build_number + 1 })
+    build_app( scheme: "wuchuheng", xcodebuild_formatter: "" )
+    upload_to_testflight(skip_waiting_for_build_processing: true)
+  end
+...
 
-## 8 参考资料
+```
+这段代码是本地是不会执行的，但在线上构建时需要，如果没有这一段代码，那么不是选择构建流程一直卡住。从而无法执行构建成功。
 
-* [《fastlane.app_store_connect_api_key》](https://docs.fastlane.tools/actions/app_store_connect_api_key/)
 
+## 11 源代码
+
+[Source code](https://github.com/zhrr394RRRR4/com.wuchuheng.ios.helloWorld)
+
+## 12 参考资料
+* [Automate your workflow with the App Store Connect API](https://developer.apple.com/app-store-connect/api/)
 
