@@ -95,3 +95,15 @@ Changes not staged for commit:
 </details>
 
 
+## 2 Flutter在不使用Appbar时，状态栏如何保持不遮挡?
+
+使用`SafeArea`可规避状态栏被遮挡的问题. 
+
+```dart
+import 'package:flutter/material.dart';
+
+Scaffold(
+  body: SafeArea( child: Column( children: [] )),
+);
+
+```
