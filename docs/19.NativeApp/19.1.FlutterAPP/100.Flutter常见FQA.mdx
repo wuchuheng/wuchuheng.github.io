@@ -1,5 +1,5 @@
 ---
-title: 09 Flutter常见FQA
+title: 100 Flutter常见FQA
 date: 2023-01-11 14:17
 ---
 
@@ -107,3 +107,23 @@ Scaffold(
 );
 
 ```
+
+## 3 如何修改flutter的包名?
+### 3.1 如何在创建flutter时指定包名?
+
+
+``` dart title="如想要创建一个应用的包名: com.wuchuheng.app"
+$ flutter create --org com.wuchuheng.app appname
+```
+
+### 3.2 如何修改已有项目的包名?
+
+#### 3.2.1 修改android的包名
+
+```bash
+$ flutter pub add -d change_app_package_name
+$ flutter pub run change_app_package_name:main com.wuchuheng.app
+```
+## 2.2 如何修改IOS的包名
+In Xcode > select Runner > In general tab you can change the bundle Identifier.
+
