@@ -6,9 +6,9 @@
  * @Time        2022/11/15 13:42
  */
 
-import React, {useState} from "react";
+import React,{useState} from "react"; // This only needs to be imported once in your app
 import ImgLightbox  from 'react-image-lightbox';
-import 'react-image-lightbox/style.css'; // This only needs to be imported once in your app
+import 'react-image-lightbox/style.css';
 
 const Lightbox: React.FC<{alt?: string, url: string, width?: number}> = ({alt,url, width}) => {
     const [isVisit, setIsVisit] = useState<boolean>(false);

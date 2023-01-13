@@ -16,7 +16,8 @@
     // .toolsName 工具名
     lvl2: "article h3, .toolsName",
     // .toolsDesc 说明
-    lvl3: "article h4, .toolsDesc",
+    // #docusaurus_skipToContent_fallback > div > main > div > div > div > div > article > div.theme-doc-markdown.markdown > div > div > p 应用库说明
+    lvl3: "article h4, .toolsDesc, #docusaurus_skipToContent_fallback > div > main > div > div > div > div > article > div.theme-doc-markdown.markdown > div > div > p",
     // article > div.theme-doc-markdown.markdown > div > div > div > span 标签
     lvl4: "article h5, article > div.theme-doc-markdown.markdown > div > div > div > span",
     lvl5: "article h6",

@@ -52,6 +52,7 @@
     "react-spinners": "^0.11.0",
     "rxjs": "^7.5.1",
     "sass": "^1.43.4",
+    "styled-components": "^5.3.6",
     "subscriptions-transport-ws": "^0.11.0",
     "three": "0.133.1",
     "url-loader": "^4.1.1"
@@ -71,6 +72,7 @@
   "devDependencies": {
     "@docusaurus/module-type-aliases": "^2.0.0-beta.21",
     "@tsconfig/docusaurus": "^1.0.4",
+    "@types/react": "^18.0.26",
     "babel-loader": "^8.2.5",
     "prettier": "2.8.1",
     "sass-loader": "10.1.1",

@@ -6,30 +6,33 @@
  */
 
 import React from 'react';
+import LightBox from '../Lightbox/Lightbox'
 
 import styles from './styles.module.css'
 
 interface Props {
-    children: React.ReactNode;
     src: string;
     alt?: string;
-    align?: "center"
+    align?: "center";
+    size?: number;
 }
 
-function Img({src:url, alt, align}: Props): JSX.Element {
+function Img({src:url, alt, align, size}: Props): JSX.Element {
     const hasUrl = url.match('https?://[^\\.]+\\.[^\\.]+')
     const prefix = "//qiniu.wuchuheng.com"
     const props = {
         ...(alt ? {alt} : {}),
     }
-    const column = <img
-            src={hasUrl ? url : `${prefix}${url}`}
-            {...props} />;
+    const column = <LightBox
+        url={hasUrl ? url : `${prefix}${url}`}
+        alt={alt || ''}
+        {
+            ...(size != null ? {width: size} : {width: 30})
+        }
+    />
 
     const layoutRender = (
-        <div className={styles.layoutWrapper}>
-            {column}
-        </div>
+        <div className={styles.layoutWrapper}>{column}</div>
     );
 
     return align === 'center' ? layoutRender : column;

@@ -6,11 +6,25 @@ date: 2023-01-13 14:14
 ```mdx-code-block
 import Img from '@site/src/components/Img/index';
 import LightBox from '@site/src/components/Lightbox/Lightbox';
+import NativeApp19 from '@site/src/components/Syntax/codeAssample/Flutter/NativeApp19';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 
 ```
+## 1 flutter的自定义裁剪是如何实现的? 
+`flutter`会假想出一个**X**和**Y**轴的坐标网格。而这个坐标的起始点也就是**Y**和**X**轴都是**(x,y) = (0,0)**的起始点是在左上角位置，如图: 
+<Img src="/images/1673592010.jpg" align="center" />
+那么裁剪的时候就可以假想手上有一条2头相连的橡皮绳，而裁剪的方式便是从一个已经固定的坐标点拉伸橡皮绳到另一个坐标点并进行固定。比如我们要裁剪出一个
+梯形，那么我们就需要做到4步:
 
-## 1 flutter裁剪出梯形
-```dart
+### 1.1 先固定一个初始点,这时的画面上什么都没有代码如:
+
+<details>
+    
+    <summary>先设置起始的坐标点</summary>
+
+```dart {39}
 import 'package:flutter/material.dart';
 
 class DailyCaloriesTitleView extends StatelessWidget {
@@ -22,7 +36,6 @@ class DailyCaloriesTitleView extends StatelessWidget {
     return SizedBox(
       width: btnWidth,
       child: ClipPath(
-        //路径剪裁组件
         clipper: TrapezoidPath(),
         child: Container(
           width: btnWidth,
@@ -46,12 +59,11 @@ class DailyCaloriesTitleView extends StatelessWidget {
 class TrapezoidPath extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
+    double x = size.width;
+    double y = size.height;
     var path = Path();
-    path.moveTo(0, size.height); //x,y坐标
-    path.lineTo(25, 0);
-    path.lineTo(size.width - 25, 0);
-    path.lineTo(size.width, size.height);
-    path.close();
+    double skewing = 25;
+    path.moveTo(skewing, y); // step 1: 选择一个点
 
     return path;
   }
@@ -63,8 +75,118 @@ class TrapezoidPath extends CustomClipper<Path> {
 }
 
 ```
+    
+    
+</details>
+
+代码中的`moveTo`方法会移动初始点到(x-25, y),的位置上。大概如何下方图片所示:
+
+<Img src="/images/1673594186.jpg" align="center" />
+
+
+> 此时在视图中是什么东西没有显示，因为只有一个点而已。
+
+### 1.2 添加新的坐标点(0,0), 代码如下: 
+```dart {9}
+
+// ...
+Path getClip(Size size) {
+    double x = size.width;
+    double y = size.height;
+    var path = Path();
+    double skewing = 25;
+    path.moveTo(skewing, y); // step 1: 选择一个点
+    path.lineTo(0, 0); // step 2: 添添加第2个坐标点
+
+    return path;
+}
+
+```
+
+<Img src="/images/1673594653.jpg" />
+
+>  此时还是什么都没有显示，因为只有2个坐标，形成了一条线没有宽度和面积的线而已。
+
+### 1.3 添加新的坐标点(x,0), 代码如下:
+
+```dart {10}
+// ...
+@override
+Path getClip(Size size) {
+    double x = size.width;
+    double y = size.height;
+    var path = Path();
+    double skewing = 25;
+    path.moveTo(skewing, y); // step 1: 选择一个点
+    path.lineTo(0, 0); // step 2: 添加坐标(0, 0)
+    path.lineTo(x, 0); // step 3: 添加坐标(x, 0)
+
+    return path;
+}
+// ...
+
+```
+
+<Tabs>
+    <TabItem value="orange" label="坐标原理图" default>
+        <Img src="/images/1673595623.jpg" />
+    </TabItem>
+    <TabItem value="banana" label="flutter效果图">
+        <Img src="/images/WX20230113-154853.png" />
+    </TabItem>
+</Tabs>
+
+
+### 1.4 添置第4个坐标点,形成四边形
+
+> 示例代码:
+
+```dart {11-12}
+class TrapezoidPath extends CustomClipper<Path> {
+    @override
+    Path getClip(Size size) {
+        double x = size.width;
+        double y = size.height;
+        var path = Path();
+        double skewing = 25;
+        path.moveTo(skewing, y); // step 1: 选择一个点
+        path.lineTo(0, 0); // step 2: 添加坐标(0, 0)
+        path.lineTo(x, 0); // step 3: 添加坐标(x, 0)
+        path.lineTo(x - skewing, y); // step 4: 添置第4个坐标点，形成四边形
+        path.close();
+
+        return path;
+    }
+
+    @override
+    bool shouldReclip(CustomClipper<Path> oldClipper) {
+        return true;
+    }
+}
+    
+```
+
+> 最终由4个坐标点相连接，形成了一个4边四的梯形。    
+    
+
+<Tabs>
+    <TabItem value="orange" label="坐标原理图" default>
+        <Img src="/images/1673596792.jpg" />
+    </TabItem>
+    <TabItem value="banana" label="flutter效果图">
+        <Img src="/images/WX20230113-160159.png" />
+    </TabItem>
+</Tabs>
 
 <Imag src="https://qiniu.wuchuheng.com/images/WX20230113-141740.png"  />
+    
+    
+<details>
+    <summary> 最终完整示例代码</summary>
+
+<NativeApp19 />
+    
+</details>
 
 ## 参考资料
 
