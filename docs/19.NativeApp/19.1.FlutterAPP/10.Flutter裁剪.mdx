@@ -1,0 +1,71 @@
+---
+title: 10 Flutter自定义裁剪
+date: 2023-01-13 14:14
+---
+
+```mdx-code-block
+import Img from '@site/src/components/Img/index';
+import LightBox from '@site/src/components/Lightbox/Lightbox';
+
+```
+
+## 1 flutter裁剪出梯形
+```dart
+import 'package:flutter/material.dart';
+
+class DailyCaloriesTitleView extends StatelessWidget {
+  const DailyCaloriesTitleView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    double btnWidth = 200;
+    return SizedBox(
+      width: btnWidth,
+      child: ClipPath(
+        //路径剪裁组件
+        clipper: TrapezoidPath(),
+        child: Container(
+          width: btnWidth,
+          height: 77,
+          alignment: Alignment.center,
+          decoration: const BoxDecoration(color: Colors.red),
+          child: const Text(
+            'Clipper',
+            style: TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class TrapezoidPath extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    var path = Path();
+    path.moveTo(0, size.height); //x,y坐标
+    path.lineTo(25, 0);
+    path.lineTo(size.width - 25, 0);
+    path.lineTo(size.width, size.height);
+    path.close();
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) {
+    return true;
+  }
+}
+
+```
+
+<Imag src="https://qiniu.wuchuheng.com/images/WX20230113-141740.png"  />
+
+## 参考资料
+
+* [Flutter: Custom Clipper ](https://medium.com/flutter-community/flutter-custom-clipper-28c6d380fdd6#:~:text=To%20create%20a%20custom%20clipper,widget%20height%20and%20width%20values.)
