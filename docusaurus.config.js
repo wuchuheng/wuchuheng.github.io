@@ -71,7 +71,7 @@ const config = {
           label: 'Docs',
         },
         {to: '/blog', label: 'Blog', position: 'right'},
-        {to: '/docs/myLibaries', label: 'MyLibraries', position: 'right'},
+        {to: '/docs/myLiberies', label: 'MyLibraries', position: 'right'},
         {to: '/emailMarkdown', label: 'EmailMarkdown', position: 'right'},
         {to: '/tools', label: 'Tools', position: 'right'},
         {to: '/docs/收录优秀的开源库', label: 'libraries', position: 'right'},
