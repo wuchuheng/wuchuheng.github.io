@@ -58,3 +58,47 @@ class MainLayout extends StatelessWidget {
 
 <Img src="/image/WX20230111-152959.png" align="center" />
 
+## 2 Grid布局
+### 2.1 自定义长宽高布局
+```dart
+       Container(
+          height: 100,
+          margin: const EdgeInsets.only(left: sideMargin, right: sideMargin),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              const int crossAxisCount = 3;
+              List<Color> colors = [
+                Colors.red,
+                Colors.blue,
+                Colors.grey,
+                Colors.cyan,
+                Colors.yellow,
+                Colors.pink,
+              ];
+              double itemWidth = constraints.maxWidth / crossAxisCount;
+              double itemHeight =
+                  constraints.maxHeight / (colors.length / crossAxisCount);
+              return GridView.count(
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: crossAxisCount,
+                childAspectRatio: (itemWidth / itemHeight),
+                children: [
+                  for (int i = 0; i < colors.length; i++)
+                    Container(
+                      color: colors[i],
+                      child: Center(child: Text(i.toString())),
+                    ),
+                ],
+              );
+            },
+          ),
+        );
+```
+
+<Img src="/images/WX20230113-111704.png" align="center" />
+
+
