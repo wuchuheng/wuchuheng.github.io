@@ -1,0 +1,44 @@
+---
+title: 08 Flutter长宽约束布局中的作用
+date: 2023-01-10 21:17
+---
+
+```mdx-code-block
+import Img from '@site/src/components/Img/index';
+import LightBox from '@site/src/components/Lightbox/Lightbox';
+
+```
+
+## 1 什么是**Flutter**长宽约束?它有什么用？ 
+**Flutter**的界面基本上都是一个组件嵌套另一个组件的。而父级组件进行长宽约束能起到约束子级组件的作用。相当于父级为子级定义了长宽一个范围, 而子级
+只能在这个范围内进行设置。如以下的定义了一个组件，限定子级的长度在: **100-200**:
+
+```dart
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            minWidth: 100,
+            maxWidth: 200,
+          ),
+          child: LayoutBuilder(
+            builder: (BuildContext, BoxConstraints size) {
+              return Container(
+                color: Colors.red,
+                height: 20,
+                width: 0,
+                child: Text("width: ${size.maxWidth}"),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+```
+
+<Img src="https://qiniu.wuchuheng.com/images/WX20230113-111051.png" align="center" />
+
+也就是不管子组件再怎么设置，都只能在这个长度的范围。哪怕设置为长度为0，以下
+的子组件设置长度为0，
