@@ -187,6 +187,146 @@ class TrapezoidPath extends CustomClipper<Path> {
 <NativeApp19 />
     
 </details>
+    
+
+## 2 flutter弧度裁剪
+
+弧度裁剪是通过`arcTo`方法来实现的。如: 
+
+```dart
+/**
+ * @Rect rect 指定了坐标的开始位置和结束位置
+ * @double startAngle 开始的圆周率Pi的开始位置
+ * @double sweepAngle 结束的圆周率跨越角度
+ * @bool forceMoveTo 顺时钟方向或反之
+ */   
+void arcTo(Rect rect, double startAngle, double sweepAngle, bool forceMoveTo);
+    
+```    
+<Img src="/images/ED7DAA5D-1120-4895-BF0F-19866C56FDBD_4_5005_c.jpeg"   />
+    
+以上图片把一个圆来划分开始的角度位置。弧度会从 **startAngle**开始向**sweepAngle**这个角度延伸过去。
+
+裁剪的方式根据坐标的选择又分为以下4种:
+
+<Img src="/images/1_ZUTBDSxUQZPYxylT12ZUwQ.webp" />
+
+### 2.1 fromPoint方式裁剪方式
+
+```dart
+
+import 'dart:math';
+
+import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
+
+class DailyCaloriesTitleView extends StatelessWidget {
+  const DailyCaloriesTitleView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    Color primaryColor = Theme.of(context).primaryColor;
+    double btnWidth = 200;
+    return SizedBox(
+      width: btnWidth,
+      child: ClipPath(
+        clipper: TrapezoidPath(),
+        child: Container(
+          width: btnWidth,
+          height: 47,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                HexColor('#43E091'),
+                primaryColor,
+              ],
+            ),
+          ),
+          child: const Text(
+            'Clipper',
+            style: TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class TrapezoidPath extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    double radius = 5;
+    double offset = 20;
+
+    Path path = Path()
+      ..lineTo(size.width - radius, 0)
+      ..arcTo(
+        Rect.fromPoints(
+          Offset(size.width - radius, 0),
+          Offset(
+            size.width,
+            radius,
+          ),
+        ), // Rect
+        1.5 * pi, // Start engle
+        0.5 * pi, // Sweep engle
+        true,
+      ) // direction clockwise
+      ..lineTo(size.width - offset, size.height - radius)
+      ..arcTo(
+        Rect.fromPoints(
+          Offset(size.width - offset, size.height - radius),
+          Offset(size.width - offset - radius, size.height),
+        ),
+        .5,
+        0.5 * pi,
+        false,
+      )
+      ..lineTo(radius + offset, size.height)
+      ..arcTo(
+        Rect.fromPoints(
+          Offset(radius + offset, size.height),
+          Offset(offset, size.height - radius),
+        ),
+        0.5 * pi,
+        0.5 * pi,
+        false,
+      )
+      ..lineTo(0, radius)
+      ..arcTo(
+        Rect.fromPoints(
+          Offset(0, radius),
+          Offset(
+            radius,
+            0,
+          ),
+        ), // Rect
+        1 * pi,
+        0.5 * pi,
+        false,
+      )
+      ..close();
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) {
+    return true;
+  }
+}
+
+```    
+    
+<Img src="/images/WX20230113-233314.png" />
+    
 
 ## 参考资料
 
