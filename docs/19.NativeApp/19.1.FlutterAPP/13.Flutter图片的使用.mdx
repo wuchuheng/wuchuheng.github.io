@@ -1,0 +1,27 @@
+---
+title: 13 Flutter图片的使用
+date: 2023-01-15 00:39
+---
+
+```mdx-code-block
+import Img from '@site/src/components/Img/index';
+import LightBox from '@site/src/components/Lightbox/Lightbox';
+import NativeApp19 from '@site/src/components/Syntax/codeAssample/Flutter/NativeApp19';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+```
+
+## 1 flutter如何实现图片圆角?
+```dart
+ClipRRect(
+  borderRadius: BorderRadius.circular(10),
+  child: SizedBox.fromSize(
+    size: const Size(200, double.infinity),
+    child: Image.asset(goodsList[0].image, fit: BoxFit.cover),
+  ),
+),
+```
+
+<Img src="/images/WX20230115-004046.png" />
