@@ -127,3 +127,17 @@ $ flutter pub run change_app_package_name:main com.wuchuheng.app
 ## 2.2 如何修改IOS的包名
 In Xcode > select Runner > In general tab you can change the bundle Identifier.
 
+## 4 如何用flutter画个点? 
+
+```dart
+Container(
+  height: 10,
+  width: 10,
+  decoration: BoxDecoration(
+    color: Colors.red,
+    borderRadius: BorderRadius.all(Radius.circular(10)),
+  ),
+)
+
+```
+
