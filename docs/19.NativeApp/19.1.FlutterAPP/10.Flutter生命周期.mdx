@@ -1,0 +1,30 @@
+---
+title: 11 Flutter生命周期的使用
+date: 2023-01-12 19:38
+---
+
+```mdx-code-block
+import Img from '@site/src/components/Img/index';
+import LightBox from '@site/src/components/Lightbox/Lightbox';
+import NativeApp19 from '@site/src/components/Syntax/codeAssample/Flutter/NativeApp19';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+```
+
+## 1 什么是flutter的生命周期?
+
+在`flutter`中有2种组件：有状态组件和无状态组件。由于无状态组件的生命周期只有一个`build`方法，所以`flutter`中的生命周期常指有状态的组件的生命周期。
+而生命周期指的是`flutter`在使用组件时，在不同时期阶段去调用组件内的不同的方法，而这些方法就是生命周期了。
+
+## 2 **didUpdateWidget**
+在本地状态变化或父级组件参数变化，并本地的组件已渲染完成，就调用了这个方法.
+
+## 3 **initState***
+状态初始化方法。 在组件首次渲染前就会调用这个方法。通常用于初始化一个参数。
+
+## 4  **dispose**
+
+组件销毁时调用的方法。通常用于销毁一些内存的操作，防止溢出的问题。
+
