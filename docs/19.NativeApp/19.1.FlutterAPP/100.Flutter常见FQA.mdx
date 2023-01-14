@@ -174,3 +174,33 @@ Container(
 
 ```
 
+## 6 flutter如何设置透明度
+
+### 6.1 设置背景颜色整透明度
+
+
+```dart
+  child: Container(
+    decoration: BoxDecoration(
+      color: Colors.black.withOpacity(0.5), // 设置container的背景颜色透明度不涉及子组件
+      borderRadius:
+	  BorderRadius.all(Radius.circular(4)),
+    ),
+    child: Text(
+      '送半年VIP会员',
+      style: TextStyle(
+	  fontSize: 10, color: HexColor('#DB7450')),
+    ),
+  ),
+
+```
+
+### 6.2 设置子组件全体的透明度
+
+```dart
+Opacity(
+    opacity: 0.5, //from 0-1, 0.5 = 50% opacity
+    child: Container(),
+),
+
+```
