@@ -1,0 +1,115 @@
+---
+title: 12 Flutter的动画实现
+date: 2023-01-12 20:02
+---
+
+```mdx-code-block
+import Img from '@site/src/components/Img/index';
+import LightBox from '@site/src/components/Lightbox/Lightbox';
+import NativeApp19 from '@site/src/components/Syntax/codeAssample/Flutter/NativeApp19';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+```
+
+## 1 什么是flutter动画?原理是什么?
+动画的本质就是一个时间内快速播放不同的画面。而由于人的视网膜的对图像的感知能力是0.1s。也就是说在只要在1秒内快速播放10张以上的图像。那么人眼是无法
+感知到停顿的，也就是说，如何这些画像是连续的，那么由于播放的速度过快，对人眼来说，无法感知其中的卡顿，那看起来就是一组动画了。而`flutter`的动画也
+是这个原理。就是在单位的时间内不停渲染画面。从而实现动画的效果。
+
+## 2 flutter的动画是如何实现?
+前面说了，动画的原理就是在短时间内快速播放画面。而**flutter**的动画实现也是在单位时间内快速播放画面形成的。而在**flutter**的有个动画构建器(**AnimatedBuilder**)。
+它的作用就是，声明好的动画的播放时间、播放方式和控制器。然后通过这个动画控制器来控制动画的播放和倒放。然后**AnimatedBuilder**就会不停去重新渲染子组件。
+并传递一个不停变化的数值，而这个值就是每一幀的变量。然后子组件根据这个变量去进行画面的改动，从而在短时间内由于变量不一样，从而子组件就会绘制不会的
+画面，从而实现的动画的效果。代码如下: 
+
+```dart title="flutter线性动画示例代码"
+import 'package:flutter/material.dart';
+
+class AnimationDemo extends StatefulWidget {
+  const AnimationDemo({Key? key}) : super(key: key);
+
+  @override
+  State<AnimationDemo> createState() => _AnimationDemoState();
+}
+
+/// step 1: 使用 SingleTickerProviderStateMixin
+class _AnimationDemoState extends State<AnimationDemo>
+    with SingleTickerProviderStateMixin {
+  double height = 300;
+  late AnimationController controller;
+  late Animation animation;
+  final double animateEnd = 1;
+
+  @override
+  void initState() {
+    super.initState();
+
+    /// step: 2 声明动画的控制器，用于启动动画的播放
+    controller = AnimationController(
+      duration: const Duration(microseconds: 200000),
+      vsync: this,
+    );
+    animation = Tween<double>(
+      begin: 0,
+      end: animateEnd,
+    ).animate(
+      CurvedAnimation(
+        parent: controller,
+        curve: Curves.linear, // 线性播放
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    /// step 5: 组件销毁时，也要记得销毁动画
+    controller.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        AnimatedBuilder(
+          animation: animation,
+          builder: (BuildContext context, Widget? child) {
+            /// step: 3 设置子组件画面
+            return Container(
+              height: animation.value * height,
+              width: 50,
+              color: Colors.red,
+            );
+          },
+        ),
+
+        /// step 4: 启动播放
+        TextButton(
+          onPressed: () {
+            if (controller.value == 0) {
+              controller.forward(from: 0); // 正向播放
+            }
+            if (controller.value == 1) {
+              controller.animateBack(0); // 反向播放
+            }
+          },
+          child: Text('Play'),
+        ),
+      ],
+    );
+  }
+}
+
+```
+
+
+<Img src="/images/2023-01-14%2020-36-02.2023-01-14%2020_36_22.gif" />
+
+
+
+
+
+
