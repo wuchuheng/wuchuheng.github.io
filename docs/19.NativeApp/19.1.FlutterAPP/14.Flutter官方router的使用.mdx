@@ -1,0 +1,102 @@
+---
+title: 14 Flutter官方router的使用
+date: 2023-01-16 23:12
+---
+
+```mdx-code-block
+import Img from '@site/src/components/Img/index';
+import LightBox from '@site/src/components/Lightbox/Lightbox';
+import NativeApp19 from '@site/src/components/Syntax/codeAssample/Flutter/NativeApp19';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+```
+
+## 1 flutter路由的基本使用
+
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      title: 'Flutter Demo',
+      onGenerateRoute: onGenerateRoute,
+    );
+  }
+}
+
+const firstScreenRouteName = '/';
+const secondScreenRouteName = '/second';
+
+/// Configure route for app
+Route<dynamic> onGenerateRoute(RouteSettings settings) {
+  return MaterialPageRoute(
+    builder: (context) {
+      switch (settings.name!) {
+        case firstScreenRouteName:
+          return const FirstScreen();
+        case secondScreenRouteName:
+          return const SecondScreen();
+        default:
+          return const Scaffold(
+            body: Center(
+              child: Text("Not found page"),
+            ),
+          );
+      }
+    },
+  );
+}
+
+/// To create first screen.
+class FirstScreen extends StatelessWidget {
+  const FirstScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('FirstScreen')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () => Navigator.pushNamed(context, secondScreenRouteName),
+          child: const Text('Go to second screen'),
+        ),
+      ),
+    );
+  }
+}
+
+class SecondScreen extends StatelessWidget {
+  const SecondScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Second screen'),
+      ),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text('Back to First screen.'),
+        ),
+      ),
+    );
+  }
+}
+```
+
+## 2 如何添加路由鉴权?
+在`onGenerateRoute`中添加一些验证逻辑就在返回视图前实现路由的鉴权。
