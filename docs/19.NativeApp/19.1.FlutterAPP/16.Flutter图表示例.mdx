@@ -1,5 +1,5 @@
 ---
-title: 16 Dart的异常处理
+title: 17 Flutter图表示例
 date: 2023-01-17 20:54
 ---
 
@@ -12,25 +12,82 @@ import TabItem from '@theme/TabItem';
 
 ```
 
-## 1 定义dart的异常类
+```bash title="安装相关依赖"
+$ flutter pub add syncfusion_flutter_charts  
+$ flutter pub add intl
+```
 
-> 其实就是实现内置的`Exception`,就是自定义异常类了。
+## 1 flutter line图表示例
 
 ```dart
-class RoutingFormatErrorException implements Exception {
-  late String _message;
-  RoutingFormatErrorException(
-      [String message = 'Routing format error exception']) {
-    _message = message;
-  }
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
+
+class LineChartPage extends StatelessWidget {
+  const LineChartPage({Key? key}) : super(key: key);
 
   @override
-  String toString() {
-    return _message;
+  Widget build(BuildContext context) {
+    final List<ChartData> chartData = [
+      ChartData(DateTime(2015, 1), 6),
+      ChartData(DateTime(2016, 1), 11),
+      ChartData(DateTime(2017, 1), 9),
+      ChartData(DateTime(2018, 1), 14),
+      ChartData(DateTime(2019, 1), 10),
+    ];
+    return Scaffold(
+      body: Center(
+        child: Container(
+          child: SfCartesianChart(
+            title: ChartTitle(
+              text: '参考范围: 12~25',
+              alignment: ChartAlignment.near,
+              textStyle: TextStyle(
+                color: Colors.red,
+                fontSize: 20,
+              ),
+            ),
+            primaryXAxis: DateTimeAxis(
+                majorGridLines: MajorGridLines(width: 0),
+                dateFormat: DateFormat('MM/d')),
+            primaryYAxis: NumericAxis(
+              interval: 1,
+            ),
+            tooltipBehavior: TooltipBehavior(
+              enable: true,
+              format: 'point.y',
+            ),
+            series: <ChartSeries<ChartData, DateTime>>[
+              // Renders line chart
+              SplineSeries<ChartData, DateTime>(
+                name: "BMI",
+                dataSource: chartData,
+                xValueMapper: (ChartData data, _) => data.x,
+                yValueMapper: (ChartData data, _) => data.y,
+                enableTooltip: true,
+                pointColorMapper: (ChartData data, _) => Colors.red,
+                markerSettings: MarkerSettings(isVisible: true),
+                animationDuration: 2000,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
-
+class ChartData {
+  ChartData(this.x, this.y);
+  final DateTime x;
+  final double y;
+}
 
 ```
 
+![](https://qiniu.wuchuheng.com/image/WX20230120-110136%402x.png)
+
+## 示例代码 
+
+* [示例代码](https://github.com/wuchuhengtools/flutter_chart_example)
