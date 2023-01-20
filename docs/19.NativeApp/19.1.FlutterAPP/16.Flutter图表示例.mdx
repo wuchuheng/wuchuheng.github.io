@@ -1,0 +1,36 @@
+---
+title: 16 Dart的异常处理
+date: 2023-01-17 20:54
+---
+
+```mdx-code-block
+import Img from '@site/src/components/Img/index';
+import LightBox from '@site/src/components/Lightbox/Lightbox';
+import NativeApp19 from '@site/src/components/Syntax/codeAssample/Flutter/NativeApp19';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+```
+
+## 1 定义dart的异常类
+
+> 其实就是实现内置的`Exception`,就是自定义异常类了。
+
+```dart
+class RoutingFormatErrorException implements Exception {
+  late String _message;
+  RoutingFormatErrorException(
+      [String message = 'Routing format error exception']) {
+    _message = message;
+  }
+
+  @override
+  String toString() {
+    return _message;
+  }
+}
+
+
+
+```
+

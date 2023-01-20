@@ -79,7 +79,7 @@ export default function Home() {
   const { siteConfig } = useDocusaurusContext();
   return (
     <ApolloProvider client={client}>
-      <NotionFeature />
+      {/*<NotionFeature />*/}
       <Layout
         title={`Hello from ${siteConfig.title}`}
         description="Description will go into a meta tag in <head />"
