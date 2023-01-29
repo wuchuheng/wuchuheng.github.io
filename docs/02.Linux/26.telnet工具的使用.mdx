@@ -1,0 +1,41 @@
+---
+title: 26 telnet工具的使用
+date: 2023-01-29 16:57
+---
+## 1 什么是telnet?
+`telnet`是一个`tcp`连接工具，用于在2端进行文本的传输的通讯工具.
+
+
+## 2 安装telnet
+```bash 
+$ brew tap theeternalsw0rd/telnet # 安装telenet
+$ brew install telnet
+```
+
+
+## 3 基本使用
+
+```bash 
+$ telnet baidu.com 80 
+Trying 110.242.68.66...
+Connected to baidu.com.
+Escape character is '^]'.
+
+```
+
+## 4 如何退出? 
+
+```bash 
+ telnet baidu.com 80
+Trying 39.156.66.10...
+Connected to baidu.com.
+Escape character is '^]'.
+
+^] # <-- ctrl+] 进行下面的输入状态
+telnet> close # <-- 输入close并回车进行退出
+Connection closed.
+kkk:w
+B:w
+```
+
+
