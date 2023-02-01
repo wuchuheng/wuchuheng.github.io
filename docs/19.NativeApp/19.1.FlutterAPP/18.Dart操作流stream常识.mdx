@@ -275,6 +275,10 @@ import TabItem from '@theme/TabItem';
   });
 ```
 
+
+
+
+
 :::tip 提示
  虽然**takeWhile**和**where**的操作结果一样，但遍历的机制不一样，**takeWhile**是一遇到**false**就不再遍历后面的剩下的元素了，相当于懒加载.
 而**where**则是全量遍历。 官方说明如下: 
@@ -283,6 +287,121 @@ import TabItem from '@theme/TabItem';
 * [《where method》](https://api.dart.dev/stable/2.19.0/dart-core/Iterable/where.html)
 
 :::
+
+
+### 5.7 every-懒加载遍历检查
+```dart
+  test('every method in dart stream', () async {
+    // Step 1: 声明流
+    final StreamController<String> streamController = StreamController<String>();
+    streamController.add('e1');
+    streamController.add('e2');
+    streamController.add('e3');
+    // step 2: 遍历每一元素
+    final result = await streamController.stream.every((e) {
+      if (e == 'e2') {
+        return false; // step 2.1: 如果有 e2 则返回false,且中断遍历
+      }
+      return true;
+    });
+    print(result); // false
+  });
+```
+
+:::tip 提示
+如果检查元素并返回检查的结果，如果元素检查返回的是`false`则中断遍历，并返回结果。
+
+:::
+
+### 5.8 firstWhere-懒遍历首次查找匹配
+
+```dart
+  test('firstWhere method in dart stream', () async {
+    // Step 1: 声明流
+    final StreamController<String> streamController = StreamController<String>();
+    streamController.add('e1');
+    streamController.add('e2');
+    streamController.add('e3');
+    String el = await streamController.stream.firstWhere((element) {
+      return element == 'e2';
+    });
+    print(el); // e2
+  });
+```
+
+### 5.9 fold-重复迭代元素
+
+``` dart
+  test('fold method in dart stream', () async {
+    final Stream<String> stream = Stream.fromIterable(['e1', 'e2', 'e3']);
+    final String el = await stream.fold<String>('hello ', (previous, element) {
+      return previous + element;
+    });
+    print(el); // hello e1e2e3
+  });
+```
+
+### 5.10 lastWhere-查找最后的元素
+
+```dart
+  test('lastWhere method in dart stream', () async {
+    Stream<String> stream = Stream.fromIterable(['e1', 'e2', '3']);
+    final String result = await stream.lastWhere((el) {
+      if (el == 'e2') {
+        return true;
+      }
+      return false;
+    }, orElse: () => '');
+    print(result);
+  });
+```
+
+### 5.11 reduce-元素迭代
+
+```dart
+  test('reduce method in dart stream', () async {
+    final String result = await Stream.fromIterable(['e1', 'e2', '3']).reduce((previous, el) {
+      return previous + el;
+    });
+    print(result); // e1e2e3
+  });
+```
+
+### 5.12 singleWhere-找出单一元素
+```dart
+  test('singleWhere method in dart stream', () async {
+    final String result = await Stream.fromIterable(['e1', 'e1', 'e2', 'e2', 'e2', 'e3']).singleWhere((element) {
+      if (element == 'e3') {
+        return true;
+      }
+      return false;
+    }, orElse: () => '');
+    print(result); // e3
+  });
+```
+:::tip 提示
+
+**singleWhere**只能返回一次**true**
+
+:::
+
+### 5.13  toList-转换为列表
+
+```dart
+  test('toList method in dart stream', () async {
+    List<String> result = await Stream.fromIterable(['e1', 'e2', 'e3']).toList();
+    print(result); // ['e1', 'e2', 'e3']
+  });
+
+```
+
+### 5.14 toSet-转换为set
+```dart
+  test('toSet method in dart stream', () async {
+    Set<String> result = await Stream.fromIterable(['e1', 'e2', 'e3']).toSet();
+    print(result); // {e1, e2, e3}
+  });
+```
 
 ## 参考资料
 
