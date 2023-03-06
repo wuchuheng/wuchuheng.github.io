@@ -29,9 +29,9 @@ jobs:
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
           ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
       - run: mkdir -p ~/.ssh
-      - run: echo 'wuchuheng.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINA60zE+n49NGkrLL0CiyUYqidfvX9AQpYvMJRkktiDA' >> ~/.ssh/known_hosts
-      - run: echo 'wuchuheng.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDM27dExayA3jCVbi1ks4ZypPWO56qWyXhr8oDb4atKjyPVZssLAfnVTh6MJuVFOQc9swwGrLn2xmeEksgwB2FoqTBidntKhIDfaGO6GeZzQYXM/BbFrCmhhY9jcZBMKAWM9ZzADHzaowVZdqt0BeGCpI7ADqgysaGjeGM2edUmPFscLDNbopT0XBaASetmmePEHEsJ41E7o0hu0zdHMHcEHvdMitS377T712F/5AQOe91+/N4AjNFKIGaj3a2fRKMIo/WuB5WKWgL2blB/LR3ZJrFAGyn5tpGxDpwjLDgFnnC8w3fym4Yx6aP6G2EMfKMsJExHwOXIXSXuPfOJtR47' >> ~/.ssh/known_hosts
-      - run: echo 'wuchuheng.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBN9mwp4NkkJ3we3yTuiNzI3wiSqjpWgZpxfTSXH3EGGlV4DMjw4sANN2CFyHR2nRRJGAqL7MftbIPu+UnrsSA+A=' >> ~/.ssh/known_hosts
+      - run: echo '43.153.36.204 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFsRPdRZaT1gNZDjrt4XHov5c/1Raz4wduIo3dfjeEAt' >> ~/.ssh/known_hosts
+      - run: echo '43.153.36.204 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCwpU3KS710EYvqG6CYoYKQKBhZ6VOg2QxJSL7nlXgeMzS9SktspyT/EQ+HFRU5g9StbvCOpNUBgONclMlIoPlt7hDFtt09mNCGKUnnqa8W07K/1nmeojeHTX3z1Bb5W+Pj5gOsSupt/3zSGU5Ki7hk17fb3KADHf7Mw8EEQCdD1aTXeyb3Ov65rs0V4jJdJLwUZzpJwO1pBYJ03RJX+wXMsaMkZiaNmeBQ8Jvsmtc+nN+ymVf5tNJkUl0fGTz43GPM6+UL/4mLEJog2w3l8EdkhinkRI6ipqhgs5A30kUZUybh0DUAElANvqwWPrE2K6x9x5ZLKKP0e54CRx/2ahjUUDu0vQVSwCN1oftuXhvRM7iiLjxdOofJiyhB5Xe9IK8Vl5/FViZcbI41embQG3mcf3a1AbY9kdcATUnZ2K7gR7nX9gaKEGVL7XLCqwRHR3erIa/fp5cHi7bpWlw7+kymD0cm/6NODPBM3DNO7m8l8A8pty1QHcqBnsj7/iGLO7k=' >> ~/.ssh/known_hosts
+      - run: echo '43.153.36.204 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEO9ZXlRWOyxPpPB+CvhGxPpHEsdXUNM2BiOt2n3cvas44CE7aaHjkJZzcZ2/U9ql8EIY5kJEXky5pPCoJtM2m4=' >> ~/.ssh/known_hosts
       - name: Upload files to the online
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
