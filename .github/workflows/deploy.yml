@@ -40,7 +40,7 @@ jobs:
                 cd /www/wwwroot/wuchuheng.com
                 lcd build
                 put -r * ./
-
+            EOF
       - name: Install json5
         run: npm install -g json5
       - run: json5 ./config.json5
