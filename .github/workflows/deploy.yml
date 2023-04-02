@@ -37,7 +37,7 @@ jobs:
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-            sftp root@wuchuheng.com <<EOF
+            sftp root@ys.wuchuheng.com <<EOF
                 cd /root/myProjects/linux_server_tools/www/wwwroot/wuchuheng.com
                 lcd build
                 put -r * ./
