@@ -38,10 +38,24 @@ jobs:
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
+          remoteDir=/root/myProjects/linux_server_tools/www/wwwroot/wuchuheng.com
+          tar -zcvf build.tar.gz build
           sftp root@ys.wuchuheng.com <<EOF
-              cd /root/myProjects/linux_server_tools/www/wwwroot/wuchuheng.com
-              lcd build
-              put -r * ./
+            cd $remoteDir
+            put build.tar.gz
+            pwd
+            ls -ahl
+          EOF
+          ssh root@ys.wuchuheng.com <<EOF
+            cd $remoteDir
+            pwd
+            mv build.tar.gz ~/build.tar.gz
+            rm -rf ./*
+            mv ~/build.tar.gz ./
+            tar -zxvf build.tar.gz
+            mv build/* build/.* ./
+            rm -rf build
+            rm -rf build.tar.gz
           EOF
       - name: Install json5
         run: npm install -g json5
