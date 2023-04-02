@@ -12,6 +12,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      # 👇 Build steps
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - name: Install dependencies
+        run: npm install -g pnpm@7.2.1
+      - run: pnpm --version
+      - run: pnpm install
+      - name: Build
+        run: pnpm run build
       - name: deploy files
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
@@ -29,24 +40,9 @@ jobs:
         run: |
           sftp root@ys.wuchuheng.com <<EOF
               cd /root/myProjects/linux_server_tools/www/wwwroot/wuchuheng.com
-              cd build
+              lcd build
               put -r * ./
           EOF
-      # 👇 Build steps
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
-      - name: Install dependencies
-        run: npm install -g pnpm@7.2.1
-      - run: pnpm --version
-      - run: pnpm install
-      - name: Build
-        run: pnpm run build
-
-
-
-
       - name: Install json5
         run: npm install -g json5
       - run: json5 ./config.json5
