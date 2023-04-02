@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 localDir=build
-remoteDir=/www/wwwroot/wuchuheng.com
+remoteDir=/root/myProjects/linux_server_tools/www/wwwroot/wuchuheng.com
 pnpm build
 
-if [ $? !== 0 ]; then
+if [ $? !eq 0 ]; then
   RED='\033[0;31m'
   echo -e "❌ ❌ ❌ ${RED} React build failure."
     if command -v notificationTool-darwin-amd64 &> /dev/null
@@ -17,7 +17,7 @@ fi
 
 echo $?
 
-sftp root@wuchuheng.com <<EOF
+sftp root@ys.wuchuheng.com <<EOF
   cd $remoteDir
   lcd $localDir
   put -r * ./
