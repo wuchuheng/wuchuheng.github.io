@@ -17,11 +17,28 @@ fi
 
 echo $?
 
+tar -zcvf build.tar.gz build
+
 sftp root@ys.wuchuheng.com <<EOF
   cd $remoteDir
-  lcd $localDir
-  put -r * ./
+  put build.tar.gz
+  pwd
+  ls -ahl
 EOF
+
+ssh root@ys.wuchuheng.com <<EOF
+  cd $remoteDir
+  pwd
+  mv build.tar.gz ~/build.tar.gz
+  rm -rf ./*
+  mv ~/build.tar.gz ./
+  tar -zxvf build.tar.gz
+  mv build/* build/.* ./
+  rm -rf build
+  rm -rf build.tar.gz
+EOF
+
+rm build.tar.gz
 
 docker run -it --env-file=.env -e "CONFIG=$(json5 ./config.json5)" --name crawler algolia/docsearch-scraper
 
