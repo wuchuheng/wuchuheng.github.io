@@ -1,0 +1,82 @@
+---
+title: 27 为terminal的输出字符添加颜色
+date: 2023-07-22 22:22
+---
+
+```mdx-code-block
+import TerminalColorOutputDemo  from '@site/src/components/blog/demos/TerminalColorOutputDemo';
+```
+
+## 1 在terminal中输出颜色的字符格式是什么？
+&emsp;`terminal`客户端是一个**tui**的字符解析器。当程序以字符输出时，有些字符会用特定的字符格式标记为该字符在在`terminal`显示时，要解析成特定的颜色或格式，从而展示到用户面前。
+所以`terminal`的之所以能显示出字符的颜色或其它字符样式，其它原因在于对特定格式的解析，明白了这些格式原理和应用就能知道怎么在终端中输出字符格式了。  
+&emsp;字符的颜色格式从: **\e[风格代码;字符颜色代码;背景颜色代码m**开始到 **\e[0m**结束.  
+&emsp; 如输出, 一个粗体绿色字符和蓝色背景的字符，则是: 
+```bash
+$ echo -e "\e[0;92;104m Hello world \e[0m"
+Hello world 
+```
+
+效果如下: 
+
+```mdx-code-block
+
+<TerminalColorOutputDemo />
+
+```
+
+## 2 风格代码和颜色代码
+
+|Color|	Foreground Code |	Background Code |
+| --- | --- | --- |
+| Black	| 30	| 40 |
+| Red	| 31	| 41 |
+| Green	| 32	| 42 |
+| Yellow	| 33	| 43 |
+| Blue	| 34	| 44 |
+| Magenta	| 35	| 45 |
+| Cyan	| 36	| 46 |
+| Light Gray	| 37	| 47 |
+| Gray	| 90	| 100 |
+| Light Red	| 91	| 101 |
+| Light Green	| 92	| 102 |
+| Light Yellow	| 93	| 103 |
+| Light Blue	| 94	| 104 |
+| Light Magenta	| 95	| 105 |
+| Light Cyan	| 96	| 106 |
+| White	| 97	| 107 |
+
+To change the color of the text, what we want is the foreground code. There are also a few other non-color special codes that are relevant to us:
+
+| Code	| Description | 
+|--- | --- |
+| 0 | 	Reset/Normal| 
+| 1 |	Bold text|
+| 2 |	Faint text|
+| 3 |	Italics|
+| 4 |	Underlined text|
+
+## 3 简短写法
+风格代码 、 颜色代码和背景颜色代码各不一样且互不重复，所以在写的时候不用注重格式的顺序,只要代码对了就行。如还是上那个例子: 
+可这样写: 
+```bash 
+$ echo -e "\e[0;104;92m Hello world \e[0m" 
+$ echo -e "\e[104;0;92m Hello world \e[0m" 
+$ echo -e "\e[92;104;0m Hello world \e[0m" 
+```
+
+都是可以的
+
+## 4 参考资料
+
+1. [《Adding colors to Bash scripts 》](https://dev.to/ifenna__/adding-colors-to-bash-scripts-48g4)
+
+    
+
+
+
+
+
+
+
+
