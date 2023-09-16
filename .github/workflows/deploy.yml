@@ -23,49 +23,62 @@ jobs:
       - run: pnpm install
       - name: Build
         run: pnpm run build
-      - name: deploy files
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+      - name: deploy static sites
         run: |
-          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
-      - run: mkdir -p ~/.ssh
-      - run: echo '103.146.50.52 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGeJFUfxFmS3k016invioPuuSO/oXDVXsEZ3fMvDLiXu' >> ~/.ssh/known_hosts
-      - run: echo '103.146.50.52 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDMkRcEbgH3xig+RTUS40UJDg1J4xCN3KqWiX8Oww7Li9dGBob5EYbBzAY2BqtCkgnmQnTpbZBjwDVTh0slqgrpAWe+SrRPK8/S5s4gc/ReUZge9vjEtPkZDkRLNOzoqJ/340eRCVWPrJaNp5WG9XuC9cdrYH+GlMdvcM9JASev5nws16z/8qSVUZY8T6b16cnPW3IimGamu9yJ2TdkhtfXNJX6eWAcsGKjvlY4hn2Ek68mMTbKQiYkPA6cMINMI9CvCYjaBhV95xnQL+54TKPk14KM1XtVKTRtJR9sTYlQCixU32jgGg/5Js8Pjslijip3vjA4Hxld1zyM4wna6htp' >> ~/.ssh/known_hosts
-      - run: echo '103.146.50.52 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBGZJxbXogN4A879YwHnpGs4YCR5r1ZeDzd6sKDOk80yZHeGXfJR8DWmPs871lfoo/oQ/frdWZlw3anE+yN0QjXA=' >> ~/.ssh/known_hosts
-      - run: echo 'ys.wuchuheng.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGeJFUfxFmS3k016invioPuuSO/oXDVXsEZ3fMvDLiXu' >> ~/.ssh/known_hosts
-      - name: Upload files to the online
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: |
-          remoteDir=/root/myProjects/linux_server_tools/www/wwwroot/wuchuheng.com
-          tar -zcvf build.tar.gz build
-          sftp root@ys.wuchuheng.com <<EOF
-            cd $remoteDir
-            put build.tar.gz
-            pwd
-            ls -ahl
-          EOF
-          ssh root@ys.wuchuheng.com <<EOF
-            cd $remoteDir
-            pwd
-            mv build.tar.gz ~/build.tar.gz
-            rm -rf ./*
-            mv ~/build.tar.gz ./
-            tar -zxvf build.tar.gz
-            mv build/* build/.* ./
-            rm -rf build
-            rm -rf build.tar.gz
-          EOF
-      - name: Install json5
-        run: npm install -g json5
-      - run: json5 ./config.json5
-      - name: Get the content of algolia.json as config
-        id: algolia_config
-        run: echo "::set-output name=config::$(json5 ./config.json5 | jq -r tostring)"
-      - name: Push indices to Algolia
-        uses: signcl/docsearch-scraper-action@master
-        env:
-          APPLICATION_ID: ${{ secrets.ALGOLIA_APPLICATION_ID }}
-          API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
-          CONFIG: ${{ steps.algolia_config.outputs.config }}
+          # navigate into the build output directory
+          cd build
+          # create a fresh new git repo in the output directory
+          git init
+          git add -A
+          git commit -m 'deploy'
+          # Force push to the "publishing source" of your GitHub pages site
+          # in this case, the gh-pages branch
+          git push -f git@github.com:<wuchuheng>/<wuchuheng.github.io>.git main:gh-pages
+          # Back to previous directory (the root of your repo)
+
+#      - name: deploy files
+#        env:
+#          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+#        run: |
+#          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+#          ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
+#      - run: mkdir -p ~/.ssh
+#      - run: echo '103.146.50.52 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGeJFUfxFmS3k016invioPuuSO/oXDVXsEZ3fMvDLiXu' >> ~/.ssh/known_hosts
+#      - run: echo '103.146.50.52 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDMkRcEbgH3xig+RTUS40UJDg1J4xCN3KqWiX8Oww7Li9dGBob5EYbBzAY2BqtCkgnmQnTpbZBjwDVTh0slqgrpAWe+SrRPK8/S5s4gc/ReUZge9vjEtPkZDkRLNOzoqJ/340eRCVWPrJaNp5WG9XuC9cdrYH+GlMdvcM9JASev5nws16z/8qSVUZY8T6b16cnPW3IimGamu9yJ2TdkhtfXNJX6eWAcsGKjvlY4hn2Ek68mMTbKQiYkPA6cMINMI9CvCYjaBhV95xnQL+54TKPk14KM1XtVKTRtJR9sTYlQCixU32jgGg/5Js8Pjslijip3vjA4Hxld1zyM4wna6htp' >> ~/.ssh/known_hosts
+#      - run: echo '103.146.50.52 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBGZJxbXogN4A879YwHnpGs4YCR5r1ZeDzd6sKDOk80yZHeGXfJR8DWmPs871lfoo/oQ/frdWZlw3anE+yN0QjXA=' >> ~/.ssh/known_hosts
+#      - run: echo 'ys.wuchuheng.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGeJFUfxFmS3k016invioPuuSO/oXDVXsEZ3fMvDLiXu' >> ~/.ssh/known_hosts
+#      - name: Upload files to the online
+#        env:
+#          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+#        run: |
+#          remoteDir=/root/myProjects/linux_server_tools/www/wwwroot/wuchuheng.com
+#          tar -zcvf build.tar.gz build
+#          sftp root@ys.wuchuheng.com <<EOF
+#            cd $remoteDir
+#            put build.tar.gz
+#            pwd
+#            ls -ahl
+#          EOF
+#          ssh root@ys.wuchuheng.com <<EOF
+#            cd $remoteDir
+#            pwd
+#            mv build.tar.gz ~/build.tar.gz
+#            rm -rf ./*
+#            mv ~/build.tar.gz ./
+#            tar -zxvf build.tar.gz
+#            mv build/* build/.* ./
+#            rm -rf build
+#            rm -rf build.tar.gz
+#          EOF
+#      - name: Install json5
+#        run: npm install -g json5
+#      - run: json5 ./config.json5
+#      - name: Get the content of algolia.json as config
+#        id: algolia_config
+#        run: echo "::set-output name=config::$(json5 ./config.json5 | jq -r tostring)"
+#      - name: Push indices to Algolia
+#        uses: signcl/docsearch-scraper-action@master
+#        env:
+#          APPLICATION_ID: ${{ secrets.ALGOLIA_APPLICATION_ID }}
+#          API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
+#          CONFIG: ${{ steps.algolia_config.outputs.config }}
