@@ -32,8 +32,8 @@ jobs:
           cd build
           git config --global user.name 'wuchuheng'
           git config --global user.email 'root@wuchuheng.com'
-          git remote add origin git@github.com:wuchuheng/wuchuheng.github.io.git
           git init
+          git remote add origin git@github.com:wuchuheng/wuchuheng.github.io.git
           git checkout -b hg-pages
           git add -A
           git commit -am "Automated report"
