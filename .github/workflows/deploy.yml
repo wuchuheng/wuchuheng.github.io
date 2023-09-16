@@ -27,18 +27,13 @@ jobs:
         run: |
           # navigate into the build output directory
           cd build
-          # create a fresh new git repo in the output directory
-          git config --global user.email "root@wuchuheng.com"
-          git config --global user.name "wuchuheng"
-          git init
-          git add -A
-          git commit -m 'deploy'
-          # Force push to the "publishing source" of your GitHub pages site
-          git checkout -b gh-pages
-          # in this case, the gh-pages branch
-          git remote add origin git@github.com:wuchuheng/wuchuheng.github.io
-          git push -f origin gh-pages
-          # Back to previous directory (the root of your repo)
+      - name: Commit report
+        run: |
+          git config --global user.name 'wuchuheng'
+          git config --global user.email 'root@wuchuheng.com'
+          git checkout -b hg-pages
+          git commit -am "Automated report"
+          git push origin gh-pages
 
 #      - name: deploy files
 #        env:
