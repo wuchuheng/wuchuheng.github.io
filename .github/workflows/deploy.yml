@@ -31,6 +31,7 @@ jobs:
         run: |
           git config --global user.name 'wuchuheng'
           git config --global user.email 'root@wuchuheng.com'
+          git init
           git checkout -b hg-pages
           git add -A
           git commit -am "Automated report"
