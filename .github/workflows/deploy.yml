@@ -28,6 +28,8 @@ jobs:
           # navigate into the build output directory
           cd build
           # create a fresh new git repo in the output directory
+          git config --global user.email "root@wuchuheng.com"
+          git config --global user.name "wuchuheng"
           git init
           git add -A
           git commit -m 'deploy'
