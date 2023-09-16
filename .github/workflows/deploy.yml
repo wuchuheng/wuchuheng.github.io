@@ -24,6 +24,7 @@ jobs:
       - name: Build
         run: pnpm run build
       # to deploy to github pages
+
       - name: add ssh host to  known hosts
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
