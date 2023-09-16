@@ -25,10 +25,9 @@ jobs:
         run: pnpm run build
       - name: deploy static sites
         run: |
-          # navigate into the build output directory
-          cd build
       - name: Commit report
         run: |
+          pwd
           git config --global user.name 'wuchuheng'
           git config --global user.email 'root@wuchuheng.com'
           git init
