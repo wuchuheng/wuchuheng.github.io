@@ -33,7 +33,7 @@ jobs:
           git config --global user.email 'root@wuchuheng.com'
           git checkout -b hg-pages
           git commit -am "Automated report"
-          git push origin gh-pages
+          git push origin gh-pages -f
 
 #      - name: deploy files
 #        env:
