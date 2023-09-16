@@ -34,8 +34,10 @@ jobs:
           git add -A
           git commit -m 'deploy'
           # Force push to the "publishing source" of your GitHub pages site
+          git checkout -b gh-pages
           # in this case, the gh-pages branch
-          git push -f git@github.com:wuchuheng/wuchuheng.github.io gh-pages
+          git remote add origin git@github.com:wuchuheng/wuchuheng.github.io
+          git push -f origin gh-pages
           # Back to previous directory (the root of your repo)
 
 #      - name: deploy files
