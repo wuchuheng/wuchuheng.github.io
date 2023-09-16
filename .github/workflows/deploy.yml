@@ -11,9 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
+        with:
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          persist-credentials: true
         uses: actions/checkout@v3
-        ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
-        persist-credentials: true
       # 👇 Build steps
       - name: Set up Node.js
         uses: actions/setup-node@v3
