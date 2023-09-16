@@ -29,11 +29,10 @@ jobs:
           cd build
       - name: Commit report
         run: |
-          pwd
           cd build
-          pwd
           git config --global user.name 'wuchuheng'
           git config --global user.email 'root@wuchuheng.com'
+          git remote add origin git@github.com:wuchuheng/wuchuheng.github.io.git
           git init
           git checkout -b hg-pages
           git add -A
