@@ -27,13 +27,24 @@ jobs:
       - name: create sone test files.
         run: |
           mkdir out
-          touch out/file1
-          touch out/file2
-          touch out/file3
+          echo hello >  out/index.html
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
           path: ./out
+
+  # Deployment job
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
+
 
 # deploy to my server host
 #      - name: deploy files
