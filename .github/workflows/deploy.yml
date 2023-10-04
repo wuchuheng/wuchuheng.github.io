@@ -6,6 +6,12 @@ on:
     branches:
       - tmp
       - master
+# The permission config to deploying github pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
