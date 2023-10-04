@@ -28,7 +28,7 @@ const Library = ({desc, rep, cover, name, website, tags}: LibraryProps): React.R
         <div className={styles.itemRender}>
             <ImgRender desc={desc} rep={rep} cover={cover} />
             <ARender rep={rep} name={name} website={website} />
-            <p>{desc}</p>
+            <p className='lib--desc'>{desc}</p>
             <TagsRender tags={tags} />
             <StarRender desc={desc} rep={rep} />
         </div>
