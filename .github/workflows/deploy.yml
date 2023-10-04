@@ -12,42 +12,30 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      # 👇 Build steps
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
-      - name: Install dependencies
-        run: npm install -g pnpm@7.2.1
-      - run: pnpm --version
-      - run: pnpm install
-      - name: Build
-        run: pnpm run build
-      # to deploy to github pages
-      - name: add ssh host to  known hosts
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: |
-          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
-          mkdir -p ~/.ssh
-          echo 'github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl' >> ~/.ssh/known_hosts
-          echo 'github.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg=' >> ~/.ssh/known_hosts
-          echo 'github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk=' >> ~/.ssh/known_hosts
-      - name: Commit report
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: |
-          cd build
-          git config --global user.name 'wuchuheng'
-          git config --global user.email 'root@wuchuheng.com'
-          git init
-          git remote add origin git@github.com:wuchuheng/wuchuheng.github.io.git
-          git checkout -b hg-pages
-          git add -A
-          git commit -am "Automated report"
-          git push origin hg-pages -f
+#      # 👇 Build steps
+#      - name: Set up Node.js
+#        uses: actions/setup-node@v3
+#        with:
+#          node-version: 16.x
+#      - name: Install dependencies
+#        run: npm install -g pnpm@7.2.1
+#      - run: pnpm --version
+#      - run: pnpm install
+#      - name: Build
+#        run: pnpm run build
 
+      - name: create sone test files.
+        run: |
+          mkdir out
+          touch out/file1
+          touch out/file2
+          touch out/file3
+      - name: Upload artifact
+          uses: actions/upload-pages-artifact@v2
+          with:
+            path: ./out
+
+# deploy to my server host
 #      - name: deploy files
 #        env:
 #          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
@@ -82,15 +70,17 @@ jobs:
 #            rm -rf build
 #            rm -rf build.tar.gz
 #          EOF
-      - name: Install json5
-        run: npm install -g json5
-      - run: json5 ./config.json5
-      - name: Get the content of algolia.json as config
-        id: algolia_config
-        run: echo "::set-output name=config::$(json5 ./config.json5 | jq -r tostring)"
-      - name: Push indices to Algolia
-        uses: signcl/docsearch-scraper-action@master
-        env:
-          APPLICATION_ID: ${{ secrets.ALGOLIA_APPLICATION_ID }}
-          API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
-          CONFIG: ${{ steps.algolia_config.outputs.config }}
+
+## generate the index for algolia
+#      - name: Install json5
+#        run: npm install -g json5
+#      - run: json5 ./config.json5
+#      - name: Get the content of algolia.json as config
+#        id: algolia_config
+#        run: echo "::set-output name=config::$(json5 ./config.json5 | jq -r tostring)"
+#      - name: Push indices to Algolia
+#        uses: signcl/docsearch-scraper-action@master
+#        env:
+#          APPLICATION_ID: ${{ secrets.ALGOLIA_APPLICATION_ID }}
+#          API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
+#          CONFIG: ${{ steps.algolia_config.outputs.config }}
