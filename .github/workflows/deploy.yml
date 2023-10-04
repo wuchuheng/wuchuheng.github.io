@@ -28,12 +28,7 @@ jobs:
       - run: pnpm install
       - name: Build documents
         run: pnpm run build
-
-# Package all generated files
-  packageArtifact:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
+      # Package all generated files
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
@@ -45,7 +40,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: packageArtifact
+    needs: build
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
