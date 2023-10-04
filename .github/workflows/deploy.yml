@@ -31,9 +31,9 @@ jobs:
           touch out/file2
           touch out/file3
       - name: Upload artifact
-          uses: actions/upload-pages-artifact@v2
-          with:
-            path: ./out
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: ./out
 
 # deploy to my server host
 #      - name: deploy files
