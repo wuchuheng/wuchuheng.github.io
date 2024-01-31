@@ -77,8 +77,8 @@ const config = {
           { to: "/emailMarkdown", label: "EmailMarkdown", position: "right" },
           { to: "/tools", label: "Tools", position: "right" },
           {
-            to: "/docs/收录优秀的开源库",
-            label: "libraries",
+            to: "/docs/awsomeLibaries",
+            label: "Libraries",
             position: "right",
           },
           { to: "/todos", label: "Todos", position: "right" },
