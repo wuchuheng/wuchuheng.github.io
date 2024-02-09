@@ -18,8 +18,11 @@ import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { createClient } from "graphql-ws";
 import { getMainDefinition } from "@apollo/client/utilities";
 
-const url: string = "http://127.0.0.1:3000/graphql";
-const wsUrl: string ="ws://127.0.0.1:3000/graphql"
+// the the host from the current url by windows object in js
+// const host = window.location.host;
+const host = '127.0.0.1:3000/graphql'
+const url: string = `http://${host}`;
+const wsUrl: string =`ws://${host}`
 const httpLink = new HttpLink({
     uri: url,
 });
@@ -50,19 +53,21 @@ const client = new ApolloClient({
 const NotionFeature: React.FC = () => {
   const NOTION_SUBSCRIPTION = gql`
     subscription {
-      authors {
+      notification {
         id
-        name
+        title
+        body
       }
     }
   `;
-  const { data, loading } = useSubscription(NOTION_SUBSCRIPTION);
-  if (!loading) {
-      console.log(data)
-    // const { id, title, content } = data.newMessage;
-    const notification = new Notification("title", {
+  const { data, loading, error } = useSubscription(NOTION_SUBSCRIPTION);
+  if (!loading && !error) {
+    console.log(`loading: ${loading}`);
+    console.log(error);
+    const { title, body } = data.notification as {id: number, title: string, body: string}
+    const notification = new Notification(title, {
       icon: "https://wuchuheng.com/img/icons-96x96.png",
-      body: "hello: content",
+      body,
     });
     notification.onclick = function () {
       window.open("https://wuchuheng.com");
