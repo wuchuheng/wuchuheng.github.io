@@ -1,0 +1,77 @@
+---
+title: 03.Initiate a Python Project
+tags:
+- Python
+categories:
+- Python
+date: 2024-02-15 00:14
+---
+
+# Initiate a Python Project
+
+``` bash
+# 1 create a new directory for the project
+$ mkdir python-project
+$ cd python-project
+# 2 create a virtual environment
+$ python3 -m venv venv
+# 2.1 activate the virtual environment
+$ source venv/bin/activate
+# 3 create a requirements.txt file
+$ touch requirements.txt
+# 3.1 add the required package `attach`.
+$ pip install attach
+# 3.2 export the installed packages to the requirements.txt file.
+$ pip freeze > requirements.txt
+# 4 create a .gitignore file
+$ touch .gitignore
+# 4.1 add the virtual environment to the .gitignore file
+$ echo "venv" >> .gitignore
+# 5 create a source code file `src/main.py`
+$ mkdir src
+$ touch src/main.py
+
+```
+
+``` python title="src/main.py"
+#!/usr/bin/env python3
+
+if __name__ == '__main__':
+    print("Hello World!")
+    try:
+        while True:
+            pass
+    except KeyboardInterrupt:
+        print("Exiting...")
+```
+
+``` bash title="Run the source code"
+$ python3 src/main.py
+Hello World!
+```
+
+## 2 Create a README.md file
+
+1. Clone the project repository:
+```bash
+git clone https://github.com/wuchuheng/python-demo.git
+cd python-demo
+```
+2. Create and activate a virtual environment:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+3. Install project dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+4. Run the source code
+
+``` bash
+python3 src/main.py
+```
