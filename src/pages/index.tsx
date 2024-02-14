@@ -18,14 +18,14 @@ import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { createClient } from "graphql-ws";
 import { getMainDefinition } from "@apollo/client/utilities";
 
-const url: string = "https://wuchuheng.com/query";
+// the the host from the current url by windows object in js
+// const host = window.location.host;
+const host = '127.0.0.1:3000/graphql'
+const url: string = `http://${host}`;
+const wsUrl: string =`ws://${host}`
 const httpLink = new HttpLink({
-  uri: url,
+    uri: url,
 });
-const wsUrl =
-  url.substr(0, "https".length) === "https"
-    ? `wss${url.substr(5)}`
-    : `http${url.substr(0, 4)}`;
 
 const splitLink =
   typeof window !== "undefined"
@@ -53,19 +53,21 @@ const client = new ApolloClient({
 const NotionFeature: React.FC = () => {
   const NOTION_SUBSCRIPTION = gql`
     subscription {
-      newMessage {
+      notification {
         id
         title
-        content
+        body
       }
     }
   `;
-  const { data, loading } = useSubscription(NOTION_SUBSCRIPTION);
-  if (!loading) {
-    const { id, title, content } = data.newMessage;
+  const { data, loading, error } = useSubscription(NOTION_SUBSCRIPTION);
+  if (!loading && !error) {
+    console.log(`loading: ${loading}`);
+    console.log(error);
+    const { title, body } = data.notification as {id: number, title: string, body: string}
     const notification = new Notification(title, {
       icon: "https://wuchuheng.com/img/icons-96x96.png",
-      body: content,
+      body,
     });
     notification.onclick = function () {
       window.open("https://wuchuheng.com");
@@ -79,7 +81,7 @@ export default function Home() {
   const { siteConfig } = useDocusaurusContext();
   return (
     <ApolloProvider client={client}>
-      {/*<NotionFeature />*/}
+      <NotionFeature />
       <Layout
         title={`Hello from ${siteConfig.title}`}
         description="Description will go into a meta tag in <head />"
