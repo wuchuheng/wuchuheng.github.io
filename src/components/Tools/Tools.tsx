@@ -64,7 +64,5 @@ const LinksRender = ({links}: LinksRenderProps): React.ReactElement => {
     )
 }
 
+export {LinksRender}
 export default Tools;
-
-
-
