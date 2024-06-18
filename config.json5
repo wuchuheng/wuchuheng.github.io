@@ -12,7 +12,7 @@
   "selectors": {
     // The parent level name: .menu__link.menu__link--sublist.menu__link--sublist-caret.menu__link--active
     // The navigation bar name: .navbar__item.navbar__link.navbar__link--active
-    "lvl0": ".menu__link.menu__link--sublist.menu__link--sublist-caret.menu__link--active,navbar__item.navbar__link.navbar__link--active",
+    "lvl0": ".menu__link.menu__link--sublist.menu__link--sublist-caret.menu__link--active,.navbar__item.navbar__link.navbar__link--active",
 
     // The doc title: h1
     "lvl1": "h1",
@@ -29,8 +29,8 @@
     // The tag name from libary component: .lib-tag
     "lvl4": "h4,.lib-tag",
 
-    // The doc content: article > p
-    "content": "article p"
+    // The doc content: p
+    "content": "p"
   },
   "strip_chars": " .,;:#",
   "custom_settings": {
