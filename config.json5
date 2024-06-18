@@ -10,18 +10,28 @@
   ],
   "sitemap_urls": ["https://wuchuheng.com/sitemap.xml"],
   "selectors": {
-    // lvl0: "header h1",
-    // #__docusaurus > div.main-wrapper > main > div > div.col.col--2 > div > ul > li  a left side bar in tools page.
-    lvl1: "article h2, #__docusaurus > div.main-wrapper > main > div >  div.col > h2 ",
-    // .toolsName 工具名
-    lvl2: "article h3, .toolsName",
-    // .toolsDesc 说明
-    // #docusaurus_skipToContent_fallback > div > main > div > div > div > div > article > div.theme-doc-markdown.markdown > div > div > p 应用库说明
-    lvl3: "article h4, .toolsDesc,.lib--desc, #docusaurus_skipToContent_fallback > div > main > div > div > div > div > article > div.theme-doc-markdown.markdown > div > div > p",
-    // article > div.theme-doc-markdown.markdown > div > div > div > span 标签
-    lvl4: "article h5, article > div.theme-doc-markdown.markdown > div > div > div > span",
-    lvl5: "article h6",
-    content: "article li",
+    // The parent level name: .menu__link.menu__link--sublist.menu__link--sublist-caret.menu__link--active
+    // The navigation bar name: .navbar__item.navbar__link.navbar__link--active
+    "lvl0": ".menu__link.menu__link--sublist.menu__link--sublist-caret.menu__link--active,navbar__item.navbar__link.navbar__link--active",
+
+    // The doc title: .markdown h1
+    // The category name for tools page: h2.anchor
+    "lvl1": "header > h1,h2.anchor",
+
+    // The doc title: .markdown h2
+    // The tools name: .toolsName
+    "lvl2": "article h2,toolsName",
+
+    // The doc title: .markdown h3
+    // The tools description: .toolsDesc
+    "lvl3": "article h3,toolsDesc",
+
+    // The doc title: .markdown h4
+    // The tag name from libary component: .lib-tag
+    "lvl4": "article h4,.lib-tag",
+
+    // The doc content: article > p
+    "content": "article p"
   },
   "strip_chars": " .,;:#",
   "custom_settings": {
@@ -36,5 +46,5 @@
       "type"
     ]
   },
-  "nb_hits": 1110
+  "nb_hits": 10000
 }

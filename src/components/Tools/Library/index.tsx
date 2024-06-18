@@ -97,7 +97,7 @@ export const TagsRender = ({ tags }: TagsRenderProps): React.ReactElement => {
         return (
           <span
             style={{ color, background }}
-            className={styles.tag}
+            className={[styles.tag, 'lib-tag'].join(" ")}
             key={index}
           >
             {tag}
