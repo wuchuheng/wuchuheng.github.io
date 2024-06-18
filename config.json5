@@ -14,21 +14,20 @@
     // The navigation bar name: .navbar__item.navbar__link.navbar__link--active
     "lvl0": ".menu__link.menu__link--sublist.menu__link--sublist-caret.menu__link--active,navbar__item.navbar__link.navbar__link--active",
 
-    // The doc title: .markdown h1
-    // The category name for tools page: h2.anchor
-    "lvl1": "header > h1,h2.anchor",
+    // The doc title: h1
+    "lvl1": "h1",
 
-    // The doc title: .markdown h2
+    // The doc title: h2
     // The tools name: .toolsName
-    "lvl2": "article h2,toolsName",
+    "lvl2": "h2,toolsName",
 
-    // The doc title: .markdown h3
+    // The doc title: h3
     // The tools description: .toolsDesc
-    "lvl3": "article h3,toolsDesc",
+    "lvl3": "h3,toolsDesc",
 
-    // The doc title: .markdown h4
+    // The doc title: h4
     // The tag name from libary component: .lib-tag
-    "lvl4": "article h4,.lib-tag",
+    "lvl4": "h4,.lib-tag",
 
     // The doc content: article > p
     "content": "article p"
