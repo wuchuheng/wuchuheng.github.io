@@ -10,7 +10,7 @@
   ],
   "sitemap_urls": ["https://wuchuheng.com/sitemap.xml"],
   "selectors": {
-    lvl0: "header h1",
+    // lvl0: "header h1",
     // #__docusaurus > div.main-wrapper > main > div > div.col.col--2 > div > ul > li  a left side bar in tools page.
     lvl1: "article h2, #__docusaurus > div.main-wrapper > main > div >  div.col > h2 ",
     // .toolsName 工具名
