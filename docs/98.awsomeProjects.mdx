@@ -11,9 +11,10 @@ tags:
 import Tools from '@site/src/components/Tools/Tools';
 import Grid from '@site/src/components/Tools/Grid';
 import Library from '@site/src/components/Tools/Library';
+import CodesanboxRender from '@site/src/components/CodesanboxRender';
 ```
 
-## 1 网站类
+## 1 websites
 <Grid>
 
 <Library
@@ -36,7 +37,7 @@ tags={[ 'Web', 'Office']}
 
 </Grid>
 
-## 2 邮件服务器
+## 2 Email Server.
 
 <Grid>
 
@@ -48,9 +49,21 @@ tags={[ 'Web', 'Office']}
     website='https://james.apache.org/index.html'
 />
 
+<Library
+    rep='https://github.com/mailu/mailu'
+    desc='Mailu is a simple yet full-featured mail server as a set of Docker images.'
+    tags={[ 'mailu', 'email', '邮件', 'docker email']}
+/>
+
+<Library
+    rep='https://github.com/axllent/mailpit'
+    desc='SMTP server for testing email sending in development'
+    tags={[ 'email', '邮件', 'email debug tools']}
+/>
+
 </Grid>
 
-## 3 收集优秀项目的项目
+## 3 awesome projects.
 
 <Grid>
 
@@ -69,7 +82,7 @@ tags={[ 'Web', 'Office']}
 </Grid>
 
 
-## 4 搜索引擎
+## 4 Document Search Engine.
 <Grid>
 
 <Library
@@ -80,7 +93,7 @@ tags={[ 'Web', 'Office']}
 
 </Grid>
 
-## 5 k8s和容器项目
+## 5 Kubernetes and Docker.
 
 <Grid>
 
@@ -92,14 +105,20 @@ tags={[ 'Web', 'Office']}
 
 <Library
     rep='https://github.com/kubesphere/kubesphere'
-    desc='kubesphere 很让人着迷的项目'
+    desc='‌‌‌‌‌‌‌Kubesphere is a fascinating project.'
     tags={[ 'docker', 'k8s']}
+/>
+
+<Library
+    rep='https://github.com/play-with-docker/play-with-docker'
+    desc='Play With Docker gives you the experience of having a free Alpine Linux Virtual Machine in the cloud where you can build and run Docker containers and even create clusters with Docker features like Swarm Mode.\nUnder the hood DIND or Docker-in-Docker is used to give the effect of multiple VMs/PCs.'
+    tags={[ 'docker' ]}
 />
 
 
 </Grid>
 
-## 6 编辑器
+## 6 Editors
 <Grid>
 
 <Library
@@ -116,7 +135,7 @@ tags={[ 'Web', 'Office']}
 
 </Grid>
 
-## 7 开源教程
+## 7 Open Source University.
 
 <Grid>
 
@@ -138,25 +157,15 @@ tags={[ 'Web', 'Office']}
     tags={[ 'University', 'OSSU']}
 />
 
-</Grid>
-
-## 8 email项目
-<Grid>
-
 <Library
-    rep='https://github.com/mailu/mailu'
-    desc='Mailu is a simple yet full-featured mail server as a set of Docker images.'
-    tags={[ 'mailu', 'email', '邮件', 'docker email']}
-/>
-<Library
-    rep='https://github.com/axllent/mailpit'
-    desc='SMTP server for testing email sending in development'
-    tags={[ 'email', '邮件', 'email debug tools']}
+    rep='https://github.com/worldzhao/react-ui-library-tutorial'
+    desc='一个react库的教程, 获益良多'
+    tags={[ 'react文档', 'react组件库']}
 />
 
 </Grid>
 
-## 9 diagram 项目
+## 8 Diagram Tools.
 
 <Grid>
 
@@ -168,18 +177,25 @@ tags={[ 'Web', 'Office']}
 
 </Grid>
 
-## 10 代理转发
+## 9 Proxy tools.
+
 <Grid>
 
 <Library
     rep='https://github.com/ehang-io/nps'
-    desc='一款轻量级、高性能、功能强大的内网穿透代理服务器'
+    desc='NPS is a tool to access nps server through http proxy'
     tags={[ 'nps', '代理转发']}
+/>
+
+<Library
+    rep='https://github.com/vaxilu/x-ui/'
+    desc='可以看成是v2ray的ui化布署工具，相对于命令行方式的v2ray，更友好'
+    tags={['proxy', 'vemess', 'v2ray']}
 />
 
 </Grid>
 
-## 11 CI/CD
+## 10 CI/CD
 
 <Grid>
 
@@ -192,19 +208,19 @@ tags={[ 'Web', 'Office']}
 
 </Grid>
 
-## 11 电子书
+## 11 Ebooks.
 
 <Grid>
 
 <Library
     rep='https://github.com/cdhigh/KindleEar'
-    desc='把内容从rss转换成mobi并发布到kindle的程序，有时间我再搞下'
+    desc='Translate rss/atom feed into mobi/epub for kindle'
     tags={[ 'ebook', 'kindle']}
 />
 
 </Grid>
 
-## 12 监测软件
+## 12 Monitor.
 
 <Grid>
 
@@ -222,31 +238,19 @@ tags={[ 'Web', 'Office']}
 
 </Grid>
 
-## 13 文档
+## 13 Developer Document.
 
 <Grid>
 
 <Library
     rep='https://github.com/umijs/dumi'
     desc='一个专为react组件库提供文档和示例的文档，解决react组件库的文档功能和开发调试功能'
-    tags={[ 'react文档', 'react组件库']}
+    tags={[ 'Document for react', 'react组件库']}
 />
 
 </Grid>
 
-## 14 教程
-
-<Grid>
-
-<Library
-    rep='https://github.com/worldzhao/react-ui-library-tutorial'
-    desc='一个react库的教程, 获益良多'
-    tags={[ 'react文档', 'react组件库']}
-/>
-
-</Grid>
-
-## 15 AI
+## 14 AI projects.
 
 <Grid>
 
@@ -275,7 +279,7 @@ tags={[ 'Web', 'Office']}
 
 </Grid>
 
-## 16 Engine
+## 15 JS Engine
 
 <Grid>
 
@@ -287,7 +291,7 @@ tags={[ 'Web', 'Office']}
 
 </Grid>
 
-## 17 webAssembly
+## 16 webAssembly
 
 <Grid>
 
@@ -299,7 +303,7 @@ tags={[ 'Web', 'Office']}
 
 </Grid>
 
-## 18 nodejs binary compiler
+## 17 nodejs binary compiler
 
 <Grid>
 
@@ -317,7 +321,7 @@ tags={[ 'Web', 'Office']}
     
 </Grid>
 
-## 19 梯子
+## 18 梯子
 
 <Grid>
 
@@ -329,7 +333,7 @@ tags={[ 'Web', 'Office']}
 
 </Grid>
 
-## 20 网站设计规范
+## 19 ‌Website Design Standards.
 
 <Grid>
 
@@ -341,7 +345,7 @@ tags={[ 'Web', 'Office']}
 
 </Grid>
 
-## 21 对象存储
+## 21 Object Storage.
 
 <Grid>
 
@@ -365,19 +369,7 @@ tags={[ 'Web', 'Office']}
 
 </Grid>
 
-## 23 代理项目
-
-<Grid>
-
-<Library
-    rep='https://github.com/vaxilu/x-ui/'
-    desc='可以看成是v2ray的ui化布署工具，相对于命令行方式的v2ray，更友好'
-    tags={['proxy', 'vemess', 'v2ray']}
-/>
-
-</Grid>
-
-## 24 UML
+## 23 UML
 <Grid>
 
 <Library
@@ -388,18 +380,18 @@ tags={[ 'Web', 'Office']}
 
 </Grid>
 
-## 25 docker tools 
+## 24 docker tools 
 <Grid>
 
 <Library
     rep='https://github.com/wagoodman/dive'
-    desc='A tool for exploring each layer in a docker image'
+    desc='A tool for exploring each layer in a Docker image and discovering ways to shrink its size. In other words, Dive can help you explore which files or folders will be included in the Docker image.'
     tags={['docker', 'docker tools']}
 />
 
 </Grid>
 
-## 26 certificates
+## 25 Certificates.
 
 <Grid>
     <Library
@@ -409,7 +401,7 @@ tags={[ 'Web', 'Office']}
     />
 </Grid>
 
-## 27 Citadel 
+## 26 Citadel 
 
 <Grid>
     <Library
@@ -420,7 +412,7 @@ tags={[ 'Web', 'Office']}
 </Grid>
 
 
-## 28 Grammar
+## 27 Grammar.
 
 
 <Grid>
@@ -431,7 +423,7 @@ tags={[ 'Web', 'Office']}
     />
 </Grid>
 
-## 29 Algorithm
+## 28 Algorithm
 
 
 <Grid>
@@ -443,7 +435,7 @@ tags={[ 'Web', 'Office']}
 </Grid>
 
 
-## 30 RX
+## 29 Rx - Reactive Programming.
 
 <Grid>
     <Library
@@ -453,4 +445,4 @@ tags={[ 'Web', 'Office']}
     />
 </Grid>
 
-
+<CodesanboxRender url="https://rxviz.com/" />

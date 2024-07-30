@@ -21,7 +21,6 @@ yarn-error.log*
 
 .idea/
 .env
-.vscode
 
 .pnpm-debug.log
 .local-history
