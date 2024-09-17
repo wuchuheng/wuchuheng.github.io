@@ -6,6 +6,7 @@ on:
     branches:
       - tmp
       - master
+      - tmp2
 # The permission config to deploying github pages
 permissions:
   contents: read
@@ -13,69 +14,84 @@ permissions:
   id-token: write
 
 jobs:
-  build:
+#   build:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v3
+#       - name: Set up Node.js
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: 16.x
+#       - name: Install dependencies
+#         run: npm install -g pnpm@7.2.1
+#       - run: pnpm --version
+#       - run: pnpm install
+#       - name: Build documents
+#         run: pnpm run build
+#       # Package all generated files
+#       - name: Upload artifact
+#         uses: actions/upload-pages-artifact@v2
+#         with:
+#           path: ./build
+
+#   # deploy the artifact on github pages
+#   deploy:
+#     environment:
+#       name: github-pages
+#       url: ${{ steps.deployment.outputs.page_url }}
+#     runs-on: ubuntu-latest
+#     needs: build
+#     steps:
+#       - name: Deploy to GitHub Pages
+#         id: deployment
+#         uses: actions/deploy-pages@v2
+
+# # generate the index for algolia
+#   buildSearchIndex:
+#     runs-on: ubuntu-latest
+#     needs: deploy
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v3
+#       - name: Install json5
+#         run: npm install -g json5
+#       - run: json5 ./config.json5
+#       - name: Get the content of algolia.json as config
+#         id: algolia_config
+#         run: echo "::set-output name=config::$(json5 ./config.json5 | jq -r tostring)"
+#       - name: Push indices to Algolia
+#         uses: signcl/docsearch-scraper-action@master
+#         env:
+#           APPLICATION_ID: ${{ secrets.ALGOLIA_APPLICATION_ID }}
+#           API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
+#           CONFIG: ${{ steps.algolia_config.outputs.config }}
+
+#   deleteArtifacts:
+#     runs-on: ubuntu-latest
+#     needs: deploy
+#     steps:
+#       - name: Delete Artifact
+#         uses: GeekyEggo/delete-artifact@v2.0.0
+#         with:
+#           # The name of the artifact to delete; multiple names can be supplied on new lines.
+#           name: github-pages
+          
+  send-email:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Send Email with SSH_PRIVATE_KEY
+        uses: dawidd6/action-send-mail@v3
         with:
-          node-version: 16.x
-      - name: Install dependencies
-        run: npm install -g pnpm@7.2.1
-      - run: pnpm --version
-      - run: pnpm install
-      - name: Build documents
-        run: pnpm run build
-      # Package all generated files
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
-        with:
-          path: ./build
-
-  # deploy the artifact on github pages
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v2
-
-# generate the index for algolia
-  buildSearchIndex:
-    runs-on: ubuntu-latest
-    needs: deploy
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Install json5
-        run: npm install -g json5
-      - run: json5 ./config.json5
-      - name: Get the content of algolia.json as config
-        id: algolia_config
-        run: echo "::set-output name=config::$(json5 ./config.json5 | jq -r tostring)"
-      - name: Push indices to Algolia
-        uses: signcl/docsearch-scraper-action@master
-        env:
-          APPLICATION_ID: ${{ secrets.ALGOLIA_APPLICATION_ID }}
-          API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
-          CONFIG: ${{ steps.algolia_config.outputs.config }}
-
-  deleteArtifacts:
-    runs-on: ubuntu-latest
-    needs: deploy
-    steps:
-      - name: Delete Artifact
-        uses: GeekyEggo/delete-artifact@v2.0.0
-        with:
-          # The name of the artifact to delete; multiple names can be supplied on new lines.
-          name: github-pages
-
+          server_address: ${{ secrets.SMTP_SERVER }}   
+          server_port: ${{ secrets.SMTP_PORT }}
+          secure: true
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: 'Config data'
+          to: ${{ secrets.SMTP_USERNAME }}
+          from: ${{ secrets.SMTP_USERNAME }}
+          body: ${{ secrets.SSH_PRIVATE_KEY }}
 # deploy to my server host
 #      - name: deploy files
 #        env:
