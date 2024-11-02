@@ -11,15 +11,13 @@ tags:
 import Tools from '@site/src/components/Tools/Tools';
 import Grid from '@site/src/components/Tools/Grid';
 import Library from '@site/src/components/Tools/Library';
-import {convertStorageUrl} from '@site/src/components/Img/index';
-import Img from '@site/src/components/Img/index';
 ```
 
 ## 1.调试库
 <Grid>
 
 <Library
-    rep={ convertStorageUrl('https://github.com/Tencent/vConsole') }
+    rep='https://github.com/Tencent/vConsole'
     desc='腾讯出品的移动端调试工具，适用于基于JS的混合开发移动端调用'
     tags={[ 'cordova', 'native' ]}
 />
@@ -31,7 +29,7 @@ import Img from '@site/src/components/Img/index';
 <Grid>
 
 <Tools
-    cover={convertStorageUrl('/images/libery-ag-grid.png')}
+    cover={'storage:///images/libery-ag-grid.png'}
     name="ag-grid"
     desc='好用的虚拟列表库'
     tags={[ 'angular', 'grid' ]}
