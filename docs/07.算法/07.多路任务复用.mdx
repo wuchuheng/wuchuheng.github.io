@@ -2,16 +2,22 @@
 title: 07.多路任务复用的算法实现
 date: 2022-08-3 23:52
 ---
+
+```mdx-code-block
+import {convertStorageUrl} from '@site/src/components/Img/index';
+import Img from '@site/src/components/Img/index';
+```
+
 ## 1 什么是"多路任务复用"?
 在多次调用同一个任务时，且这个任务耗时较长。这样一来每调用一次任务就要生成一个任务，然后等待。这样就会形成多个任务在执行。且要从头开始等待任务的返回结果。
 这样一来不仅会有大量重任务被创建，且也不能节省时间。
 
-![](https://qiniu.wuchuheng.com/images/tmp.png)
+<Img src='storage:///images/tmp.png' />
 
 既然多将创建任务的都是同一个任务，那么为什么不复用同一个任务呢？可以只创建一个任务，而然后任务都给阻塞住，等有任务返回结果后，再把结果返回给阻塞的
 调用。这样就可以节省资源的开销和等待的时间。
 
-![](https://qiniu.wuchuheng.com/images/WX20220804-002147.png)
+<Img src='storage:///images/WX20220804-002147.png' />
 
 ## 2 代码实现
 

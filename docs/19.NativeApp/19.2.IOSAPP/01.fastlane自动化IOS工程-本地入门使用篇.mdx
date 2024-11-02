@@ -3,6 +3,11 @@ title: 01 fastlane自动化IOS工程(一)-本地入门使用篇
 date: 2023-01-03 09:25
 ---
 
+```mdx-code-block
+import {convertStorageUrl} from '@site/src/components/Img/index';
+import Img from '@site/src/components/Img/index';
+```
+
 ## 1 软件工程为什么要自动化流程?
 > 为什么IOS软件工程要引入自动化流程?  
 
@@ -36,12 +41,12 @@ date: 2023-01-03 09:25
 <details>
     <summary>在开发者平台上创建应用标识</summary>
 > 创建项目的标识: [Identifiers](https://developer.apple.com/account/resources/identifiers/list)
-<img src='https://qiniu.wuchuheng.com/WX20230103-164852%402x.png' />
-<img src='https://qiniu.wuchuheng.com/WX20230103-165058%402x.png' />
-<img src='https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-03%20at%2016.55.50.png' />
-<img src='https://qiniu.wuchuheng.com/images/WX20230103-165827%402x.png' />
-<img src='https://qiniu.wuchuheng.com/images/WX20230103-170130%402x.png' />
-<img src='https://qiniu.wuchuheng.com/images/WX20230103-170130%402x.png' />
+<Img src='storage:///WX20230103-164852%402x.png' />
+<Img src='storage:///WX20230103-165058%402x.png' />
+<Img src='storage:///images/Screen%20Shot%202023-01-03%20at%2016.55.50.png' />
+<Img src='storage:///images/WX20230103-165827%402x.png' />
+<Img src='storage:///images/WX20230103-170130%402x.png' />
+<Img src='storage:///images/WX20230103-170130%402x.png' />
     
 </details>
 
@@ -49,8 +54,8 @@ date: 2023-01-03 09:25
 
 <details>
     <summary>开发者平台创建新应用"wuchuheng"</summary>
-    <img src="https://qiniu.wuchuheng.com/images/WX20230103-214143.png" />
-    <img src="https://qiniu.wuchuheng.com/images/WX20230103-214503.png" />
+    <Img src="storage:///images/WX20230103-214143.png" />
+    <Img src="storage:///images/WX20230103-214503.png" />
 </details>
 
 
@@ -58,9 +63,9 @@ date: 2023-01-03 09:25
 
 <details>
     <summary>本地创建新项目"wuchuheng"</summary>
-    <img src="https://qiniu.wuchuheng.com/images/WX20230103-104553%402x.png" />
-    <img src="https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-04%20at%2009.26.02.png" />
-    <img src="https://qiniu.wuchuheng.com/images/WX20230103-105256%402x.png" />
+    <Img src="storage:///images/WX20230103-104553%402x.png" />
+    <Img src="storage:///images/Screen%20Shot%202023-01-04%20at%2009.26.02.png" />
+    <Img src="storage:///images/WX20230103-105256%402x.png" />
     
 </details>
 
@@ -93,20 +98,20 @@ IOS的开发和发布证书是基于非对称密钥原理，由IOS开发平台�
 私钥和公钥，然后把自己公钥写进CSR中，送给苹果去签名，这一来，有了证书就说明了自己的公钥被认可了，而公钥被认可了，那就说明了自己的私钥也被认可了。所以
 原理就这么个原理。而在`macOS`中有`keychain`能在生成CSR文件前就会自己生成对应的公钥和私钥并保存在本地了。 
     
-<img src='https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-03%20at%2016.30.30.png' />
-<img src='https://qiniu.wuchuheng.com/images/WX20230103-163556%402x.png' />
-<img src='https://qiniu.wuchuheng.com/images/WX20230103-163755%402x.png' />
+<Img src='storage:///images/Screen%20Shot%202023-01-03%20at%2016.30.30.png' />
+<Img src='storage:///images/WX20230103-163556%402x.png' />
+<Img src='storage:///images/WX20230103-163755%402x.png' />
 </details>
 
 <details>
 <summary>Step 2: 在苹果开发者平台上申请开发证书</summary>
     需要到 <a href='https://developer.apple.com/account/resources/certificates/list'>这里</a>去提交我们的CSR文件，让苹果开发者平台为我们的公钥进行签发。 
     
-<img src="https://qiniu.wuchuheng.com/images/WX20230103-215009.png" />
-<img src="https://qiniu.wuchuheng.com/images/WX20230103-215123.png" />
+<Img src="storage:///images/WX20230103-215009.png" />
+<Img src="storage:///images/WX20230103-215123.png" />
 并上传我们的CRS文件
-<img src="https://qiniu.wuchuheng.com/images/WX20230103-215411.png" />
-<img src="https://qiniu.wuchuheng.com/images/WX20230103-215632.png" />
+<Img src="storage:///images/WX20230103-215411.png" />
+<Img src="storage:///images/WX20230103-215632.png" />
     
 </details>
 
@@ -126,12 +131,12 @@ IOS的开发和发布证书是基于非对称密钥原理，由IOS开发平台�
 创建profile需要到[这里profiles](https://developer.apple.com/account/resources/profiles/list)进行创建并下载，然后安装到xcode(双击或直接用xcode打开)
 开发用的profile文件在本地开发时，起到了说明证书(certificates)和本地应用(identifiers)之间的匹配关系。从而才能使用本地私钥对应用进行开发和调试。
 
-    <img src='https://qiniu.wuchuheng.com/images/WX20230103-220814.png' />
-    <img src='https://qiniu.wuchuheng.com/images/WX20230103-220951.png' />
-    <img src='https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-03%20at%2022.11.09.png' />
-    <img src='https://qiniu.wuchuheng.com/images/WX20230103-221309.png' />
-    <img src='https://qiniu.wuchuheng.com/images/WX20230103-221445.png' />
-    <img src='https://qiniu.wuchuheng.com/images/WX20230103-221553.png' />
+    <Img src='storage:///images/WX20230103-220814.png' />
+    <Img src='storage:///images/WX20230103-220951.png' />
+    <Img src='storage:///images/Screen%20Shot%202023-01-03%20at%2022.11.09.png' />
+    <Img src='storage:///images/WX20230103-221309.png' />
+    <Img src='storage:///images/WX20230103-221445.png' />
+    <Img src='storage:///images/WX20230103-221553.png' />
 </details>
 
 > Step 2: 在苹果开发者平台上创建发布用的profile
@@ -141,7 +146,7 @@ IOS的开发和发布证书是基于非对称密钥原理，由IOS开发平台�
 <details>
     <summary>step 3: 打开本地项目，并为项目指定profile</summary>
 
-    <ima src="https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-04%20at%2009.11.02.png" />
+    <Img src="storage:///images/Screen%20Shot%202023-01-04%20at%2009.11.02.png" />
 </details>
 
 ### 2.5 安装fastlane
@@ -510,51 +515,51 @@ d9881d30e75263faf8b4f467be3a8bfdcdddfd70
 <details>
     <summary>step 1: 在xcode项目中选择任何设备 </summary>
 
-<img src="https://qiniu.wuchuheng.com/images/WX20230105-080308%402x.png" />
+<Img src="storage:///images/WX20230105-080308%402x.png" />
 </details>
 
     
 <details>
     <summary>step 2: 在xcode项目中选择product > archive </summary>
     
-    <img src="https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-05%20at%2008.06.22.png" />
+    <Img src="storage:///images/Screen%20Shot%202023-01-05%20at%2008.06.22.png" />
 </details>
     
 <details>
     <summary>step 3: 在xcode项目中选择发布</summary>
     
-    <img src="https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-05%20at%2008.08.09.png" />
+    <Img src="storage:///images/Screen%20Shot%202023-01-05%20at%2008.08.09.png" />
 </details>
         
 <details>
     <summary>step 4: 在xcode项目中选择下一步</summary>
     
-    <img src="https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-05%20at%2008.09.18.png" />
+    <Img src="storage:///images/Screen%20Shot%202023-01-05%20at%2008.09.18.png" />
 </details>
         
        
 <details>
     <summary>step 5: 在xcode项目中选择上传</summary>
     
-    <img src="https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-05%20at%2008.10.13.png" />
+    <Img src="storage:///images/Screen%20Shot%202023-01-05%20at%2008.10.13.png" />
 </details>
 
 <details>
     <summary>step 6: 在xcode项目中选择上次下载回来用于发布使用的profile</summary>
     
     注意: 是发布用的`profile`文件，而不是开发用的。申请流程跟申请开发用的`profile`一样的，只不过在申请时选择的类型为`App Store`。
-    <img src="https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-05%20at%2008.12.03.png" />
+    <Img src="storage:///images/Screen%20Shot%202023-01-05%20at%2008.12.03.png" />
 </details>
 
 <details>
 <summary>step 7: 在xcode项目中选择确定上传</summary>
 
-<img src="https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-05%20at%2008.15.12.png" />
+<Img src="storage:///images/Screen%20Shot%202023-01-05%20at%2008.15.12.png" />
 </details>
 
 <details> 
 <summary>step 8: 上传失败了，报错了</summary>
-<img src="https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-05%20at%2008.21.02.png" />
+<Img src="storage:///images/Screen%20Shot%202023-01-05%20at%2008.21.02.png" />
 </details>
 
 ```bash title="报错内容如下:"
@@ -569,17 +574,17 @@ Missing Info.plist value. A value for the Info.plist key 'CFBundleIconName' is m
 
 <details>
 <summary>step 9: 添加应用图标</summary>
-<img src="https://qiniu.wuchuheng.com/images/WX20230105-094116%402x.png" />
+<Img src="storage:///images/WX20230105-094116%402x.png" />
 </details>
 
 <details>
 <summary>step 10: 然后再把上面的步骤再来一次, 重新上传应用</summary>
-<img src="https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-05%20at%2009.53.32.png" />
+<Img src="storage:///images/Screen%20Shot%202023-01-05%20at%2009.53.32.png" />
 </details>
     
 好到了这一步，就说明了手动在xcode进行应用打包和上传已经没有问题了。在`testFlight`也已经能看看我们上传的应用了。
 
-![](https://qiniu.wuchuheng.com/images/Screen%20Shot%202023-01-05%20at%2009.56.17.png)
+<Img src='storage:///images/Screen%20Shot%202023-01-05%20at%2009.56.17.png' />
 
 <details>
 <summary>step 11: 然后再试试fastlane的beta流程能不能跑通</summary>
@@ -1507,7 +1512,7 @@ Current version of project wuchuheng is:
 </details>
 
 
-![](https://qiniu.wuchuheng.com/images/WX20230106-061958%402x.png)
+<Img src='storage:///images/WX20230106-061958%402x.png' />
 
     
 ## 5 总结

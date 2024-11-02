@@ -9,12 +9,12 @@ import LightBox from '@site/src/components/Lightbox/Lightbox';
 import NativeApp19 from '@site/src/components/Syntax/codeAssample/Flutter/NativeApp19';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-
-
+import {convertStorageUrl} from '@site/src/components/Img/index';
 ```
+
 ## 1 flutter的自定义裁剪是如何实现的? 
 `flutter`会假想出一个**X**和**Y**轴的坐标网格。而这个坐标的起始点也就是**Y**和**X**轴都是**(x,y) = (0,0)**的起始点是在左上角位置，如图: 
-<Img src="/images/1673592010.jpg" align="center" />
+<Img src="storage:///images/1673592010.jpg" align="center" />
 那么裁剪的时候就可以假想手上有一条2头相连的橡皮绳，而裁剪的方式便是从一个已经固定的坐标点拉伸橡皮绳到另一个坐标点并进行固定。比如我们要裁剪出一个
 梯形，那么我们就需要做到4步:
 
@@ -81,7 +81,7 @@ class TrapezoidPath extends CustomClipper<Path> {
 
 代码中的`moveTo`方法会移动初始点到(x-25, y),的位置上。大概如何下方图片所示:
 
-<Img src="/images/1673594186.jpg" align="center" />
+<Img src="storage:///images/1673594186.jpg" align="center" />
 
 
 > 此时在视图中是什么东西没有显示，因为只有一个点而已。
@@ -103,7 +103,7 @@ Path getClip(Size size) {
 
 ```
 
-<Img src="/images/1673594653.jpg" />
+<Img src="storage:///images/1673594653.jpg" />
 
 >  此时还是什么都没有显示，因为只有2个坐标，形成了一条线没有宽度和面积的线而已。
 
@@ -129,10 +129,10 @@ Path getClip(Size size) {
 
 <Tabs>
     <TabItem value="orange" label="坐标原理图" default>
-        <Img src="/images/1673595623.jpg" />
+        <Img src="storage:///images/1673595623.jpg" />
     </TabItem>
     <TabItem value="banana" label="flutter效果图">
-        <Img src="/images/WX20230113-154853.png" />
+        <Img src="storage:///images/WX20230113-154853.png" />
     </TabItem>
 </Tabs>
 
@@ -171,14 +171,14 @@ class TrapezoidPath extends CustomClipper<Path> {
 
 <Tabs>
     <TabItem value="orange" label="坐标原理图" default>
-        <Img src="/images/1673596792.jpg" />
+        <Img src="storage:///images/1673596792.jpg" />
     </TabItem>
     <TabItem value="banana" label="flutter效果图">
-        <Img src="/images/WX20230113-160159.png" />
+        <Img src="storage:///images/WX20230113-160159.png" />
     </TabItem>
 </Tabs>
 
-<Imag src="https://qiniu.wuchuheng.com/images/WX20230113-141740.png"  />
+<Img src="storage:///images/WX20230113-141740.png" />
     
     
 <details>
@@ -205,13 +205,13 @@ void arcTo(Rect rect, double startAngle, double sweepAngle, bool forceMoveTo);
 ```    
 > 效果如下:
 
-<Img src="/images/ED7DAA5D-1120-4895-BF0F-19866C56FDBD_4_5005_c.jpeg"   />
+<Img src="storage:///images/ED7DAA5D-1120-4895-BF0F-19866C56FDBD_4_5005_c.jpeg"   />
     
 以上图片把一个圆来划分开始的角度位置。弧度会从 **startAngle**开始向**sweepAngle**这个角度延伸过去。
 
 裁剪的方式根据坐标的选择又分为以下4种:
 
-<Img src="/images/1_ZUTBDSxUQZPYxylT12ZUwQ.webp" />
+<Img src="storage:///images/1_ZUTBDSxUQZPYxylT12ZUwQ.webp" />
 
 ### 2.1 fromPoint方式裁剪方式
 
@@ -327,7 +327,7 @@ class TrapezoidPath extends CustomClipper<Path> {
 
 ```    
     
-<Img src="/images/WX20230113-233314.png" />
+<Img src="storage:///images/WX20230113-233314.png" />
     
 
 ## 参考资料

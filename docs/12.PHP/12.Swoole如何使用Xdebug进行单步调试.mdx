@@ -7,8 +7,14 @@ categories:
 - PHP
 date: 2021-03-09 22:08:00
 ---
+
+```mdx-code-block
+import Img from '@site/src/components/Img';
+import {convertStorageUrl} from '@site/src/components/Img/index';
+```
+
 <div content="center">
-    <img src="https://qiniu.wuchuheng.com/image/20210310142633.png" />
+    <Img src='storage:///image/20210310142633.png'/>
 </div>
 
 &emsp;在 PHP-FPM 中使用 Xdebug 的人应该不少，而在 Swoole 中使用 Xdebug 的人还是很少的，原因是 Swoole 扩展明确说明了和 Xdebug 扩展冲突
@@ -71,15 +77,17 @@ xdebug.idekey="xdebug"
 一个配置难倒英雄汉，很多人在使用 Sdebug 的时候就会遇到需要这样问题，不起作用，就吐槽不好用，实际上是你的姿势不对，配置项没加或者加错了
 需要配合 PhpStorm 的话，还需要设置一下 PhpStorm 的配置
 Preferences | Languages & Frameworks | PHP | Debug
-![](https://qiniu.wuchuheng.com/image/3859333845-309fcb0dbefaab9f_article732)
+
+
+<Img src='storage:///image/3859333845-309fcb0dbefaab9f_article732' />
 1 是为了我们不加断点的时候，自动给第一行断点
 2 是修改配置的remote_port端口
 
 Preferences | Languages & Frameworks | PHP | Servers
 添加一个服务
-![](https://qiniu.wuchuheng.com/image/1460000037782066)
+<Img src='storage:///image/1460000037782066' />
 紧接着在右上角这里添加一个调试，选择 PHP Remote Debug
-![](https://qiniu.wuchuheng.com/image/20210310141755.png)
+<Img src='storage:///image/20210310141755.png' />
 server 选择我们刚才创建的 server，IDE key 就填我们 php.ini 中配置的xdebug
 
 然后我们来试验一波，看看好不好使
@@ -103,13 +111,15 @@ $server->on('Close', function ($server, $fd) {
 $server->start();
 ```
 点击右上角的绿色虫子进入 Debug 状态，启动我们的服务，会发现自动断在了第 4 行创建 Server 对象的地方
-![](https://qiniu.wuchuheng.com/image/20210310141959.png)
+<Img src='storage:///image/20210310141959.png' />
 然后下一步下一步...
 
 start 之后我们使用 telnet 进行连接，发送一个消息，断点就进入到 Connect 这里，然后我们再下一步，终端才会输出Connect
 
 紧接着我们会到 var_dump 的地方，就可以看到 $data 的值是`11111rn`
-![](https://qiniu.wuchuheng.com/image/20210310142037.png)
+
+<Img src='storage:///image/20210310142037.png' />
+
 然后来一个 HTTP Server
 ``` php
 $http = new SwooleHttpServer('0.0.0.0', 9501);
@@ -124,11 +134,15 @@ $http->start();
 浏览器访问[http://127.0.0.1:9501/?XDEBUG_SESSION_START=xdebug](http://127.0.0.1:9501/?XDEBUG_SESSION_START=xdebug)
 
 也是可以断点调试的
-![](https://qiniu.wuchuheng.com/image/20210310142313.png)
+
+<Img src='storage:///image/20210310142313.png' />
+
 框架的使用也是同理的，至于其他的什么和 docker 一起使用等等自己研究吧...
 
 这里放一张调试 Hyperf 的截图
-![](https://qiniu.wuchuheng.com/image/20210310142404.png)
+
+<Img src='storage:///image/20210310142404.png' />
+
 还有一个 Tips，把右上角的电话图标选择为上图那样，会在命令行启动服务时自动调起 Debug 服务
 
 ### 我有话要说

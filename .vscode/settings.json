@@ -1,10 +1,12 @@
 {
-  "files.autoSave": "onFocusChange",
-  "prettier.trailingComma": "all",
-  "prettier.tabWidth": 2,
   "prettier.useTabs": false,
   "github.copilot.enable": {
     "*": true,
     "mdx": true
+  },
+  "editor.formatOnSave": true,
+  "eslint.run": "onSave",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always"
   }
 }

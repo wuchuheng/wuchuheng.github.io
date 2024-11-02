@@ -6,7 +6,8 @@ date: 2022-11-14
 ```mdx-code-block
 import Tools from '@site/src/components/Tools/Tools';
 import LightBox from '@site/src/components/Lightbox/Lightbox';
-
+import {convertStorageUrl} from '@site/src/components/Img/index';
+import Img from '@site/src/components/Img/index';
 ```
 
 ## 1 本文的目标是什么?
@@ -47,13 +48,15 @@ import LightBox from '@site/src/components/Lightbox/Lightbox';
 <summary>注册、登录、语言向导截图</summary>
 
 > 注册
-<LightBox url="https://qiniu.wuchuheng.com/images/WX20221115-130426.png" alt="Gradle发布Java库到mvnrepository" />
+<LightBox url={convertStorageUrl('/images/WX20221115-130426.png')} alt="Gradle发布Java库到mvnrepository" />
 
 > 登录
-<LightBox url="https://qiniu.wuchuheng.com/images/howToPublishJavaLiberyToMvn1.png" alt="Gradle发布Java库到mvnrepository" />
+
+<LightBox url={convertStorageUrl("/images/howToPublishJavaLiberyToMvn1.png")} alt="Gradle发布Java库到mvnrepository" />
 
 > 新手向导
-<LightBox url="https://qiniu.wuchuheng.com/images/howToPublishJavaLiberyToMvn2.png" alt="Gradle发布Java库到mvnrepository" />
+
+<LightBox url={convertStorageUrl('/images/howToPublishJavaLiberyToMvn2.png')} alt="Gradle发布Java库到mvnrepository" />
 
 </details>
 
@@ -78,16 +81,16 @@ import LightBox from '@site/src/components/Lightbox/Lightbox';
 
 > 创建Issue
 
-<LightBox url="https://qiniu.wuchuheng.com/images/https-%3A%3Aqiniu.wuchuheng.com%3Aimages%3AhowToPublishJavaLiberyToMvn3.png" alt="Gradle发布Java库到mvnrepository" />
+<LightBox url={convertStorageUrl("/images/https-%3A%3Aqiniu.wuchuheng.com%3Aimages%3AhowToPublishJavaLiberyToMvn3.png")} alt="Gradle发布Java库到mvnrepository" />
 
 > 填写Issue表单
 
-<LightBox url="https://qiniu.wuchuheng.com/images/howToCreateAJavaLiberyAndPublishToMvn2.png" alt="Gradle发布Java库到mvnrepository" />
-<LightBox url="https://qiniu.wuchuheng.com/images/howToCreateAJavaLiberyAndPublishToMvn4.png" alt="Gradle发布Java库到mvnrepository" />
+<LightBox url={convertStorageUrl("/images/howToCreateAJavaLiberyAndPublishToMvn2.png")} alt="Gradle发布Java库到mvnrepository" />
+<LightBox url={convertStorageUrl("/images/howToCreateAJavaLiberyAndPublishToMvn4.png")} alt="Gradle发布Java库到mvnrepository" />
 
 > Issue 创建成功
 
-<LightBox url="https://qiniu.wuchuheng.com/images/howToCreateAJavaLiberyAndPublishToMvn5.png" alt="Gradle发布Java库到mvnrepository" />
+<LightBox url={convertStorageUrl("/images/howToCreateAJavaLiberyAndPublishToMvn5.png")} alt="Gradle发布Java库到mvnrepository" />
 </details>
 
 
@@ -97,7 +100,7 @@ import LightBox from '@site/src/components/Lightbox/Lightbox';
 ### 3.4 添加TXT域名解析
 :::note 根据帖子的回复内容: 需要用`wuchuheng.cn`添加一个TXT域名解析,参数值为:OSSRH-86264
 
-<LightBox url="https://qiniu.wuchuheng.com/images/howToCreateAJavaLiberyAndPublishToMvn6.png" alt="Gradle发布Java库到mvnrepository" width={40}/>
+<LightBox url={convertStorageUrl("/images/howToCreateAJavaLiberyAndPublishToMvn6.png")} alt="Gradle发布Java库到mvnrepository" width={40}/>
 
 :::
 
@@ -105,18 +108,18 @@ import LightBox from '@site/src/components/Lightbox/Lightbox';
 
 <details>
     <summary>阿里云添加TXT记录示例</summary>
-    <LightBox url="https://qiniu.wuchuheng.com/images/howToCreateAJavaLiberyAndPublishToMvn7.png" alt="Gradle发布Java库到mvnrepository" />
+    <LightBox url={convertStorageUrl("/images/howToCreateAJavaLiberyAndPublishToMvn7.png")} alt="Gradle发布Java库到mvnrepository" />
 </details>
 
 
 ### 3.5 回复Issue并告知对方Txt记录已添加
 
-<LightBox url="https://qiniu.wuchuheng.com/images/howToCreateAJavaLiberyAndPublishToMvn8.png" alt="Gradle发布Java库到mvnrepository" width={40} />
+<LightBox url={convertStorageUrl("/images/howToCreateAJavaLiberyAndPublishToMvn8.png")} alt="Gradle发布Java库到mvnrepository" width={40} />
 
 > 然后等待对方回复.也许几分钟吧. 😂😂😂
 
 ### 3.6 完成仓库的发包许可
-<LightBox url="https://qiniu.wuchuheng.com/images/howToCreateAJavaLiberyAndPublishToMvn9.png" alt="Gradle发布Java库到mvnrepository" width={40} />
+<LightBox url={convertStorageUrl("/images/howToCreateAJavaLiberyAndPublishToMvn9.png")} alt="Gradle发布Java库到mvnrepository" width={40} />
 
 > 从对方的回复中，本账号已经被允许上传包到[`s01.oss.sonatype.org`](https://s01.oss.sonatype.org/)中。而后面我们制作出来的`artifacts`便是提交到这个仓库中的。
 > 至此，包的发布渠道问题算是解决了.
@@ -448,7 +451,7 @@ tasks.named('test') {
 
 <details>
     <summary>操作截图</summary>
-    <LightBox url="https://qiniu.wuchuheng.com/howToPublishJavaLiberyToMvn11.png" alt="Gradle发布Java库到mvnrepository" width={40}/>
+    <LightBox url={convertStorageUrl("/howToPublishJavaLiberyToMvn11.png")} alt="Gradle发布Java库到mvnrepository" width={40}/>
 </details>
 
 ### 6.1 编写包的代码
@@ -628,9 +631,9 @@ BUILD SUCCESSFUL in 24s
 是的，它让我们把包上传到这个[s01.oss.sonatype.org](https://s01.oss.sonatype.org/), 我们已经做了;而同样的这个链接也是仓库的后台，
 使用我们的之前注册的账号(wuchuhengcn)就能登录上去，查看我们刚才上传的包了
 
-<LightBox url="https://qiniu.wuchuheng.com/howToPublishJavaLiberyToMvn12.png" alt="" width={40} />
+<LightBox url={convertStorageUrl("/howToPublishJavaLiberyToMvn12.png")} alt="" width={40} />
 
-<LightBox url="https://qiniu.wuchuheng.com/howToPublishJavaLiberyToMvn13.png" alt="" width={40} />
+<LightBox url={convertStorageUrl("/howToPublishJavaLiberyToMvn13.png")} alt="" width={40} />
 
 
 :::warning
@@ -647,8 +650,8 @@ BUILD SUCCESSFUL in 24s
 
 <details>
 <summary>选上传的中包并保存到临时仓库中</summary>
-<LightBox url="https://qiniu.wuchuheng.com/howToPublishJavaLiberyToMvn14.png" alt="" width={40} />
-<LightBox url="https://qiniu.wuchuheng.com/howToPublishJavaLiberyToMvn15.png" alt="" width={40} />
+<LightBox url={convertStorageUrl("/howToPublishJavaLiberyToMvn14.png")} alt="" width={40} />
+<LightBox url={convertStorageUrl("/howToPublishJavaLiberyToMvn15.png")} alt="" width={40} />
 
 > 等待处理的状态为"确定"时, 包就会被放置在一个临时的仓库中. 并提供仓库的链接，供开发者把包下载回来并进行测试等开发工作。
 
@@ -660,7 +663,7 @@ BUILD SUCCESSFUL in 24s
 
 > 要是真的没什么问题了， 那么就发布吧
 
-<LightBox url="https://qiniu.wuchuheng.com/howToPublishJavaLiberyToMvn16.png" alt="" width={40} />
+<LightBox url={convertStorageUrl("/howToPublishJavaLiberyToMvn16.png")} alt="" width={40} />
 
 > 到这时， [https://repo1.maven.org/maven2/cn/wuchuheng/ ](https://repo1.maven.org/maven2/cn/wuchuheng/)就是我们上传的包了，现在其它的开发者也都可以使用我们上传的包了。
 >  而[mvnrepository](https://mvnrepository.com/repos/central)当然也是会收录这个包的。
@@ -749,7 +752,7 @@ lQWGBGNzbw0BDADJG0gP5wpw6PFV4Egyvhzssa/YFaeDP+LeW...base64文本...k4jlW8g=
 
 <details>
 <summary>Step 3: 配置Github action workflows脚本的变量</summary>
-<LightBox url="https://qiniu.wuchuheng.com/howToPublishJavaLiberyToMvn17.png" alt="" width={40} />
+<LightBox url={convertStorageUrl("/howToPublishJavaLiberyToMvn17.png")} alt="" width={40} />
 
 >  当前示例的源代码都在[gradle-libery-demo-java](https://github.com/wuchuheng/gradle-libery-demo-java)中.
 >  提交下当前的修改,
@@ -784,8 +787,8 @@ $ git push 0.0.4 # <-- 推送版本号且源代码的版本号变动会触发构
 
 <details>
     <summary>Final step: 查看流程执行的结果</summary>
-    <LightBox url="https://qiniu.wuchuheng.com/howToCreateAJavaLiberyAndPublishToMvn18.png" alt="" width={40} />
-    <LightBox url="https://qiniu.wuchuheng.com/howToCreateAJavaLiberyAndPublishToMvn19.png" alt="" width={40} />
+    <LightBox url={convertStorageUrl("/howToCreateAJavaLiberyAndPublishToMvn18.png")} alt="" width={40} />
+    <LightBox url={convertStorageUrl("/howToCreateAJavaLiberyAndPublishToMvn19.png")} alt="" width={40} />
 </details>
 
 ### 8.3 关闭sonatype(OSSRH)Issue
@@ -793,7 +796,7 @@ $ git push 0.0.4 # <-- 推送版本号且源代码的版本号变动会触发构
 
 <details>
     <summary>操作截图</summary>
-<LightBox url="https://qiniu.wuchuheng.com/howToCreateAJavaLiberyAndPublishToMvn20.png" alt="" width={40} />
+<LightBox url={convertStorageUrl("/howToCreateAJavaLiberyAndPublishToMvn20.png")} alt="" width={40} />
 </details>
 
 ## 9 重要参数合集

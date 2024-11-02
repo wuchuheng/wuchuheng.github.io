@@ -48,6 +48,9 @@ codesandboxUrl="https://codesandbox.io/embed/github/wuchuhengdemo/note-demo-nest
 :::tip GraphQL在线测试沙盒
 
 ```mdx-code-block
+import {convertStorageUrl} from '@site/src/components/Img/index';
+import Img from '@site/src/components/Img/index';
+
 <BrowserWindow
 minHeight={500}
 url="https://notedemo.wuchuheng.com/graphql"
@@ -57,13 +60,13 @@ codesandboxUrl="https://codesandbox.io/embed/github/wuchuhengdemo/note-demo-nest
 </BrowserWindow>
 <Tabs>
   <TabItem value="query" label="Query示例" default>
-    <img src="https://qiniu.wuchuheng.com/images/note-graphql20211118022512.png" />
+    <Img src="storage:///images/note-graphql20211118022512.png" />
   </TabItem>
   <TabItem value="mutation" label="Mutation示例">
-    <img src="https://qiniu.wuchuheng.com/images/graphql-notes20211118023352.png" />
+    <Img src="storage:///images/graphql-notes20211118023352.png" />
   </TabItem>
   <TabItem value="subscription" label="Subscription示例">
-    <img src="https://qiniu.wuchuheng.com/images/graphql-note20211118033049.png" />
+    <Img src="storage:///images/graphql-note20211118033049.png" />
   </TabItem>
 </Tabs>
 ```

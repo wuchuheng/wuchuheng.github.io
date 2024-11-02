@@ -16,7 +16,7 @@ import Img from '@site/src/components/Img/index';
 种方法号`match`。它是通过把`certificates`和`profiles`收集起来在同一个地方，如: `git`等等方式，然后不同的机器就通过这种方法来实现本地的`certificates`
 或`profiles`的变更同步。 
 
-<Img src='https://qiniu.wuchuheng.com/images/cs-git-img.png' align='center' />
+<Img src='storage:///images/cs-git-img.png' align='center' />
 
 
 ## 2 准备工作
@@ -107,19 +107,19 @@ fastlane match appstore
 
 > 然后执行过后，会在开发都平台上生成以`match`为前缀的对应的`profiles`
 
-<Img src="https://qiniu.wuchuheng.com/images/WX20230106-121756.png" align={'center'} />
+<Img src="storage:///images/WX20230106-121756.png" align={'center'} />
 
 
 > 再然后，也会把对应的`certificates`和`profiles`上传到git上
 
-<Img src="https://qiniu.wuchuheng.com/images/WX20230106-120833.png" align={'center'} />
+<Img src="storage:///images/WX20230106-120833.png" align={'center'} />
 
 ## 5 测试本地的match能否使用正常
 
 ### 5.1 在xcode中使用已经生成的`profiles`
 在xcode中打开项目，然后: 
 
-<Img src="https://qiniu.wuchuheng.com/images/WX20230106-122606.png" align="center" />
+<Img src="storage:///images/WX20230106-122606.png" align="center" />
 
 ### 5.2 去除fastlane/Fastfile中的下载certificates和profiles步骤
 ```git

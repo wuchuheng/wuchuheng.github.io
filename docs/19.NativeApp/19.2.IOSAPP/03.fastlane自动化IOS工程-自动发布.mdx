@@ -13,7 +13,7 @@ import Img from '@site/src/components/Img/index';
 &emsp; 前面的章节中的`beta`流程尽管能执行，但是，在同步证书的过程中要求开发都输入验证码后才能进行发布。这样一来就算不上是全自动化了。所以本章节就
 的内容就是来解决这一问题，跳过开发苹果的[2-factor authentication (2FA)](https://support.apple.com/en-us/HT204915), 实现完全自动化。
 
-<Img src="https://qiniu.wuchuheng.com/images/WX20230107-082950.png" align='center' />
+<Img src="storage:///images/WX20230107-082950.png" align='center' />
 
 ## 2 如何才避免**2-factor authentication (2FA)**验证呢?
 苹果开发平台上有[App Store Connect API](https://developer.apple.com/documentation/appstoreconnectapi)这种对外开放的api，可以通过
@@ -23,7 +23,7 @@ import Img from '@site/src/components/Img/index';
 
 在[App Store Connect API](https://appstoreconnect.apple.com/access/api)， 进行生成. 然后把文件下载下来。
 
-<Img src="https://qiniu.wuchuheng.com/images/WX20230107-130328.png" align="center" />
+<Img src="storage:///images/WX20230107-130328.png" align="center" />
 
 
 ## 4 修改相关配置
@@ -79,7 +79,7 @@ index ab44af6..a9e5aab 100644
 
 ### 5.1 如何删除本地证书?
 
-<Img src="https://qiniu.wuchuheng.com/images/WX20230107-134713.png" align="center" />
+<Img src="storage:///images/WX20230107-134713.png" align="center" />
 
 ### 5.1 执行**beta**流程
 ```bash
