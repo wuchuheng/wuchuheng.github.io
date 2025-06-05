@@ -4,6 +4,7 @@
   border-radius: 4px;
   transition: box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0s;
   padding: 1rem;
+  gap: 1rem;
   display: grid;
   justify-items: center;
   > a {
@@ -54,6 +55,13 @@ html[data-theme='light'] {
 }
 .tagsRender {
   margin-bottom: .3rem;
+}
+
+.flexTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  align-items: center;
 }
 
 .tag {

@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useState, useCallback } from 'react'
 import styles from "../styles.module.scss";
 import { LinksRender } from "../Tools.tsx";
+import { MdContentCopy, MdCheck } from 'react-icons/md';
 
-declare interface LibraryProps
-  extends LinksRenderProps,
+declare interface LibraryProps extends LinksRenderProps,
     ImgRenderProps,
     ARenderProps,
     TagsRenderProps,
@@ -39,11 +39,69 @@ const Library = ({
   tags,
   links,
 }: LibraryProps): React.ReactElement => {
+  const [copiedStates, setCopiedStates] = useState<{[key: string]: boolean}>({});
+  
+  // Handle copy to clipboard functionality
+  const handleCodeClick = useCallback(async (text: string, codeId: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedStates(prev => ({ ...prev, [codeId]: true }));
+      
+      // Reset the copied state after 2 seconds
+      setTimeout(() => {
+        setCopiedStates(prev => ({ ...prev, [codeId]: false }));
+      }, 2000);
+      
+      console.log('Code copied to clipboard:', text);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
+  }, []);
+  
+  // 2. Handle logic.
+  // 2.1 If the description is include "`xxx`", then the description is a code block.
+  const codeBlockReg = /`.*`/g;
+  let codeCounter = 0;
+  
+  const processedDesc = desc.replace(codeBlockReg, (match) => {
+    const codeText = match.replace(/`/g, "");
+    const codeId = `code-${rep}-${codeCounter++}`;
+    const isCopied = copiedStates[codeId] || false;
+    
+    return `<span class="code-wrapper" onclick="window.copyCodeHandler && window.copyCodeHandler('${codeText}', '${codeId}')" title="Click to copy">
+      <code style="padding: 0.2em 0.4em;">${codeText}
+      <span id="icon-${codeId}">
+        ${isCopied ? '✓' : '📋'}
+      </span>
+      </code>
+    </span>`;
+  });
+  
+  // Add the copy function to window object and update icons
+  React.useEffect(() => {
+    (window as any).copyCodeHandler = (text: string, codeId: string) => {
+      handleCodeClick(text, codeId);
+    };
+    
+    // Update icons based on copied states
+    Object.keys(copiedStates).forEach(codeId => {
+      const iconElement = document.getElementById(`icon-${codeId}`);
+      if (iconElement) {
+        iconElement.innerHTML = copiedStates[codeId] ? '✓' : '📋';
+        iconElement.style.color = copiedStates[codeId] ? '#4CAF50' : '#666';
+      }
+    });
+    
+    return () => {
+      delete (window as any).copyCodeHandler;
+    };
+  }, [handleCodeClick, copiedStates]);
+
   return (
     <div className={styles.itemRender}>
       <ImgRender desc={desc} rep={rep} cover={cover} />
       <ARender rep={rep} name={name} website={website} />
-      <p className="lib--desc">{desc}</p>
+      <p className="lib--desc" dangerouslySetInnerHTML={{__html: processedDesc}}></p>
       <TagsRender tags={tags} />
       <LinksRender links={links} />
       <StarRender desc={desc} rep={rep} />
@@ -74,15 +132,6 @@ const StarRender = ({ rep, desc }: StarRenderProps): React.ReactElement => {
 
 export const TagsRender = ({ tags }: TagsRenderProps): React.ReactElement => {
   if (!tags) return <></>;
-  const classNames = [
-    styles.grid,
-    styles.tagsRender,
-    ...(tags.length === 1 ? [styles.gridColumn1] : []),
-    ...(tags.length === 2 ? [styles.gridColumn2] : []),
-    ...(tags.length === 3 ? [styles.gridColumn3] : []),
-    ...(tags.length === 4 ? [styles.gridColumn4] : []),
-    ...(tags.length >= 5 ? [styles.gridColumn5] : []),
-  ];
   const colors: Array<{ color: string; background: string }> = [
     { color: "#D96868", background: "#FAEEEE" },
     { color: "#DFB573", background: "#FBF4E9" },
@@ -91,7 +140,7 @@ export const TagsRender = ({ tags }: TagsRenderProps): React.ReactElement => {
     { color: "#5C97FC", background: "#ECF3FF" },
   ];
   return (
-    <div className={classNames.join(" ")}>
+    <div className={[styles.flexTags, styles.tagsRender].join(" ")}>
       {tags.map((tag, index) => {
         const { color, background } = colors[index % colors.length];
         return (
