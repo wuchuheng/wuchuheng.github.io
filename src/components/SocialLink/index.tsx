@@ -26,7 +26,7 @@ declare interface ARenderProps extends CommonRepProps{
     name: string
 }
 
-const FrendlyURL = ({desc, avatar, name, website, tags, links}: LibraryProps): React.ReactElement => {
+const SocialLink = ({desc, avatar, name, website, tags, links}: LibraryProps): React.ReactElement => {
 
     return (
         <div className={styles.itemRender}>
@@ -114,4 +114,4 @@ const ImgRender = ({name, avatar}: ImgRenderProps): React.ReactElement => {
     return avatar ? <img src={avatar}  alt={name}/> : <SiGravatar style={{fontSize: "2.7rem", color: 'var(--ifm-color-primary)', marginBottom: ".2rem"}} />
 }
 
-export default FrendlyURL
+export default SocialLink
