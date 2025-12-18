@@ -73,11 +73,11 @@ const config = {
             label: "Docs",
           },
           { to: "/blog", label: "Blog", position: "right" },
-          { to: "/docs/myLiberies", label: "MyLibraries", position: "right" },
+          { to: "/docs/myLibraries", label: "MyLibraries", position: "right" },
           { to: "/emailMarkdown", label: "EmailMarkdown", position: "right" },
           { to: "/tools", label: "Tools", position: "right" },
           {
-            to: "/docs/awsomeLibaries",
+            to: "/docs/awesomeLibraries",
             label: "Libraries",
             position: "right",
           },
@@ -86,7 +86,7 @@ const config = {
           { to: "/docs/book", label: "Books", position: "right" },
           {
             to: "/docs/友情链接收录",
-            label: "FriendlyLinks",
+            label: "SocialLinks",
             position: "right",
           },
           {
